@@ -9,6 +9,7 @@ interface SavedFilter {
   filters: {
     status: string;
     roasMin: string; roasMax: string;
+    roas90Min: string; roas90Max: string;
     spendMin: string; spendMax: string;
     spend90Min: string; spend90Max: string;
     clicksMin: string; clicksMax: string;
@@ -70,6 +71,8 @@ export default function ProductsPage() {
   const [showFilters, setShowFilters] = useState(false);
   const [roasMin,   setRoasMin]   = useState('');
   const [roasMax,   setRoasMax]   = useState('');
+  const [roas90Min, setRoas90Min] = useState('');
+  const [roas90Max, setRoas90Max] = useState('');
   const [spendMin,   setSpendMin]   = useState('');
   const [spendMax,   setSpendMax]   = useState('');
   const [spend90Min, setSpend90Min] = useState('');
@@ -256,7 +259,7 @@ export default function ProductsPage() {
   }, []);
 
   function currentFilterSnapshot() {
-    return { status, roasMin, roasMax, spendMin, spendMax, spend90Min, spend90Max, clicksMin, clicksMax, cpcMin, cpcMax, customStart, customEnd };
+    return { status, roasMin, roasMax, roas90Min, roas90Max, spendMin, spendMax, spend90Min, spend90Max, clicksMin, clicksMax, cpcMin, cpcMax, customStart, customEnd };
   }
 
   function saveCurrentFilter() {
@@ -273,6 +276,7 @@ export default function ProductsPage() {
   function applyFilter(f: SavedFilter) {
     setStatus(f.filters.status);
     setRoasMin(f.filters.roasMin);   setRoasMax(f.filters.roasMax);
+    setRoas90Min(f.filters.roas90Min ?? ''); setRoas90Max(f.filters.roas90Max ?? '');
     setSpendMin(f.filters.spendMin); setSpendMax(f.filters.spendMax);
     setSpend90Min(f.filters.spend90Min ?? ''); setSpend90Max(f.filters.spend90Max ?? '');
     setClicksMin(f.filters.clicksMin); setClicksMax(f.filters.clicksMax);
@@ -288,11 +292,11 @@ export default function ProductsPage() {
   }
 
   // Count active filters for badge
-  const activeFilterCount = [roasMin, roasMax, spendMin, spendMax, spend90Min, spend90Max, clicksMin, clicksMax, cpcMin, cpcMax]
+  const activeFilterCount = [roasMin, roasMax, roas90Min, roas90Max, spendMin, spendMax, spend90Min, spend90Max, clicksMin, clicksMax, cpcMin, cpcMax]
     .filter(v => v !== '').length + (status !== 'all' ? 1 : 0) + (customActive ? 1 : 0);
 
   function clearFilters() {
-    setRoasMin(''); setRoasMax('');
+    setRoasMin(''); setRoasMax(''); setRoas90Min(''); setRoas90Max('');
     setSpendMin(''); setSpendMax(''); setSpend90Min(''); setSpend90Max('');
     setClicksMin(''); setClicksMax('');
     setCpcMin(''); setCpcMax('');
@@ -326,8 +330,10 @@ export default function ProductsPage() {
           const effectiveStatus = p.status === 'unknown' ? 'active' : p.status;
           if (effectiveStatus !== status) return false;
         }
-        if (roasMin  !== '' && p.d30.roas   < Number(roasMin))  return false;
-        if (roasMax  !== '' && p.d30.roas   > Number(roasMax))  return false;
+        if (roasMin   !== '' && p.d30.roas < Number(roasMin))   return false;
+        if (roasMax   !== '' && p.d30.roas > Number(roasMax))   return false;
+        if (roas90Min !== '' && p.d90.roas < Number(roas90Min)) return false;
+        if (roas90Max !== '' && p.d90.roas > Number(roas90Max)) return false;
         if (spendMin   !== '' && p.d30.spend < Number(spendMin))   return false;
         if (spendMax   !== '' && p.d30.spend > Number(spendMax))   return false;
         if (spend90Min !== '' && p.d90.spend < Number(spend90Min)) return false;
@@ -338,7 +344,7 @@ export default function ProductsPage() {
         if (cpcMax !== '' && p.d30.cpc > Number(cpcMax)) return false;
         return true;
       });
-  }, [products, selectedStore, collectionProductIds, excludedProductIds, brandOverrides, search, status, roasMin, roasMax, spendMin, spendMax, spend90Min, spend90Max, clicksMin, clicksMax, cpcMin, cpcMax]);
+  }, [products, selectedStore, collectionProductIds, excludedProductIds, brandOverrides, search, status, roasMin, roasMax, roas90Min, roas90Max, spendMin, spendMax, spend90Min, spend90Max, clicksMin, clicksMax, cpcMin, cpcMax]);
 
   const filteredRoas = useMemo(() => {
     let spend = 0, revenue = 0;
@@ -666,10 +672,16 @@ export default function ProductsPage() {
                 <div className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Performance</div>
                 <div className="space-y-2.5">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-600 w-12 shrink-0">ROAS</span>
+                    <span className="text-sm text-gray-600 w-20 shrink-0">ROAS 30D</span>
                     <NumInput value={roasMin} onChange={setRoasMin} placeholder="Min" />
                     <Dash />
                     <NumInput value={roasMax} onChange={setRoasMax} placeholder="Max" />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-600 w-20 shrink-0">ROAS 90D</span>
+                    <NumInput value={roas90Min} onChange={setRoas90Min} placeholder="Min" />
+                    <Dash />
+                    <NumInput value={roas90Max} onChange={setRoas90Max} placeholder="Max" />
                   </div>
                 </div>
               </div>
