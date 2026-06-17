@@ -1,89 +1,120 @@
-export interface ReamazeMessage {
-  body: string;
-  createdAt: string;
+// Re:amaze support-desk client.
+//
+// Re:amaze runs as a multi-brand account: each store has its own "brand"
+// (subdomain). Note Luhvia's brand slug is "luvia" (not "luhvia") and
+// Modemeister's is "modemeisteroutlet".
+// Auth = HTTP Basic with a login email + API token.
+//
+// Required env vars:
+//   REAMAZE_LOGIN_EMAIL   – an admin/staff login email
+//   REAMAZE_API_TOKEN     – REST API token (Re:amaze → Settings → Developer/API)
+// Optional brand overrides:
+//   REAMAZE_BRAND_LUHVIA (default "luvia"), _CECOLE ("cecole"),
+//   _LUVANDE ("luvande"), _MODEMEISTER ("modemeisteroutlet")
+
+export type ShopKey = 'luhvia' | 'cecole' | 'luvande' | 'modemeister';
+
+export const REAMAZE_BRANDS: Record<ShopKey, string> = {
+  luhvia:      process.env.REAMAZE_BRAND_LUHVIA      || 'luvia',
+  cecole:      process.env.REAMAZE_BRAND_CECOLE      || 'cecole',
+  luvande:     process.env.REAMAZE_BRAND_LUVANDE     || 'luvande',
+  modemeister: process.env.REAMAZE_BRAND_MODEMEISTER || 'modemeisteroutlet',
+};
+
+function creds(): { email: string; token: string } | null {
+  const email = process.env.REAMAZE_LOGIN_EMAIL;
+  const token = process.env.REAMAZE_API_TOKEN;
+  return email && token ? { email, token } : null;
 }
 
-export interface ReamazeConversation {
-  id: string;
-  number: number;
-  subject: string;
-  customerName: string;
-  customerEmail: string;
-  updatedAt: string;
-  url: string;
-  messages: ReamazeMessage[];
+export function isReamazeConfigured(): boolean {
+  return creds() !== null;
 }
 
 function authHeader(): string {
-  const email = process.env.REAMAZE_LOGIN_EMAIL!;
-  const token = process.env.REAMAZE_API_TOKEN!;
-  return 'Basic ' + Buffer.from(`${email}:${token}`).toString('base64');
+  const c = creds();
+  if (!c) throw new Error('Re:amaze not configured (REAMAZE_LOGIN_EMAIL / REAMAZE_API_TOKEN).');
+  return 'Basic ' + Buffer.from(`${c.email}:${c.token}`).toString('base64');
 }
 
-function baseUrl(): string {
-  const brand = process.env.REAMAZE_BRAND;
-  if (!brand) throw new Error('REAMAZE_BRAND env var is niet ingesteld.');
-  return `https://${brand}.reamaze.com/api/v1`;
-}
-
-async function get(path: string): Promise<any> {
-  const res = await fetch(baseUrl() + path, {
-    headers: {
-      Authorization: authHeader(),
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-    },
-    cache: 'no-store',
+async function reamazeGet<T = unknown>(brand: string, path: string): Promise<T> {
+  const res = await fetch(`https://${brand}.reamaze.io/api/v1/${path}`, {
+    headers: { Authorization: authHeader(), Accept: 'application/json' },
+    next: { revalidate: 300 },
   });
-  if (!res.ok) {
-    const body = await res.text().catch(() => '');
-    throw new Error(`Re:amaze API ${res.status}: ${body.slice(0, 200)}`);
-  }
-  return res.json();
+  if (!res.ok) throw new Error(`Re:amaze ${brand} ${path}: ${res.status}`);
+  return res.json() as Promise<T>;
 }
 
-// Fetches conversations updated in the last `days` days across all pages (max 8).
-export async function fetchRecentConversations(days = 14): Promise<ReamazeConversation[]> {
-  if (!process.env.REAMAZE_LOGIN_EMAIL || !process.env.REAMAZE_API_TOKEN) {
-    throw new Error('REAMAZE_LOGIN_EMAIL of REAMAZE_API_TOKEN ontbreekt.');
-  }
+export interface ReamazeAuthor {
+  email?: string;
+  name?: string;
+  'staff?'?: boolean;
+}
 
-  const brand   = process.env.REAMAZE_BRAND || '';
-  const cutoff  = new Date(Date.now() - days * 86400_000).toISOString();
-  const results: ReamazeConversation[] = [];
-  let page = 1;
+export interface ReamazeMessage {
+  body?: string;
+  created_at?: string;
+  user?: ReamazeAuthor;
+}
 
-  while (page <= 8) {
-    const data = await get(`/conversations?page=${page}&sort=updated`);
-    const convs: any[] = data.conversations || [];
+export interface ReamazeConversation {
+  subject: string;
+  slug: string;
+  created_at: string;
+  updated_at: string;
+  status?: number;
+  perma_url?: string;
+  author?: ReamazeAuthor;
+  last_customer_message?: ReamazeMessage | null;
+  message?: ReamazeMessage | null;
+}
+
+export async function fetchRecentConversations(
+  brand: string,
+  pages = 4,
+): Promise<ReamazeConversation[]> {
+  const out: ReamazeConversation[] = [];
+  for (let page = 1; page <= pages; page++) {
+    const data = await reamazeGet<{ conversations?: ReamazeConversation[] }>(
+      brand,
+      `conversations?page=${page}`,
+    );
+    const convs = data.conversations || [];
     if (convs.length === 0) break;
-
-    let hitCutoff = false;
-    for (const c of convs) {
-      // Stop paging once conversations are older than cutoff
-      if (c.updated_at < cutoff) { hitCutoff = true; break; }
-
-      const contact = c.contact || {};
-      const messages: ReamazeMessage[] = (c.messages || []).map((m: any) => ({
-        body: String(m.body || m.html_body || ''),
-        createdAt: m.created_at || '',
-      }));
-
-      results.push({
-        id:            String(c.id),
-        number:        c.number,
-        subject:       c.subject || '(geen onderwerp)',
-        customerName:  contact.name || contact.email || 'Onbekend',
-        customerEmail: contact.email || '',
-        updatedAt:     c.updated_at || '',
-        url:           brand ? `https://${brand}.reamaze.com/a/${brand}/conversations/${c.slug || c.number}` : '#',
-        messages,
-      });
-    }
-
-    if (hitCutoff || !data.next_page) break;
-    page++;
+    out.push(...convs);
   }
+  return out;
+}
 
-  return results;
+export async function fetchCustomerConversations(
+  brand: string,
+  email: string,
+): Promise<ReamazeConversation[]> {
+  const data = await reamazeGet<{ conversations?: ReamazeConversation[] }>(
+    brand,
+    `conversations?for=${encodeURIComponent(email)}`,
+  );
+  return data.conversations || [];
+}
+
+export async function fetchConversationMessages(
+  brand: string,
+  slug: string,
+): Promise<ReamazeMessage[]> {
+  const data = await reamazeGet<{ messages?: ReamazeMessage[] }>(
+    brand,
+    `conversations/${encodeURIComponent(slug)}/messages`,
+  );
+  return data.messages || [];
+}
+
+export function htmlToText(s?: string | null): string {
+  return (s || '')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/&[a-z]+;/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
 }

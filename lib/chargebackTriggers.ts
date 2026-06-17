@@ -1,76 +1,123 @@
-export type ThreatLevel = 'RED_FLAG' | 'WATCH';
+// Chargeback-risk trigger detection.
+//
+// Rule of thumb:
+//   • any THREAT trigger present  → 🔴 RED FLAG (chargeback imminent, act now)
+//   • only SIGNAL triggers        → 🟡 WATCH    (early risk, resolve before escalation)
 
-export interface TriggerMatch {
-  level: ThreatLevel;
-  phrase: string;
-  context: string;
+export type TriggerType = 'threat' | 'signal';
+
+export interface TriggerDef {
+  key: string;
+  label: string;
+  icon: string;
+  type: TriggerType;
+  pattern: RegExp;
 }
 
-// Explicit chargeback / dispute threats — act immediately
-const RED_FLAG: string[] = [
-  'chargeback', 'charge back', 'charge-back', 'chargebacks',
-  'terugboeking', 'terugboeken',
-  'paypal dispute', 'paypal claim', 'paypal case', 'paypal chargeback',
-  'section 75',
-  'credit card dispute', 'credit card company',
-  'bank dispute', 'dispute with my bank',
-  'i will dispute', "i'm disputing", 'disputing this charge',
-  'filing a dispute', 'file a dispute', 'filed a dispute',
-  'dispute this payment', 'dispute the charge',
-  'unauthorized charge', 'fraudulent charge',
-  'i did not authorize', 'not authorized this',
-  'consumer protection agency', 'acm melding', 'afm',
-  'ombudsman',
+export const TRIGGERS: TriggerDef[] = [
+  {
+    key: 'chargeback',
+    label: 'Chargeback threat',
+    icon: '⚠️',
+    type: 'threat',
+    pattern: /charge\s?back|dispute (it|this|the charge|the payment|my)|my bank|card (issuer|company)|file a (claim|dispute)|item not as described/i,
+  },
+  {
+    key: 'legal',
+    label: 'Legal threat',
+    icon: '⚖️',
+    type: 'threat',
+    pattern: /\blegal\b|lawyer|attorney|small claims|\bsue\b|\bauthorities\b|consumer protection/i,
+  },
+  {
+    key: 'review',
+    label: 'Review / BBB',
+    icon: '🗣️',
+    type: 'threat',
+    pattern: /trustpilot|\bbbb\b|better business|(leave|post|write)[^.]{0,16}review|report you|expose you/i,
+  },
+  {
+    key: 'ultimatum',
+    label: 'Ultimatum',
+    icon: '⏰',
+    type: 'threat',
+    pattern: /24 ?hours|48 ?hours|within \d+ ?(hours|days)|or i (will|'ll)|by (monday|tuesday|wednesday|thursday|friday|tomorrow|tonight|the end of)/i,
+  },
+  {
+    key: 'scam',
+    label: 'Scam accusation',
+    icon: '🚫',
+    type: 'threat',
+    pattern: /\bscam|fraud|ripped? off|rip[\s-]?off|misleading|false advert|deceptive|bait and switch/i,
+  },
+  {
+    key: 'full_refund',
+    label: 'Full refund demand',
+    icon: '💰',
+    type: 'signal',
+    pattern: /full refund|refund all|money back|complete refund|100% refund|entire refund/i,
+  },
+  {
+    key: 'proof',
+    label: 'Cites proof',
+    icon: '📷',
+    type: 'signal',
+    pattern: /\bphotos?\b|\bpictures?\b|\bvideo\b|attach(ed|ing|ment)?|evidence|\bproof\b|screenshot/i,
+  },
+  {
+    key: 'china_return',
+    label: 'Return-to-China friction',
+    icon: '📦',
+    type: 'signal',
+    pattern: /return.{0,20}china|ship.{0,20}china|pay.{0,20}return shipping|return label|prepaid label/i,
+  },
 ];
 
-// Early warning signs — monitor closely
-const WATCH: string[] = [
-  'or else', 'of anders',
-  'last warning', 'laatste waarschuwing', 'final warning',
-  'never arrived', 'nooit aangekomen', 'nooit ontvangen',
-  'never received', 'not received', 'niet ontvangen', 'niet aangekomen',
-  'still not here', 'nog steeds niet',
-  'where is my order', 'waar is mijn bestelling', 'waar is mijn pakket',
-  'lawyer', 'advocaat', 'solicitor',
-  'legal action', 'juridische stappen', 'rechtszaak',
-  'trading standards', 'acm', 'consumentenbond',
-  'consumer rights',
-  'i want my money back', 'geld terug', 'mijn geld terug', 'refund or',
-  'scam', 'oplichterij', 'oplichting', 'fraude', 'fraud',
-  'report you', 'report this', 'aangifte doen',
-  'review bombing', 'bad review', 'slechte review', 'trustpilot',
-  'police', 'politie',
-  'this is theft', 'stealing', 'diefstal',
-  'social media', 'instagram', 'facebook post',
-  'threatening', 'dreigen',
-  'i will contact', 'ik neem contact op',
+const SENDER_BLOCKLIST = [
+  'shopify.com', 'trustpilot', 'reamaze.com', 'chargeflow',
+  'no-reply', 'noreply', 'notifications@', 'mailer@', 'billing@',
+  'do-not-reply', 'bol.com', 'klaviyo', 'mailchimp', 'gorgias', 'postmaster',
+  'judge.me', 'yotpo', 'okendo', 'loox', 'stamped', 'junip', 'fera.ai', 'omnisend',
 ];
 
-function stripHtml(html: string): string {
-  return html.replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
+export function isSystemSender(email?: string | null): boolean {
+  if (!email) return true;
+  const e = email.toLowerCase();
+  return SENDER_BLOCKLIST.some((b) => e.includes(b));
 }
 
-function excerpt(text: string, idx: number, phraseLen: number): string {
-  const start = Math.max(0, idx - 40);
-  const end   = Math.min(text.length, idx + phraseLen + 40);
-  const pre   = start > 0 ? '…' : '';
-  const post  = end < text.length ? '…' : '';
-  return pre + text.slice(start, end).trim() + post;
+export interface DetectedTrigger {
+  key: string;
+  label: string;
+  icon: string;
+  type: TriggerType;
 }
 
-export function scanForTriggers(rawText: string): TriggerMatch | null {
-  const text  = stripHtml(rawText);
-  const lower = text.toLowerCase();
+export function detectTriggers(text: string): DetectedTrigger[] {
+  if (!text) return [];
+  return TRIGGERS.filter((t) => t.pattern.test(text)).map(({ key, label, icon, type }) => ({
+    key, label, icon, type,
+  }));
+}
 
-  for (const phrase of RED_FLAG) {
-    const idx = lower.indexOf(phrase);
-    if (idx >= 0) return { level: 'RED_FLAG', phrase, context: excerpt(text, idx, phrase.length) };
-  }
+const SEVERITY: Record<string, number> = {
+  chargeback: 50,
+  legal: 20,
+  ultimatum: 18,
+  scam: 16,
+  review: 15,
+  full_refund: 6,
+  proof: 4,
+  china_return: 4,
+};
 
-  for (const phrase of WATCH) {
-    const idx = lower.indexOf(phrase);
-    if (idx >= 0) return { level: 'WATCH', phrase, context: excerpt(text, idx, phrase.length) };
-  }
-
-  return null;
+export function computeSeverity(
+  triggers: DetectedTrigger[],
+  repeatDisputer: boolean,
+  firstOrder: boolean,
+): number {
+  let s = triggers.reduce((acc, t) => acc + (SEVERITY[t.key] ?? 0), 0);
+  if (repeatDisputer) s += 40;
+  if (firstOrder) s += 5;
+  return s;
 }
