@@ -4,13 +4,14 @@ import { fetchAdsMetrics, isAdsConfigured } from '@/lib/googleAds';
 import { getConnection } from '@/lib/adsConnections';
 import { getEurConverter } from '@/lib/fx';
 
-type ShopStore = 'luhvia' | 'cecole' | 'luvande';
+type ShopStore = 'luhvia' | 'cecole' | 'luvande' | 'modemeister';
 
 const _generic = process.env.GOOGLE_ADS_REFRESH_TOKEN;
 const ENV_FALLBACK: Record<ShopStore, string | undefined> = {
-  luhvia:  process.env.LUHVIA_GOOGLE_ADS_REFRESH_TOKEN  || _generic,
-  cecole:  process.env.CECOLE_GOOGLE_ADS_REFRESH_TOKEN  || _generic,
-  luvande: process.env.LUVANDE_GOOGLE_ADS_REFRESH_TOKEN || _generic,
+  luhvia:      process.env.LUHVIA_GOOGLE_ADS_REFRESH_TOKEN      || _generic,
+  cecole:      process.env.CECOLE_GOOGLE_ADS_REFRESH_TOKEN      || _generic,
+  luvande:     process.env.LUVANDE_GOOGLE_ADS_REFRESH_TOKEN     || _generic,
+  modemeister: process.env.MODEMEISTER_GOOGLE_ADS_REFRESH_TOKEN || _generic,
 };
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
@@ -30,8 +31,8 @@ export async function GET(req: NextRequest) {
   }
 
   const keys: ShopStore[] = store === 'all'
-    ? (['luhvia', 'cecole', 'luvande'] as ShopStore[]).filter(k => isShopifyConfigured(k) && isAdsConfigured(k))
-    : ((['luhvia', 'cecole', 'luvande'] as ShopStore[]).includes(store as ShopStore) ? [store as ShopStore] : []);
+    ? (['luhvia', 'cecole', 'luvande', 'modemeister'] as ShopStore[]).filter(k => isShopifyConfigured(k) && isAdsConfigured(k))
+    : ((['luhvia', 'cecole', 'luvande', 'modemeister'] as ShopStore[]).includes(store as ShopStore) ? [store as ShopStore] : []);
 
   if (!keys.length) return NextResponse.json({ shopifyRevenue: 0, adsSpend: 0, roas: 0 });
 

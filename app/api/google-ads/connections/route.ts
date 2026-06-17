@@ -2,16 +2,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAllConnections, removeConnection } from '@/lib/adsConnections';
 
 const CUSTOMER_IDS: Record<string, string | undefined> = {
-  luhvia:  process.env.LUHVIA_GOOGLE_ADS_CUSTOMER_ID,
-  cecole:  process.env.CECOLE_GOOGLE_ADS_CUSTOMER_ID,
-  luvande: process.env.LUVANDE_GOOGLE_ADS_CUSTOMER_ID,
+  luhvia:      process.env.LUHVIA_GOOGLE_ADS_CUSTOMER_ID,
+  cecole:      process.env.CECOLE_GOOGLE_ADS_CUSTOMER_ID,
+  luvande:     process.env.LUVANDE_GOOGLE_ADS_CUSTOMER_ID,
+  modemeister: process.env.MODEMEISTER_GOOGLE_ADS_CUSTOMER_ID,
 };
 
 // Status van de koppelingen voor de Instellingen-pagina.
 // Let op: de refresh token wordt nooit naar de client gestuurd.
 export async function GET() {
   const all = await getAllConnections();
-  const stores = ['luhvia', 'cecole', 'luvande'].map((store) => {
+  const stores = ['luhvia', 'cecole', 'luvande', 'modemeister'].map((store) => {
     const c = all[store];
     return {
       store,
@@ -27,7 +28,7 @@ export async function GET() {
 
 export async function DELETE(req: NextRequest) {
   const store = req.nextUrl.searchParams.get('store') || '';
-  if (store !== 'luhvia' && store !== 'cecole' && store !== 'luvande') {
+  if (store !== 'luhvia' && store !== 'cecole' && store !== 'luvande' && store !== 'modemeister') {
     return NextResponse.json({ error: 'Onbekende store' }, { status: 400 });
   }
   await removeConnection(store);

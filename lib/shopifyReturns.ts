@@ -5,7 +5,7 @@ import { cached } from './cache';
 // This correctly converts USD transactions to CAD for Cecole, matching Shopify Analytics.
 // Returns null if GraphQL is unavailable or fails (caller falls back to REST totals).
 async function fetchGraphQLRefundTotal(
-  storeKey: 'luhvia' | 'cecole' | 'luvande',
+  storeKey: 'luhvia' | 'cecole' | 'luvande' | 'modemeister',
   startDate: string,
   endDate: string,
 ): Promise<number | null> {
@@ -80,7 +80,7 @@ export interface ReturnProduct {
   title: string;
   brandName: string;
   imageUrl: string;
-  store: 'luhvia' | 'cecole' | 'luvande';
+  store: 'luhvia' | 'cecole' | 'luvande' | 'modemeister';
   currency: string;
   // Sales
   totalOrders: number;
@@ -97,7 +97,7 @@ export interface ReturnProduct {
 }
 
 export interface ReturnsMetrics {
-  store: 'luhvia' | 'cecole' | 'luvande';
+  store: 'luhvia' | 'cecole' | 'luvande' | 'modemeister';
   currency: string;
   totalOrders: number;
   totalRefundedOrders: number;
@@ -109,7 +109,7 @@ export interface ReturnsMetrics {
 }
 
 async function paginateOrders(
-  storeKey: 'luhvia' | 'cecole' | 'luvande',
+  storeKey: 'luhvia' | 'cecole' | 'luvande' | 'modemeister',
   firstEndpoint: string,
   fields: string,
 ): Promise<any[]> {
@@ -143,7 +143,7 @@ async function paginateOrders(
 // Product-meta verandert zelden — apart cachen met lange TTL (4u) zodat de
 // returns-aggregaat het niet elke 10 min opnieuw hoeft te paginerren.
 async function fetchProductMeta(
-  storeKey: 'luhvia' | 'cecole' | 'luvande',
+  storeKey: 'luhvia' | 'cecole' | 'luvande' | 'modemeister',
 ): Promise<Map<string, { brandName: string; imageUrl: string }>> {
   const entries = await cached(
     `shopify:return-product-meta:${storeKey}`,
@@ -154,7 +154,7 @@ async function fetchProductMeta(
 }
 
 async function fetchProductMetaUncached(
-  storeKey: 'luhvia' | 'cecole' | 'luvande',
+  storeKey: 'luhvia' | 'cecole' | 'luvande' | 'modemeister',
 ): Promise<Array<[string, { brandName: string; imageUrl: string }]>> {
   const cfg = STORES[storeKey];
   const token = await getShopifyAccessToken(storeKey);
@@ -197,7 +197,7 @@ async function fetchProductMetaUncached(
 }
 
 export async function fetchReturns(
-  storeKey: 'luhvia' | 'cecole' | 'luvande',
+  storeKey: 'luhvia' | 'cecole' | 'luvande' | 'modemeister',
   startDate: string,
   endDate: string,
 ): Promise<ReturnsMetrics> {
@@ -209,7 +209,7 @@ export async function fetchReturns(
 }
 
 async function fetchReturnsUncached(
-  storeKey: 'luhvia' | 'cecole' | 'luvande',
+  storeKey: 'luhvia' | 'cecole' | 'luvande' | 'modemeister',
   startDate: string,
   endDate: string,
 ): Promise<ReturnsMetrics> {

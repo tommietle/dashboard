@@ -11,7 +11,7 @@ export interface Dispute {
   status: string;
   initiatedAt: string;
   evidenceDueBy: string | null;
-  store: 'luhvia' | 'cecole' | 'luvande';
+  store: 'luhvia' | 'cecole' | 'luvande' | 'modemeister';
   products: { productId: string; title: string }[];
 }
 
@@ -36,7 +36,7 @@ export function formatReason(r: string) {
 }
 
 async function fetchOrderLineItems(
-  storeKey: 'luhvia' | 'cecole' | 'luvande',
+  storeKey: 'luhvia' | 'cecole' | 'luvande' | 'modemeister',
   orderId: string,
 ): Promise<{ productId: string; title: string }[]> {
   const cfg = STORES[storeKey];
@@ -61,7 +61,7 @@ async function fetchOrderLineItems(
 }
 
 export async function fetchDisputes(
-  storeKey: 'luhvia' | 'cecole' | 'luvande',
+  storeKey: 'luhvia' | 'cecole' | 'luvande' | 'modemeister',
   startDate: string,
   endDate: string,
 ): Promise<Dispute[]> {
@@ -73,7 +73,7 @@ export async function fetchDisputes(
 }
 
 async function fetchDisputesUncached(
-  storeKey: 'luhvia' | 'cecole' | 'luvande',
+  storeKey: 'luhvia' | 'cecole' | 'luvande' | 'modemeister',
   startDate: string,
   endDate: string,
 ): Promise<Dispute[]> {

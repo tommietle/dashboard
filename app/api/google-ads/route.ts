@@ -6,9 +6,10 @@ import { getConnection } from '@/lib/adsConnections';
 // GOOGLE_ADS_REFRESH_TOKEN is de generieke fallback als er geen per-store token is.
 const _generic = process.env.GOOGLE_ADS_REFRESH_TOKEN;
 const ENV_FALLBACK: Record<AdsStoreKey, string | undefined> = {
-  luhvia:  process.env.LUHVIA_GOOGLE_ADS_REFRESH_TOKEN  || _generic,
-  cecole:  process.env.CECOLE_GOOGLE_ADS_REFRESH_TOKEN  || _generic,
-  luvande: process.env.LUVANDE_GOOGLE_ADS_REFRESH_TOKEN || _generic,
+  luhvia:      process.env.LUHVIA_GOOGLE_ADS_REFRESH_TOKEN      || _generic,
+  cecole:      process.env.CECOLE_GOOGLE_ADS_REFRESH_TOKEN      || _generic,
+  luvande:     process.env.LUVANDE_GOOGLE_ADS_REFRESH_TOKEN     || _generic,
+  modemeister: process.env.MODEMEISTER_GOOGLE_ADS_REFRESH_TOKEN || _generic,
 };
 
 async function metricsFor(store: AdsStoreKey, start: string, end: string) {
@@ -30,10 +31,10 @@ export async function GET(req: NextRequest) {
 
   try {
     if (store === 'all') {
-      const keys: AdsStoreKey[] = (['luhvia', 'cecole', 'luvande'] as AdsStoreKey[]).filter(isAdsConfigured);
+      const keys: AdsStoreKey[] = (['luhvia', 'cecole', 'luvande', 'modemeister'] as AdsStoreKey[]).filter(isAdsConfigured);
       const ads = await Promise.all(keys.map(k => metricsFor(k, startDate, endDate)));
       return NextResponse.json({ ads });
-    } else if (store === 'luhvia' || store === 'cecole' || store === 'luvande') {
+    } else if (store === 'luhvia' || store === 'cecole' || store === 'luvande' || store === 'modemeister') {
       if (!isAdsConfigured(store)) {
         return NextResponse.json({ error: `Geen Google Ads customer-ID ingesteld voor ${store}.` }, { status: 400 });
       }

@@ -18,9 +18,10 @@ interface TestState {
 }
 
 const STORE_META: Record<string, { name: string; flag: string }> = {
-  luhvia:  { name: 'Luhvia',  flag: '🇺🇸' },
-  cecole:  { name: 'Cecole',  flag: '🇨🇦' },
-  luvande: { name: 'Luvande', flag: '🇬🇧' },
+  luhvia:      { name: 'Luhvia',      flag: '🇺🇸' },
+  cecole:      { name: 'Cecole',      flag: '🇨🇦' },
+  luvande:     { name: 'Luvande',     flag: '🇬🇧' },
+  modemeister: { name: 'Modemeister', flag: '🇵🇱' },
 };
 
 function fmtCustomerId(id: string | null): string {

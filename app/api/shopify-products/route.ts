@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { fetchTopProducts } from '@/lib/shopifyProducts';
 import { isShopifyConfigured } from '@/lib/shopify';
 
-type ShopStore = 'luhvia' | 'cecole' | 'luvande';
+type ShopStore = 'luhvia' | 'cecole' | 'luvande' | 'modemeister';
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -12,11 +12,11 @@ export async function GET(req: NextRequest) {
 
   try {
     if (store === 'all') {
-      const keys: ShopStore[] = (['luhvia', 'cecole', 'luvande'] as ShopStore[]).filter(isShopifyConfigured);
+      const keys: ShopStore[] = (['luhvia', 'cecole', 'luvande', 'modemeister'] as ShopStore[]).filter(isShopifyConfigured);
       const results = await Promise.all(keys.map(k => fetchTopProducts(k, startDate, endDate)));
       const merged = results.flat().sort((a, b) => b.revenue - a.revenue);
       return NextResponse.json({ products: merged });
-    } else if (store === 'luhvia' || store === 'cecole' || store === 'luvande') {
+    } else if (store === 'luhvia' || store === 'cecole' || store === 'luvande' || store === 'modemeister') {
       if (!isShopifyConfigured(store)) {
         return NextResponse.json({ error: `${store} is nog niet geconfigureerd` }, { status: 400 });
       }

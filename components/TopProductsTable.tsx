@@ -2,7 +2,7 @@
 
 import { TopProduct } from '@/lib/shopifyProducts';
 
-const STORE_FLAGS: Record<string, string> = { luhvia: '🇺🇸', cecole: '🇨🇦', luvande: '🇬🇧' };
+const STORE_FLAGS: Record<string, string> = { luhvia: '🇺🇸', cecole: '🇨🇦', luvande: '🇬🇧', modemeister: '🇵🇱' };
 
 function fmtEur(v: number) {
   return new Intl.NumberFormat('nl-NL', {

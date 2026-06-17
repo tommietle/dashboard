@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
     settingsUrl.searchParams.set('error', oauthError);
     return NextResponse.redirect(settingsUrl);
   }
-  if (!code || (store !== 'luhvia' && store !== 'cecole' && store !== 'luvande')) {
+  if (!code || (store !== 'luhvia' && store !== 'cecole' && store !== 'luvande' && store !== 'modemeister')) {
     settingsUrl.searchParams.set('error', 'missing_code');
     return NextResponse.redirect(settingsUrl);
   }

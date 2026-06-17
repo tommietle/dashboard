@@ -1,14 +1,15 @@
 import { cached } from './cache';
 
-export type AdsStoreKey = 'luhvia' | 'cecole' | 'luvande';
+export type AdsStoreKey = 'luhvia' | 'cecole' | 'luvande' | 'modemeister';
 
 // Per store een vast customer-ID en valuta. De refresh token (de Google-login)
 // wordt apart aangeleverd door de aanroeper en komt uit de in-dashboard
 // koppeling. Het account wordt direct uitgelezen, niet via de MCC.
 const ADS_ACCOUNTS: Record<AdsStoreKey, { customerId: string; currency: string }> = {
-  luhvia:  { customerId: process.env.LUHVIA_GOOGLE_ADS_CUSTOMER_ID  || '', currency: 'USD' },
-  cecole:  { customerId: process.env.CECOLE_GOOGLE_ADS_CUSTOMER_ID  || '', currency: 'EUR' },
-  luvande: { customerId: process.env.LUVANDE_GOOGLE_ADS_CUSTOMER_ID || '', currency: 'EUR' },
+  luhvia:      { customerId: process.env.LUHVIA_GOOGLE_ADS_CUSTOMER_ID      || '', currency: 'USD' },
+  cecole:      { customerId: process.env.CECOLE_GOOGLE_ADS_CUSTOMER_ID      || '', currency: 'EUR' },
+  luvande:     { customerId: process.env.LUVANDE_GOOGLE_ADS_CUSTOMER_ID     || '', currency: 'EUR' },
+  modemeister: { customerId: process.env.MODEMEISTER_GOOGLE_ADS_CUSTOMER_ID || '', currency: 'EUR' },
 };
 
 export function isAdsConfigured(storeKey: AdsStoreKey): boolean {

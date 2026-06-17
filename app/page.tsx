@@ -13,10 +13,11 @@ const DATE_PRESETS = [
 ];
 
 const STORES: { key: StoreKey; label: string; flag: string }[] = [
-  { key: 'all',     label: 'All Stores', flag: ''   },
-  { key: 'luhvia',  label: 'Luhvia',     flag: '🇺🇸' },
-  { key: 'cecole',  label: 'Cecole',     flag: '🇨🇦' },
-  { key: 'luvande', label: 'Luvande',    flag: '🇬🇧' },
+  { key: 'all',         label: 'All Stores',  flag: ''   },
+  { key: 'luhvia',      label: 'Luhvia',      flag: '🇺🇸' },
+  { key: 'cecole',      label: 'Cecole',      flag: '🇨🇦' },
+  { key: 'luvande',     label: 'Luvande',     flag: '🇬🇧' },
+  { key: 'modemeister', label: 'Modemeister', flag: '🇵🇱' },
 ];
 
 function getDateRange(days: number) {

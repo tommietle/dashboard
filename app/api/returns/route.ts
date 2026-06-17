@@ -3,7 +3,7 @@ import { fetchReturns } from '@/lib/shopifyReturns';
 import { fetchDisputes, buildDisputeProductMap } from '@/lib/shopifyDisputes';
 import { isShopifyConfigured } from '@/lib/shopify';
 
-type ShopStore = 'luhvia' | 'cecole' | 'luvande';
+type ShopStore = 'luhvia' | 'cecole' | 'luvande' | 'modemeister';
 
 function today()       { return new Date().toISOString().slice(0, 10); }
 function daysAgo(n: number) {
@@ -12,7 +12,7 @@ function daysAgo(n: number) {
 }
 
 async function getStoreData(
-  storeKey: 'luhvia' | 'cecole' | 'luvande',
+  storeKey: 'luhvia' | 'cecole' | 'luvande' | 'modemeister',
   startDate: string,
   endDate: string,
 ) {
@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
 
   try {
     if (store === 'all') {
-      const keys: ShopStore[] = (['luhvia', 'cecole', 'luvande'] as ShopStore[]).filter(isShopifyConfigured);
+      const keys: ShopStore[] = (['luhvia', 'cecole', 'luvande', 'modemeister'] as ShopStore[]).filter(isShopifyConfigured);
       const results = await Promise.all(keys.map(k => getStoreData(k, startDate, endDate)));
       return NextResponse.json({
         returns: results.map(r => r.returns),
@@ -47,7 +47,7 @@ export async function GET(req: NextRequest) {
           (a, b) => new Date(b.initiatedAt).getTime() - new Date(a.initiatedAt).getTime(),
         ),
       });
-    } else if (store === 'luhvia' || store === 'cecole' || store === 'luvande') {
+    } else if (store === 'luhvia' || store === 'cecole' || store === 'luvande' || store === 'modemeister') {
       if (!isShopifyConfigured(store)) {
         return NextResponse.json({ error: `${store} is nog niet geconfigureerd` }, { status: 400 });
       }

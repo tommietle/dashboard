@@ -1,9 +1,10 @@
-export type GA4StoreKey = 'luhvia' | 'cecole' | 'luvande';
+export type GA4StoreKey = 'luhvia' | 'cecole' | 'luvande' | 'modemeister';
 
 const GA4_PROPERTIES: Record<GA4StoreKey, string> = {
-  luhvia:  process.env.LUHVIA_GA4_PROPERTY_ID!,
-  cecole:  process.env.CECOLE_GA4_PROPERTY_ID!,
-  luvande: process.env.LUVANDE_GA4_PROPERTY_ID!,
+  luhvia:      process.env.LUHVIA_GA4_PROPERTY_ID!,
+  cecole:      process.env.CECOLE_GA4_PROPERTY_ID!,
+  luvande:     process.env.LUVANDE_GA4_PROPERTY_ID!,
+  modemeister: process.env.MODEMEISTER_GA4_PROPERTY_ID!,
 };
 
 async function getAccessToken(): Promise<string> {

@@ -6,10 +6,11 @@ import { ReturnsMetrics, ReturnProduct } from '@/lib/shopifyReturns';
 import { Dispute, formatReason } from '@/lib/shopifyDisputes';
 
 const STORES: { key: StoreKey; label: string }[] = [
-  { key: 'all',     label: 'All Stores' },
-  { key: 'luhvia',  label: '🇺🇸 Luhvia'  },
-  { key: 'cecole',  label: '🇨🇦 Cecole'  },
-  { key: 'luvande', label: '🇬🇧 Luvande' },
+  { key: 'all',         label: 'All Stores'     },
+  { key: 'luhvia',      label: '🇺🇸 Luhvia'      },
+  { key: 'cecole',      label: '🇨🇦 Cecole'      },
+  { key: 'luvande',     label: '🇬🇧 Luvande'     },
+  { key: 'modemeister', label: '🇵🇱 Modemeister' },
 ];
 
 const DATE_PRESETS = [
@@ -18,8 +19,8 @@ const DATE_PRESETS = [
   { label: '90d', days: 90 },
 ];
 
-const STORE_FLAGS: Record<string, string> = { luhvia: '🇺🇸', cecole: '🇨🇦', luvande: '🇬🇧' };
-const STORE_NAMES: Record<string, string>  = { luhvia: 'Luhvia', cecole: 'Cecole', luvande: 'Luvande' };
+const STORE_FLAGS: Record<string, string> = { luhvia: '🇺🇸', cecole: '🇨🇦', luvande: '🇬🇧', modemeister: '🇵🇱' };
+const STORE_NAMES: Record<string, string>  = { luhvia: 'Luhvia', cecole: 'Cecole', luvande: 'Luvande', modemeister: 'Modemeister' };
 
 const DISPUTE_STATUS: Record<string, { label: string; color: string }> = {
   needs_response:  { label: 'Actie vereist',  color: 'bg-red-100 text-red-700'         },
@@ -35,7 +36,7 @@ function titleCase(s: string): string {
 }
 
 interface StoreBreakdown {
-  store: 'luhvia' | 'cecole' | 'luvande';
+  store: 'luhvia' | 'cecole' | 'luvande' | 'modemeister';
   currency: string;
   totalOrders: number;
   totalRevenue: number;
@@ -51,7 +52,7 @@ interface BrandRow {
   brandName: string;
   imageUrl: string;
   currency: string;
-  stores: ('luhvia' | 'cecole' | 'luvande')[];
+  stores: ('luhvia' | 'cecole' | 'luvande' | 'modemeister')[];
   totalOrders: number;
   totalRevenue: number;
   returnedOrders: number;

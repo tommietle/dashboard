@@ -20,10 +20,11 @@ interface SavedFilter {
 }
 
 const STORES = [
-  { key: 'all',     label: 'All Stores' },
-  { key: 'luhvia',  label: '🇺🇸 Luhvia'  },
-  { key: 'cecole',  label: '🇨🇦 Cecole'  },
-  { key: 'luvande', label: '🇬🇧 Luvande' },
+  { key: 'all',         label: 'All Stores'     },
+  { key: 'luhvia',      label: '🇺🇸 Luhvia'      },
+  { key: 'cecole',      label: '🇨🇦 Cecole'      },
+  { key: 'luvande',     label: '🇬🇧 Luvande'     },
+  { key: 'modemeister', label: '🇵🇱 Modemeister' },
 ];
 
 function NumInput({ value, onChange, placeholder }: {
@@ -150,15 +151,16 @@ export default function ProductsPage() {
       // Per store top 50 op spend — anders pakt slice(0,150) alleen Luhvia
       // omdat de flat array gesorteerd is als [alle Luhvia, alle Cecole, alle Luvande].
       const topN = 50;
-      const luhviaIds  = merged.filter(p => p.store === 'luhvia').slice(0, topN).map(p => p.productId);
-      const cecoleIds  = merged.filter(p => p.store === 'cecole').slice(0, topN).map(p => p.productId);
-      const luvandeIds = merged.filter(p => p.store === 'luvande').slice(0, topN).map(p => p.productId);
-      if (luhviaIds.length || cecoleIds.length || luvandeIds.length) {
+      const luhviaIds      = merged.filter(p => p.store === 'luhvia').slice(0, topN).map(p => p.productId);
+      const cecoleIds      = merged.filter(p => p.store === 'cecole').slice(0, topN).map(p => p.productId);
+      const luvandeIds     = merged.filter(p => p.store === 'luvande').slice(0, topN).map(p => p.productId);
+      const modemeisterIds = merged.filter(p => p.store === 'modemeister').slice(0, topN).map(p => p.productId);
+      if (luhviaIds.length || cecoleIds.length || luvandeIds.length || modemeisterIds.length) {
         try {
           const metaRes = await fetch('/api/shopify-products/meta', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ store: selectedStore, luhvia: luhviaIds, cecole: cecoleIds, luvande: luvandeIds }),
+            body: JSON.stringify({ store: selectedStore, luhvia: luhviaIds, cecole: cecoleIds, luvande: luvandeIds, modemeister: modemeisterIds }),
           });
           if (metaRes.ok) {
             const meta = await metaRes.json();

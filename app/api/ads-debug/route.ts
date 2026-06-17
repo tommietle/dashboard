@@ -120,8 +120,8 @@ export async function GET(req: NextRequest) {
 
   if (numericIds.length > 0) {
     try {
-      const cfg = STORES[store as 'luhvia' | 'cecole' | 'luvande'];
-      const token = await getShopifyAccessToken(store as 'luhvia' | 'cecole' | 'luvande');
+      const cfg = STORES[store as 'luhvia' | 'cecole' | 'luvande' | 'modemeister'];
+      const token = await getShopifyAccessToken(store as 'luhvia' | 'cecole' | 'luvande' | 'modemeister');
       // Fetch in batches of 250
       for (let i = 0; i < numericIds.length; i += 250) {
         const batch = numericIds.slice(i, i + 250);

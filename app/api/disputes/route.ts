@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { fetchDisputes } from '@/lib/shopifyDisputes';
 import { isShopifyConfigured } from '@/lib/shopify';
 
-type ShopStore = 'luhvia' | 'cecole' | 'luvande';
+type ShopStore = 'luhvia' | 'cecole' | 'luvande' | 'modemeister';
 
 function today()       { return new Date().toISOString().slice(0, 10); }
 function daysAgo(n: number) {
@@ -18,13 +18,13 @@ export async function GET(req: NextRequest) {
 
   try {
     if (store === 'all') {
-      const keys: ShopStore[] = (['luhvia', 'cecole', 'luvande'] as ShopStore[]).filter(isShopifyConfigured);
+      const keys: ShopStore[] = (['luhvia', 'cecole', 'luvande', 'modemeister'] as ShopStore[]).filter(isShopifyConfigured);
       const results = await Promise.all(keys.map(k => fetchDisputes(k, startDate, endDate)));
       const disputes = results.flat().sort(
         (a, b) => new Date(b.initiatedAt).getTime() - new Date(a.initiatedAt).getTime(),
       );
       return NextResponse.json({ disputes });
-    } else if (store === 'luhvia' || store === 'cecole' || store === 'luvande') {
+    } else if (store === 'luhvia' || store === 'cecole' || store === 'luvande' || store === 'modemeister') {
       if (!isShopifyConfigured(store)) {
         return NextResponse.json({ error: `${store} is nog niet geconfigureerd` }, { status: 400 });
       }

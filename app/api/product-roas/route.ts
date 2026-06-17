@@ -8,12 +8,13 @@ import { STORES, isShopifyConfigured } from '@/lib/shopify';
 
 const _generic = process.env.GOOGLE_ADS_REFRESH_TOKEN;
 const ENV_FALLBACK: Record<AdsStoreKey, string | undefined> = {
-  luhvia:  process.env.LUHVIA_GOOGLE_ADS_REFRESH_TOKEN  || _generic,
-  cecole:  process.env.CECOLE_GOOGLE_ADS_REFRESH_TOKEN  || _generic,
-  luvande: process.env.LUVANDE_GOOGLE_ADS_REFRESH_TOKEN || _generic,
+  luhvia:      process.env.LUHVIA_GOOGLE_ADS_REFRESH_TOKEN      || _generic,
+  cecole:      process.env.CECOLE_GOOGLE_ADS_REFRESH_TOKEN      || _generic,
+  luvande:     process.env.LUVANDE_GOOGLE_ADS_REFRESH_TOKEN     || _generic,
+  modemeister: process.env.MODEMEISTER_GOOGLE_ADS_REFRESH_TOKEN || _generic,
 };
 
-const STORE_KEYS: AdsStoreKey[] = ['luhvia', 'cecole', 'luvande'];
+const STORE_KEYS: AdsStoreKey[] = ['luhvia', 'cecole', 'luvande', 'modemeister'];
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const ZERO: ProductPeriodMetrics = { spend: 0, revenue: 0, conversions: 0, clicks: 0, impressions: 0, roas: 0, ctr: 0, cpc: 0, cpa: 0 };
 
@@ -60,7 +61,7 @@ async function buildProductsForStore(
   const conn = await getConnection(storeKey);
   const token = conn?.refreshToken || ENV_FALLBACK[storeKey];
 
-  const adsCurrency  = { luhvia: 'EUR', cecole: 'EUR', luvande: 'EUR' }[storeKey];
+  const adsCurrency  = { luhvia: 'EUR', cecole: 'EUR', luvande: 'EUR', modemeister: 'EUR' }[storeKey];
   const shopCurrency = STORES[storeKey].currency;
   const r2 = (v: number) => Math.round(v * 100) / 100;
 
@@ -214,7 +215,7 @@ export async function GET(req: NextRequest) {
       };
     };
 
-    const ADS_CURRENCY: Record<AdsStoreKey, string> = { luhvia: 'EUR', cecole: 'EUR', luvande: 'EUR' };
+    const ADS_CURRENCY: Record<AdsStoreKey, string> = { luhvia: 'EUR', cecole: 'EUR', luvande: 'EUR', modemeister: 'EUR' };
 
     const productsEur: ProductRoas[] = allProducts.map(p => {
       const adsCur  = ADS_CURRENCY[p.store as AdsStoreKey] ?? 'EUR';

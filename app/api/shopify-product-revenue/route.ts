@@ -3,7 +3,7 @@ import { fetchProductRevenueByPeriod, ProductRevenuePeriods } from '@/lib/shopif
 import { isShopifyConfigured } from '@/lib/shopify';
 import { getEurConverter } from '@/lib/fx';
 
-type ShopStore = 'luhvia' | 'cecole' | 'luvande';
+type ShopStore = 'luhvia' | 'cecole' | 'luvande' | 'modemeister';
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -21,10 +21,10 @@ export async function GET(req: NextRequest) {
   try {
     let products: ProductRevenuePeriods[];
     if (store === 'all') {
-      const keys: ShopStore[] = (['luhvia', 'cecole', 'luvande'] as ShopStore[]).filter(isShopifyConfigured);
+      const keys: ShopStore[] = (['luhvia', 'cecole', 'luvande', 'modemeister'] as ShopStore[]).filter(isShopifyConfigured);
       const results = await Promise.all(keys.map(k => fetchProductRevenueByPeriod(k, endDate, customRange, include90)));
       products = results.flat();
-    } else if (store === 'luhvia' || store === 'cecole' || store === 'luvande') {
+    } else if (store === 'luhvia' || store === 'cecole' || store === 'luvande' || store === 'modemeister') {
       if (!isShopifyConfigured(store)) {
         return NextResponse.json({ error: `${store} is nog niet geconfigureerd` }, { status: 400 });
       }

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const STORES = ['luhvia', 'cecole', 'luvande'];
+const STORES = ['luhvia', 'cecole', 'luvande', 'modemeister'];
 
 // Start de Google OAuth-flow voor één store. Stuurt de gebruiker naar Google,
 // waar die inlogt met het account dat toegang heeft tot de webshop.

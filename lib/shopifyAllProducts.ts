@@ -31,7 +31,7 @@ export interface ShopifyProductBasic {
 }
 
 export function fetchAllShopifyProducts(
-  storeKey: 'luhvia' | 'cecole' | 'luvande',
+  storeKey: 'luhvia' | 'cecole' | 'luvande' | 'modemeister',
 ): Promise<ShopifyProductBasic[]> {
   return cached(
     `shopify:all-products:v3:${storeKey}`,
@@ -41,7 +41,7 @@ export function fetchAllShopifyProducts(
 }
 
 async function fetchAllShopifyProductsUncached(
-  storeKey: 'luhvia' | 'cecole' | 'luvande',
+  storeKey: 'luhvia' | 'cecole' | 'luvande' | 'modemeister',
 ): Promise<ShopifyProductBasic[]> {
   const cfg = STORES[storeKey];
   const token = await getShopifyAccessToken(storeKey);

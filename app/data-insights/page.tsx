@@ -8,10 +8,11 @@ import { TopProduct } from '@/lib/shopifyProducts';
 import { ProductRoas } from '@/lib/googleAdsProducts';
 
 const STORES: { key: StoreKey; label: string }[] = [
-  { key: 'all',     label: 'All Stores' },
-  { key: 'luhvia',  label: '🇺🇸 Luhvia'  },
-  { key: 'cecole',  label: '🇨🇦 Cecole'  },
-  { key: 'luvande', label: '🇬🇧 Luvande' },
+  { key: 'all',         label: 'All Stores'     },
+  { key: 'luhvia',      label: '🇺🇸 Luhvia'      },
+  { key: 'cecole',      label: '🇨🇦 Cecole'      },
+  { key: 'luvande',     label: '🇬🇧 Luvande'     },
+  { key: 'modemeister', label: '🇵🇱 Modemeister' },
 ];
 
 const DATE_PRESETS = [
@@ -92,13 +93,14 @@ export default function DataInsightsPage() {
       if (prods.length > 0) {
         try {
           const topN = 50;
-          const luhviaIds  = prods.filter(p => p.store === 'luhvia').slice(0, topN).map(p => p.productId);
-          const cecoleIds  = prods.filter(p => p.store === 'cecole').slice(0, topN).map(p => p.productId);
-          const luvandeIds = prods.filter(p => p.store === 'luvande').slice(0, topN).map(p => p.productId);
+          const luhviaIds      = prods.filter(p => p.store === 'luhvia').slice(0, topN).map(p => p.productId);
+          const cecoleIds      = prods.filter(p => p.store === 'cecole').slice(0, topN).map(p => p.productId);
+          const luvandeIds     = prods.filter(p => p.store === 'luvande').slice(0, topN).map(p => p.productId);
+          const modemeisterIds = prods.filter(p => p.store === 'modemeister').slice(0, topN).map(p => p.productId);
           const metaRes = await fetch('/api/shopify-products/meta', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ store: selectedStore, luhvia: luhviaIds, cecole: cecoleIds, luvande: luvandeIds }),
+            body: JSON.stringify({ store: selectedStore, luhvia: luhviaIds, cecole: cecoleIds, luvande: luvandeIds, modemeister: modemeisterIds }),
           });
           if (metaRes.ok) {
             const meta = await metaRes.json();
@@ -350,7 +352,7 @@ export default function DataInsightsPage() {
                   {filteredRoasProducts.map((p, i) => {
                     const roas = p.d30.roas;
                     const roasColor = roas >= 4 ? 'text-green-600' : roas >= 2 ? 'text-lime-600' : roas >= 1 ? 'text-amber-600' : 'text-red-500';
-                    const storeFlags: Record<string, string> = { luhvia: '🇺🇸', cecole: '🇨🇦', luvande: '🇬🇧' };
+                    const storeFlags: Record<string, string> = { luhvia: '🇺🇸', cecole: '🇨🇦', luvande: '🇬🇧', modemeister: '🇵🇱' };
                     return (
                       <tr key={`${p.store}:${p.productId}`} className="hover:bg-gray-50 transition-colors">
                         <td className="py-2.5 px-4 text-gray-300 text-xs">{i + 1}</td>

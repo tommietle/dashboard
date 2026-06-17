@@ -3,7 +3,7 @@ import { STORES, getShopifyAccessToken, isShopifyConfigured } from '@/lib/shopif
 
 export const maxDuration = 60;
 
-type ShopKey = 'luhvia' | 'cecole' | 'luvande';
+type ShopKey = 'luhvia' | 'cecole' | 'luvande' | 'modemeister';
 
 async function addOne(
   url: string, token: string, productId: string, collectionId: string, attempt = 0
@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
     store: ShopKey; productIds: string[]; collectionId: string;
   };
 
-  if (!store || !['luhvia', 'cecole', 'luvande'].includes(store))
+  if (!store || !['luhvia', 'cecole', 'luvande', 'modemeister'].includes(store))
     return NextResponse.json({ error: 'Invalid store' }, { status: 400 });
   if (!isShopifyConfigured(store))
     return NextResponse.json({ error: 'Store not configured' }, { status: 400 });

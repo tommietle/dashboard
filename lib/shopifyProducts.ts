@@ -10,13 +10,13 @@ export interface TopProduct {
   quantity: number;
   aov: number;
   currency: string;
-  store: 'luhvia' | 'cecole' | 'luvande';
+  store: 'luhvia' | 'cecole' | 'luvande' | 'modemeister';
   imageUrl?: string;
   brandName?: string;
 }
 
 export async function fetchTopProducts(
-  storeKey: 'luhvia' | 'cecole' | 'luvande',
+  storeKey: 'luhvia' | 'cecole' | 'luvande' | 'modemeister',
   startDate: string,
   endDate: string,
   limit = 20
@@ -29,7 +29,7 @@ export async function fetchTopProducts(
 }
 
 async function fetchTopProductsUncached(
-  storeKey: 'luhvia' | 'cecole' | 'luvande',
+  storeKey: 'luhvia' | 'cecole' | 'luvande' | 'modemeister',
   startDate: string,
   endDate: string,
   limit: number,
@@ -122,7 +122,7 @@ export interface ProductRevenuePeriods {
   d14: number;
   d7: number;
   custom?: number;
-  store: 'luhvia' | 'cecole' | 'luvande';
+  store: 'luhvia' | 'cecole' | 'luvande' | 'modemeister';
   currency: string;
 }
 
@@ -130,7 +130,7 @@ export interface ProductRevenuePeriods {
 // (gemeten vanaf endDate). Gebruikt voor échte ROAS-berekening op de
 // products page: Shopify omzet ÷ Google Ads spend.
 export async function fetchProductRevenueByPeriod(
-  storeKey: 'luhvia' | 'cecole' | 'luvande',
+  storeKey: 'luhvia' | 'cecole' | 'luvande' | 'modemeister',
   endDate: string,
   customRange?: { start: string; end: string },
   include90 = false,
@@ -146,7 +146,7 @@ export async function fetchProductRevenueByPeriod(
 }
 
 async function fetchProductRevenueByPeriodUncached(
-  storeKey: 'luhvia' | 'cecole' | 'luvande',
+  storeKey: 'luhvia' | 'cecole' | 'luvande' | 'modemeister',
   endDate: string,
   customRange?: { start: string; end: string },
   include90 = false,

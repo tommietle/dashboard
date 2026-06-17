@@ -9,13 +9,14 @@ export async function GET(req: NextRequest) {
 
   try {
     if (store === 'all') {
-      const [luhvia, cecole, luvande] = await Promise.all([
-        fetchGA4Metrics('luhvia',  startDate, endDate),
-        fetchGA4Metrics('cecole',  startDate, endDate),
-        fetchGA4Metrics('luvande', startDate, endDate),
+      const [luhvia, cecole, luvande, modemeister] = await Promise.all([
+        fetchGA4Metrics('luhvia',      startDate, endDate),
+        fetchGA4Metrics('cecole',      startDate, endDate),
+        fetchGA4Metrics('luvande',     startDate, endDate),
+        fetchGA4Metrics('modemeister', startDate, endDate),
       ]);
-      return NextResponse.json({ analytics: [luhvia, cecole, luvande] });
-    } else if (store === 'luhvia' || store === 'cecole' || store === 'luvande') {
+      return NextResponse.json({ analytics: [luhvia, cecole, luvande, modemeister] });
+    } else if (store === 'luhvia' || store === 'cecole' || store === 'luvande' || store === 'modemeister') {
       const data = await fetchGA4Metrics(store, startDate, endDate);
       return NextResponse.json({ analytics: [data] });
     } else {

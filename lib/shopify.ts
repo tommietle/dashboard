@@ -1,6 +1,6 @@
 import { cached } from './cache';
 
-export type StoreKey = 'luhvia' | 'cecole' | 'luvande' | 'all';
+export type StoreKey = 'luhvia' | 'cecole' | 'luvande' | 'modemeister' | 'all';
 
 const SHOPIFY_TIMEZONE = 'Europe/Amsterdam';
 
@@ -31,7 +31,7 @@ export function shopifyTzParam(dateStr: string, isEnd: boolean): string {
   const mm   = String(abs % 60).padStart(2, '0');
   return `${dateStr}T${timeStr}${sign}${hh}:${mm}`;
 }
-type ShopKey = 'luhvia' | 'cecole' | 'luvande';
+type ShopKey = 'luhvia' | 'cecole' | 'luvande' | 'modemeister';
 
 const STORES = {
   luhvia: {
@@ -55,6 +55,13 @@ const STORES = {
     store: process.env.LUVANDE_SHOPIFY_STORE!,
     token: process.env.LUVANDE_SHOPIFY_TOKEN!,
   },
+  modemeister: {
+    name: 'Modemeister',
+    currency: 'EUR',
+    flag: '🇵🇱',
+    store: process.env.MODEMEISTER_SHOPIFY_STORE!,
+    token: process.env.MODEMEISTER_SHOPIFY_TOKEN!,
+  },
 };
 
 export type StoreConfig = typeof STORES.luhvia;
@@ -66,7 +73,8 @@ export { STORES };
 const SHOPIFY_CLIENT_AUTH: Record<ShopKey, { clientId?: string; clientSecret?: string }> = {
   luhvia:  { clientId: process.env.LUHVIA_SHOPIFY_CLIENT_ID,  clientSecret: process.env.LUHVIA_SHOPIFY_CLIENT_SECRET },
   cecole:  { clientId: process.env.CECOLE_SHOPIFY_CLIENT_ID,  clientSecret: process.env.CECOLE_SHOPIFY_CLIENT_SECRET },
-  luvande: { clientId: process.env.LUVANDE_SHOPIFY_CLIENT_ID, clientSecret: process.env.LUVANDE_SHOPIFY_CLIENT_SECRET },
+  luvande:     { clientId: process.env.LUVANDE_SHOPIFY_CLIENT_ID,     clientSecret: process.env.LUVANDE_SHOPIFY_CLIENT_SECRET },
+  modemeister: { clientId: process.env.MODEMEISTER_SHOPIFY_CLIENT_ID, clientSecret: process.env.MODEMEISTER_SHOPIFY_CLIENT_SECRET },
 };
 
 const tokenCache = new Map<ShopKey, { token: string; expiresAt: number }>();

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { STORES, getShopifyAccessToken, isShopifyConfigured } from '@/lib/shopify';
 
-type ShopKey = 'luhvia' | 'cecole' | 'luvande';
+type ShopKey = 'luhvia' | 'cecole' | 'luvande' | 'modemeister';
 
 async function shopifyGet(storeKey: ShopKey, endpoint: string) {
   const cfg = STORES[storeKey];
@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
   const store = searchParams.get('store') as ShopKey | null;
   const collectionId = searchParams.get('collectionId');
 
-  if (!store || !['luhvia', 'cecole', 'luvande'].includes(store)) {
+  if (!store || !['luhvia', 'cecole', 'luvande', 'modemeister'].includes(store)) {
     return NextResponse.json({ error: 'Invalid store' }, { status: 400 });
   }
   if (!isShopifyConfigured(store)) {

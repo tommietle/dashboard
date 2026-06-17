@@ -25,7 +25,7 @@ function fmt(v: number, currency: string, decimals = 0) {
 }
 function fmtPct(v: number) { return v === 0 ? '—' : `${v.toFixed(2)}%`; }
 
-const STORE_FLAGS: Record<string, string> = { luhvia: '🇺🇸', cecole: '🇨🇦', luvande: '🇬🇧' };
+const STORE_FLAGS: Record<string, string> = { luhvia: '🇺🇸', cecole: '🇨🇦', luvande: '🇬🇧', modemeister: '🇵🇱' };
 
 // Sticky column widths
 const COL_PRODUCT = 'min-w-[220px] max-w-[220px]';
@@ -205,9 +205,9 @@ export default function ProductRoasTable({ products, selectedStore, show3m = fal
     setFeedback(null);
 
     // Per store batchen.
-    const byStore = new Map<'luhvia' | 'cecole' | 'luvande', string[]>();
+    const byStore = new Map<'luhvia' | 'cecole' | 'luvande' | 'modemeister', string[]>();
     for (const p of archivable) {
-      const store = p.store as 'luhvia' | 'cecole' | 'luvande';
+      const store = p.store as 'luhvia' | 'cecole' | 'luvande' | 'modemeister';
       const arr = byStore.get(store) ?? [];
       arr.push(p.productId);
       byStore.set(store, arr);
@@ -247,7 +247,7 @@ export default function ProductRoasTable({ products, selectedStore, show3m = fal
 
   // Unique stores in current selection.
   const storesInSelection = useMemo(
-    () => Array.from(new Set(selectedItems.map(p => p.store))) as ('luhvia' | 'cecole' | 'luvande')[],
+    () => Array.from(new Set(selectedItems.map(p => p.store))) as ('luhvia' | 'cecole' | 'luvande' | 'modemeister')[],
     [selectedItems]
   );
 

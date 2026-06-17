@@ -42,7 +42,7 @@ function chunk<T>(arr: T[], size: number): T[][] {
 // Haalt status / variantCount / imageUrl op voor een lijst Shopify product-IDs.
 // Onbekende IDs (bv. handmatig ingevoerde item-ID's in Google Ads) blijven gewoon weg uit de map.
 export async function fetchShopifyProductMeta(
-  storeKey: 'luhvia' | 'cecole' | 'luvande',
+  storeKey: 'luhvia' | 'cecole' | 'luvande' | 'modemeister',
   productIds: string[],
 ): Promise<Map<string, ShopifyProductMeta>> {
   const cfg = STORES[storeKey];
@@ -153,7 +153,7 @@ export async function fetchShopifyProductMeta(
 
 // Zet de Shopify-status van een product (active / archived / draft).
 export async function setShopifyProductStatus(
-  storeKey: 'luhvia' | 'cecole' | 'luvande',
+  storeKey: 'luhvia' | 'cecole' | 'luvande' | 'modemeister',
   productId: string,
   status: 'active' | 'archived' | 'draft',
 ): Promise<void> {

@@ -1,11 +1,12 @@
 import { cached } from './cache';
 
-export type AdsStoreKey = 'luhvia' | 'cecole' | 'luvande';
+export type AdsStoreKey = 'luhvia' | 'cecole' | 'luvande' | 'modemeister';
 
 const ADS_ACCOUNTS: Record<AdsStoreKey, { customerId: string; currency: string }> = {
-  luhvia:  { customerId: process.env.LUHVIA_GOOGLE_ADS_CUSTOMER_ID  || '', currency: 'EUR' },
-  cecole:  { customerId: process.env.CECOLE_GOOGLE_ADS_CUSTOMER_ID  || '', currency: 'EUR' },
-  luvande: { customerId: process.env.LUVANDE_GOOGLE_ADS_CUSTOMER_ID || '', currency: 'EUR' },
+  luhvia:      { customerId: process.env.LUHVIA_GOOGLE_ADS_CUSTOMER_ID      || '', currency: 'EUR' },
+  cecole:      { customerId: process.env.CECOLE_GOOGLE_ADS_CUSTOMER_ID      || '', currency: 'EUR' },
+  luvande:     { customerId: process.env.LUVANDE_GOOGLE_ADS_CUSTOMER_ID     || '', currency: 'EUR' },
+  modemeister: { customerId: process.env.MODEMEISTER_GOOGLE_ADS_CUSTOMER_ID || '', currency: 'EUR' },
 };
 
 export function isAdsProductsConfigured(storeKey: AdsStoreKey): boolean {

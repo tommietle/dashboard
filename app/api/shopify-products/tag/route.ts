@@ -3,7 +3,7 @@ import { STORES, getShopifyAccessToken, isShopifyConfigured } from '@/lib/shopif
 
 export const maxDuration = 60;
 
-type ShopKey = 'luhvia' | 'cecole' | 'luvande';
+type ShopKey = 'luhvia' | 'cecole' | 'luvande' | 'modemeister';
 
 async function tagOne(
   store: string, token: string, id: string, cleanTag: string, attempt = 0
@@ -43,7 +43,7 @@ async function tagOne(
 export async function POST(req: NextRequest) {
   const { store, productIds, tag } = await req.json() as { store: ShopKey; productIds: string[]; tag: string };
 
-  if (!store || !['luhvia', 'cecole', 'luvande'].includes(store))
+  if (!store || !['luhvia', 'cecole', 'luvande', 'modemeister'].includes(store))
     return NextResponse.json({ error: 'Invalid store' }, { status: 400 });
   if (!isShopifyConfigured(store))
     return NextResponse.json({ error: 'Store not configured' }, { status: 400 });

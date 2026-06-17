@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { setShopifyProductStatus } from '@/lib/shopifyProductMeta';
 
-type StoreKey = 'luhvia' | 'cecole' | 'luvande';
+type StoreKey = 'luhvia' | 'cecole' | 'luvande' | 'modemeister';
 
 interface ArchiveBody {
   store: StoreKey;
