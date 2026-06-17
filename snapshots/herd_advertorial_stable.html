@@ -1,0 +1,785 @@
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,600&family=Inter:wght@400;500;600;700&display=swap');
+
+.hd-wrap{
+  --pink:#E5447F;
+  --pink-dark:#C7325F;
+  --plum:#4A2270;
+  --plum-soft:#6B3C95;
+  --blush:#FCEAF1;
+  --ink:#2A2530;
+  --muted:#837A86;
+  --line:#F0DCE6;
+  background:var(--blush);
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  color:var(--ink);
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+  padding:0 0 50px;
+  margin:0 calc(50% - 50vw);
+}
+.hd-wrap *{box-sizing:border-box;}
+
+/* ---- masthead ---- */
+.hd-masthead{
+  background:#fff;border-bottom:1px solid var(--line);
+  text-align:center;padding:14px 16px;
+}
+.hd-masthead-name{
+  font-family:'Playfair Display',serif;font-size:20px;font-weight:700;
+  letter-spacing:.06em;text-transform:uppercase;margin:0;
+}
+.hd-masthead-tag{
+  font-size:10px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--muted);margin:3px 0 0;
+}
+
+/* ---- article container ---- */
+.hd-article{max-width:680px;margin:0 auto;padding:34px 22px 0;}
+
+/* ---- header ---- */
+.hd-eyebrow{
+  display:inline-block;background:#FBD7E5;color:var(--pink-dark);
+  font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  padding:5px 12px;border-radius:20px;margin-bottom:16px;
+}
+.hd-headline{
+  font-family:'Playfair Display',serif;font-size:34px;line-height:1.22;
+  font-weight:700;margin:0 0 14px;
+}
+.hd-headline .hd-em{font-style:italic;color:var(--pink);}
+.hd-subhead{font-size:18px;color:var(--muted);margin:0 0 20px;}
+.hd-meta{
+  display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;
+  font-size:13px;color:var(--muted);
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  padding:12px 0;margin-bottom:24px;
+}
+.hd-meta b{color:var(--ink);font-weight:600;}
+.hd-meta-dot{width:3px;height:3px;border-radius:50%;background:#D9C3CE;}
+.hd-author{display:inline-flex;align-items:center;gap:8px;}
+.hd-author-img{width:32px;height:32px;border-radius:50%;object-fit:cover;display:block;border:1px solid var(--line);}
+
+/* ---- afbeelding-placeholder ---- */
+.hd-img-ph{
+  width:100%;aspect-ratio:16/10;
+  background:repeating-linear-gradient(45deg,#F6DCE7,#F6DCE7 14px,#EFCDDD 14px,#EFCDDD 28px);
+  border:2px dashed #E0AEC4;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;text-align:center;
+  color:#B07590;font-size:13px;font-weight:600;padding:20px;margin:8px 0 4px;
+}
+.hd-hero-img{width:100%;border-radius:14px;display:block;margin:8px 0 4px;}
+
+/* ---- intro ---- */
+.hd-lead{font-size:18px;margin:22px 0 14px;}
+.hd-lead .hd-hl{background:#FBD7E5;padding:1px 4px;border-radius:3px;font-weight:600;}
+.hd-body{font-size:16.5px;margin:0 0 16px;}
+.hd-body .hd-em{font-style:italic;color:var(--pink-dark);}
+.hd-body b{color:var(--plum);}
+
+/* ---- reason blokken ---- */
+.hd-reason{
+  background:#fff;border:1px solid var(--line);border-radius:16px;
+  padding:26px 24px;margin:20px 0;box-shadow:0 6px 20px rgba(74,34,112,.05);
+}
+.hd-reason-head{display:flex;align-items:center;gap:14px;margin-bottom:12px;}
+.hd-num{
+  flex:0 0 auto;width:42px;height:42px;border-radius:50%;
+  background:linear-gradient(135deg,var(--pink),var(--pink-dark));
+  color:#fff;font-family:'Playfair Display',serif;font-weight:700;font-size:20px;
+  display:flex;align-items:center;justify-content:center;
+}
+.hd-reason-title{
+  font-family:'Playfair Display',serif;font-size:22px;font-weight:600;
+  margin:0;line-height:1.3;
+}
+.hd-ingredients{list-style:none;margin:14px 0 0;padding:0;}
+.hd-ingredients li{padding:9px 0;border-top:1px solid var(--line);font-size:15.5px;}
+.hd-ingredients li b{color:var(--pink-dark);}
+
+/* ---- CTA blok ---- */
+.hd-cta{
+  max-width:680px;margin:30px auto 0;
+  background:linear-gradient(160deg,#E5447F,#B62B5A);
+  border-radius:20px;padding:34px 26px;text-align:center;color:#fff;
+}
+.hd-cta-title{
+  font-family:'Playfair Display',serif;font-size:25px;font-weight:700;
+  line-height:1.3;margin:0 0 18px;
+}
+.hd-offer{
+  background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35);
+  border-radius:12px;padding:14px 18px;font-size:18px;font-weight:700;margin:0 0 14px;
+}
+.hd-risk{
+  display:inline-flex;align-items:center;gap:7px;background:#7A1535;color:#fff;
+  font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+  padding:7px 14px;border-radius:20px;margin-bottom:20px;
+}
+.hd-btn{
+  display:inline-block;background:var(--plum);color:#fff !important;
+  font-size:18px;font-weight:700;text-decoration:none;padding:17px 38px;
+  border-radius:50px;box-shadow:0 8px 22px rgba(0,0,0,.22);
+  transition:transform .12s ease,background .12s ease;
+}
+.hd-btn:hover{background:var(--plum-soft);transform:translateY(-2px);}
+
+/* ---- inline CTA ---- */
+.hd-inline-cta{text-align:center;margin:24px 0;}
+.hd-btn-sm{
+  display:inline-block;background:var(--pink);color:#fff !important;
+  font-size:16px;font-weight:700;text-decoration:none;padding:14px 30px;
+  border-radius:50px;box-shadow:0 6px 16px rgba(229,68,127,.32);
+  transition:transform .12s ease,background .12s ease;
+}
+.hd-btn-sm:hover{background:var(--pink-dark);transform:translateY(-2px);}
+
+/* ============ PRODUCTSECTIE ============ */
+.hd-product{
+  max-width:940px;margin:30px auto 0;background:#fff;
+  border:1px solid var(--line);border-radius:20px;
+  padding:30px;box-shadow:0 10px 30px rgba(74,34,112,.07);
+}
+.hd-product-grid{display:flex;flex-wrap:wrap;gap:30px;}
+
+
+
+
+.hd-product-info{flex:1 1 320px;min-width:280px;}
+.hd-product-title{
+  font-family:'Playfair Display',serif;font-size:30px;font-weight:700;
+  color:var(--pink);margin:0 0 18px;line-height:1.2;
+}
+.hd-benefits{
+  display:grid;grid-template-columns:1fr 1fr;gap:14px 16px;margin-bottom:22px;
+}
+.hd-benefit{display:flex;gap:9px;align-items:flex-start;font-size:14px;font-weight:600;}
+.hd-benefit-ic{
+  flex:0 0 auto;width:28px;height:28px;border-radius:8px;
+  background:#FBD7E5;display:flex;align-items:center;justify-content:center;
+  font-size:14px;
+}
+.hd-price-row{display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap;}
+.hd-price{font-size:30px;font-weight:700;color:var(--pink);}
+.hd-price-old{font-size:18px;color:var(--muted);text-decoration:line-through;}
+.hd-save{
+  background:var(--pink);color:#fff;font-size:13px;font-weight:700;
+  padding:5px 12px;border-radius:20px;
+}
+.hd-variant-label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin-bottom:6px;}
+.hd-variant-select{
+  width:100%;font-family:'Inter',sans-serif;font-size:15px;color:var(--ink);
+  padding:12px 14px;border:1px solid var(--line);border-radius:10px;
+  background:#fff;margin-bottom:12px;
+}
+.hd-atc{
+  display:block;width:100%;background:var(--pink);color:#fff;
+  font-family:'Inter',sans-serif;font-size:18px;font-weight:700;
+  border:none;cursor:pointer;padding:17px;border-radius:12px;
+  box-shadow:0 8px 20px rgba(229,68,127,.32);
+  transition:transform .12s ease,background .12s ease;
+}
+.hd-atc:hover{background:var(--pink-dark);transform:translateY(-2px);}
+.hd-view{
+  display:block;width:100%;text-align:center;background:var(--ink);
+  color:#fff !important;font-size:16px;font-weight:700;text-decoration:none;
+  padding:15px;border-radius:12px;margin-top:10px;
+}
+.hd-guarantee{
+  font-size:13px;color:var(--muted);text-align:center;margin:14px 0 0;
+}
+
+/* ---- trust ---- */
+.hd-trust{max-width:680px;margin:22px auto 0;text-align:center;}
+.hd-stars{font-size:20px;letter-spacing:2px;color:var(--pink);}
+.hd-reviews{font-size:14px;font-weight:600;margin:6px 0 16px;}
+.hd-checks{
+  display:flex;flex-wrap:wrap;justify-content:center;gap:10px 22px;
+  padding:0;margin:0;list-style:none;
+}
+.hd-checks li{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted);}
+.hd-check-ic{
+  width:20px;height:20px;border-radius:50%;background:#F6DCE7;color:var(--pink-dark);
+  font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;
+}
+
+/* ---- disclaimer + footer ---- */
+.hd-disclaimer{
+  max-width:680px;margin:30px auto 0;padding:0 22px;
+  font-size:11.5px;line-height:1.55;color:#A89BAE;text-align:center;
+}
+.hd-footer{
+  max-width:680px;margin:18px auto 0;padding:18px 22px 0;
+  border-top:1px solid var(--line);text-align:center;
+  font-size:12.5px;color:var(--muted);
+}
+.hd-footer a{color:var(--muted);text-decoration:underline;margin:0 6px;}
+
+/* ---- mobiel ---- */
+@media (max-width:560px){
+  .hd-headline{font-size:27px;}
+  .hd-subhead{font-size:16px;}
+  .hd-cta-title{font-size:21px;}
+  .hd-reason{padding:22px 18px;}
+  .hd-reason-title{font-size:19px;}
+  .hd-product{padding:20px;}
+  .hd-product-title{font-size:24px;}
+  .hd-benefits{grid-template-columns:1fr;}
+}
+
+.hd-gallery{position:relative;flex:1 1 320px;min-width:280px;}
+.hd-carousel{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;border-radius:14px;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+.hd-carousel::-webkit-scrollbar{display:none;}
+.hd-carousel img{flex:0 0 100%;width:100%;aspect-ratio:1/1;object-fit:cover;scroll-snap-align:start;border-radius:14px;display:block;}
+.hd-carousel-dots{display:flex;gap:8px;justify-content:center;margin-top:12px;}
+.hd-thumb-row{display:none;position:relative;margin-top:12px;}
+.hd-carousel-thumbs{display:flex;gap:8px;overflow-x:auto;scroll-behavior:smooth;scrollbar-width:none;padding-right:38px;}
+.hd-carousel-thumbs::-webkit-scrollbar{display:none;}
+.hd-thumb{flex:0 0 78px;width:78px;height:78px;border-radius:10px;overflow:hidden;border:2px solid transparent;background:#fff;padding:0;cursor:pointer;transition:border-color .15s ease;}
+.hd-thumb img{width:100%;height:100%;object-fit:cover;display:block;border-radius:8px;}
+.hd-thumb.is-active{border-color:var(--pink);}
+.hd-thumb-arrow{position:absolute;top:50%;transform:translateY(-50%);width:30px;height:30px;border-radius:50%;border:none;background:rgba(255,255,255,.95);box-shadow:0 2px 8px rgba(0,0,0,.18);cursor:pointer;font-size:18px;color:var(--ink);line-height:1;display:flex;align-items:center;justify-content:center;z-index:2;}
+.hd-thumb-arrow-prev{left:-6px;}
+.hd-thumb-arrow-next{right:-6px;}
+@media (min-width:561px){
+  .hd-thumb-row{display:block;}
+  .hd-carousel-dots{display:none;}
+  .hd-arrow{display:none;}
+}
+.hd-dot{width:8px;height:8px;border-radius:50%;border:none;background:rgba(74,34,112,.25);cursor:pointer;padding:0;transition:background .2s;}
+.hd-dot.is-active{background:var(--pink);}
+.hd-arrow{position:absolute;top:calc(50% - 14px);width:38px;height:38px;border-radius:50%;border:none;background:rgba(255,255,255,.92);box-shadow:0 2px 10px rgba(0,0,0,.15);cursor:pointer;font-size:24px;color:var(--ink);line-height:1;display:flex;align-items:center;justify-content:center;z-index:2;}
+.hd-arrow:hover{background:#fff;}
+.hd-arrow-prev{left:10px;}
+.hd-arrow-next{right:10px;}
+@media (max-width:560px){.hd-arrow{display:none;}}
+.hd-article-img{width:100%;height:auto;display:block;border-radius:14px;margin:14px 0 6px;}
+
+
+#hd-kaching-mount{margin:0;}
+#hd-kaching-mount:empty{display:none;}
+#hd-kaching-mount > *:last-child,
+#hd-kaching-mount [class*="kaching"]:last-child{margin-bottom:0 !important;padding-bottom:0 !important;}
+/* Free gift tiles: Kaching defaults (geen overrides) */
+.hd-advertorial-blocks{display:none;}
+.hd-shopify-form{display:flex;flex-direction:column;gap:6px;}
+.hd-atc-native{display:inline-flex !important;align-items:center;justify-content:center;gap:10px;text-transform:none !important;font-weight:700;font-size:17px;}
+.hd-atc-cart-icon{flex:0 0 auto;}
+.hd-price-native{margin:0 0 12px;}
+.hd-price-native .rating-with-text{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;}
+.hd-price-native .price-list{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
+.hd-price-native sale-price{font-size:28px;font-weight:700;color:var(--pink);line-height:1;}
+.hd-price-native compare-at-price{font-size:17px;color:var(--muted);text-decoration:line-through;line-height:1;}
+.hd-price-native .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+
+</style>
+
+<div class="hd-wrap">
+
+  <!-- ============ MASTHEAD ============ -->
+  <div class="hd-masthead">
+    <p class="hd-masthead-name">Women’s Health Daily</p>
+    <p class="hd-masthead-tag">Wellness · Real Stories</p>
+  </div>
+
+  <div class="hd-article">
+
+    <!-- ============ HEADER ============ -->
+    <h1 class="hd-headline">
+      6 Reasons Women Say This Daily Gummy Finally Broke Their
+      <span class="hd-em">UTI Cycle</span> in 2026
+    </h1>
+    <p class="hd-subhead">The quiet shift that’s helping women go months without another flare-up, another antibiotic, or the dread that comes with both.</p>
+
+    <div class="hd-meta">
+      <span>⏱  <b>90 seconds</b> read</span>
+      <span class="hd-meta-dot"></span>
+      <span class="hd-author">
+        <img class="hd-author-img" src="https://cdn.shopify.com/s/files/1/0939/8075/4222/files/image_5.png?v=1754941013&amp;width=160" alt="Sarah Watkins">
+        <span>By <b>Sarah Watkins</b></span>
+      </span>
+      <span class="hd-meta-dot"></span>
+      <span>Updated <b>May 18, 2026</b></span>
+    </div>
+
+    <!-- ============ INTRO ============ -->
+    <p class="hd-lead">
+      If you’ve lost count of how many UTIs you’ve had this year, you
+      already know the pattern. The burning. The 5th, 6th, 7th round of
+      antibiotics. The yeast infection that follows. The recovery. Then
+      it comes back, <span class="hd-hl">faster every time</span>.
+    </p>
+    <p class="hd-body">
+      You’ve tried the cranberry pills, the D-mannose, gallons of water,
+      peeing before and after sex, cotton underwear. Maybe a urologist
+      who eventually shrugged and said <span class="hd-em">“some women are just
+      prone to this.”</span> Most “solutions” treat the symptoms and never
+      touch the cause. That’s why nothing has worked.
+    </p>
+    <p class="hd-body">
+      One women’s wellness brand decided that wasn’t good enough. The
+      result is <b>Herdelica Women’s Probiotic Gummies</b>, a daily
+      cranberry-and-probiotic gummy made for women stuck in the recurrent
+      UTI loop, so <span class="hd-em">“not again”</span> can finally turn into
+      <span class="hd-em">“not anymore.”</span> Below are the 6 reasons women say
+      it’s the first thing that’s actually worked.
+    </p>
+
+    <!-- ============ REASON 1 ============ -->
+    <div class="hd-reason">
+      <div class="hd-reason-head">
+        <div class="hd-num">1</div>
+        <h2 class="hd-reason-title">It Targets the Root Cause, Not Just the Symptoms</h2>
+      </div>
+      <p class="hd-body">
+        Here’s what almost no GP will tell you in a 10-minute
+        appointment: recurrent UTIs almost never start in the bladder.
+        They start in your vaginal microbiome.
+      </p>
+      <p class="hd-body">
+        When the protective Lactobacillus colonies get depleted (by
+        antibiotics, hormones, or the cycle itself), there’s nothing left
+        to stop E. coli from climbing into the bladder. Antibiotics clear
+        the infection, <span class="hd-em">but kill what’s left of your
+        defense</span>. So the cycle starts again. Faster.
+      </p>
+      <p class="hd-body">
+        Cranberry and D-mannose work <span class="hd-em">after</span> the
+        bacteria reaches your bladder. They mop the floor while the leak
+        is still running. <b>Herdelica works upstream.</b> It rebuilds the
+        defense, so E. coli never gets that far.
+      </p>
+      <img class="hd-article-img" src="https://cdn.shopify.com/s/files/1/0939/7193/9654/files/advimg1.png?v=1779798481" alt="Reason 1" loading="lazy">
+    </div>
+
+    <!-- ============ REASON 2 ============ -->
+    <div class="hd-reason">
+      <div class="hd-reason-head">
+        <div class="hd-num">2</div>
+        <h2 class="hd-reason-title">One Gummy Replaces a Drawer Full of Pills</h2>
+      </div>
+      <p class="hd-body">
+        If you’ve been dealing with this for a while, your morning
+        probably looks like a pharmacy shelf. Cranberry capsules,
+        D-mannose powder, probiotics, maybe vitamin C.
+      </p>
+      <p class="hd-body">
+        Most of it doesn’t work alone. All of it costs <b>$80 to $150 a
+        month</b>. Half the time you forget at least one.
+      </p>
+      <p class="hd-body">
+        Herdelica is cranberry plus clinically-studied probiotic strains
+        plus prebiotic, in one daily gummy. One step. <b>Under $2 a day.</b>
+        The women who get the best results aren’t the most disciplined.
+        They’re the ones who <b>actually remember to take it.</b>
+      </p>
+      <img class="hd-article-img" src="https://cdn.shopify.com/s/files/1/0939/7193/9654/files/advimg2.png?v=1779798481" alt="Reason 2" loading="lazy">
+    </div>
+
+    <!-- ============ REASON 3 ============ -->
+    <div class="hd-reason">
+      <div class="hd-reason-head">
+        <div class="hd-num">3</div>
+        <h2 class="hd-reason-title">It Was Made by a Woman Who Lived in the Cycle</h2>
+      </div>
+      <p class="hd-body">
+        Herdelica wasn’t designed in a boardroom. It was built by a woman
+        who spent <b>14 months and 11 UTIs</b> trying to break out of the
+        loop herself.
+      </p>
+      <p class="hd-body">
+        After <b>7 rounds of antibiotics</b>, a specialist who told her
+        there wasn’t much more he could do, and a bathroom shelf full of
+        half-finished supplements, she figured out what was actually
+        missing. Then she put it into one gummy, so no other woman would
+        have to piece it together alone.
+      </p>
+      <p class="hd-body">
+        That’s why the formula is shaped around how women actually live
+        with this, not just what looks good on a lab report.
+      </p>
+      <img class="hd-article-img" src="https://cdn.shopify.com/s/files/1/0939/7193/9654/files/advimg3.png?v=1779798481" alt="Reason 3" loading="lazy">
+    </div>
+
+    <!-- ============ INLINE CTA ============ -->
+    <div class="hd-inline-cta">
+      <a class="hd-btn-sm" href="#buy">See Today’s Price →</a>
+    </div>
+
+    <!-- ============ REASON 4 ============ -->
+    <div class="hd-reason">
+      <div class="hd-reason-head">
+        <div class="hd-num">4</div>
+        <h2 class="hd-reason-title">You Stop Bracing for the Next One</h2>
+      </div>
+      <p class="hd-body">
+        Most women in the cycle don’t realize how much energy goes into
+        waiting for the next UTI. Bracing every time you have sex.
+        Planning your day around the closest bathroom. Tensing up the
+        second you feel anything that might be the start of it.
+      </p>
+      <p class="hd-body">
+        When the microbiome finally rebuilds, that low-grade anxiety
+        quietly disappears. You stop thinking about your bladder. You
+        sleep through the night. Many women say <span class="hd-em">that’s</span>
+        the moment they realize Herdelica is working: not when the
+        symptoms stop, but when the <b>dread</b> does.
+      </p>
+      <img class="hd-article-img" src="https://cdn.shopify.com/s/files/1/0939/7193/9654/files/advimg4.png?v=1779798481" alt="Reason 4" loading="lazy">
+    </div>
+
+    <!-- ============ REASON 5 ============ -->
+    <div class="hd-reason">
+      <div class="hd-reason-head">
+        <div class="hd-num">5</div>
+        <h2 class="hd-reason-title">Built Around the Strains That Actually Matter</h2>
+      </div>
+      <p class="hd-body">
+        Most “women’s probiotics” on the shelf are gut probiotics with a
+        pink label. They were never formulated for the urinary tract.
+      </p>
+      <p class="hd-body">
+        Herdelica is built around the strains with the strongest research
+        behind them for the female microbiome:
+      </p>
+      <ul class="hd-ingredients">
+        <li>
+<b>Lactobacillus rhamnosus, L. reuteri &amp; L. crispatus</b>, the strains that travel from gut to vaginal tract and crowd out the E. coli behind most recurrent UTIs.</li>
+        <li>
+<b>Standardized cranberry PACs</b>, for urinary-tract support at a clinically meaningful dose.</li>
+        <li>
+<b>Prebiotic inulin</b>, so the good bacteria actually survive long enough to colonize.</li>
+      </ul>
+      <p class="hd-body" style="margin-top:14px;">
+        Not just a probiotic. Not just cranberry. A complete daily
+        formula for the women who are tired of guessing.
+      </p>
+      <img class="hd-article-img" src="https://cdn.shopify.com/s/files/1/0939/7193/9654/files/advimg5.png?v=1779798481" alt="Reason 5" loading="lazy">
+    </div>
+
+    <!-- ============ REASON 6 ============ -->
+    <div class="hd-reason">
+      <div class="hd-reason-head">
+        <div class="hd-num">6</div>
+        <h2 class="hd-reason-title">“Not Again” Slowly Turns Into “Not Anymore”</h2>
+      </div>
+      <p class="hd-body">
+        The women who get the most out of Herdelica treat it like
+        brushing their teeth: a small daily habit that quietly builds in
+        the background.
+      </p>
+      <p class="hd-body">
+        By week two, the false alarms start fading. By week four, most
+        women realize they haven’t checked the calendar for “when was my
+        last one” in days. By week eight, the microbiome has rebuilt
+        enough that the cycle has lost its grip.
+      </p>
+      <p class="hd-body">
+        It’s not a miracle. It’s not overnight. It’s the first thing in a
+        long time that actually works <span class="hd-em">with</span> your body
+        instead of against it. And one morning you’ll catch yourself
+        realizing it’s been months since the last one. That’s when
+        <span class="hd-em">“not again”</span> finally turns into
+        <span class="hd-em">“not anymore.”</span>
+      </p>
+      <img class="hd-article-img" src="https://cdn.shopify.com/s/files/1/0939/7193/9654/files/advimg6.png?v=1779798480" alt="Reason 6" loading="lazy">
+    </div>
+
+  </div>
+<!-- /.hd-article -->
+
+  <!-- ============ CTA ============ -->
+  <div class="hd-cta">
+    <h2 class="hd-cta-title">
+      How to Start Breaking the Cycle<br>
+      Before This Batch Sells Out
+    </h2>
+    <div class="hd-offer">🍒 New customers save big on their first 30-day supply</div>
+    <div class="hd-risk">⚠️ Selling Fast</div>
+    <br>
+    <a class="hd-btn" href="#buy">See Today’s Price →</a>
+  </div>
+
+  <!-- ============ PRODUCTSECTIE ============ -->
+  <div class="hd-product" id="buy">
+    <div class="hd-product-grid">
+
+      <!-- linkerkolom: productafbeeldingen uit herdelica.com -->
+      <div class="hd-gallery">
+        <div class="hd-carousel" id="hdCarousel">
+          <img src="https://herdelica.com/cdn/shop/files/HERDELICA_PDP_PAGE_1.jpg?v=1778923693&amp;width=1080" alt="Herdelica Women’s Probiotic Gummies" loading="eager">
+          <img src="https://herdelica.com/cdn/shop/files/HERDELICA_PDP_PAGE_2.png?v=1764513074&amp;width=1080" alt="Herdelica Women’s Probiotic Gummies" loading="lazy">
+          <img src="https://herdelica.com/cdn/shop/files/HERDELICA_PDP_PAGE_3_copy.png?v=1764513075&amp;width=1080" alt="Herdelica Women’s Probiotic Gummies" loading="lazy">
+          <img src="https://herdelica.com/cdn/shop/files/HERDELICA_PDP_PAGE_4_copy.jpg?v=1778923693&amp;width=1080" alt="Herdelica Women’s Probiotic Gummies" loading="lazy">
+          <img src="https://herdelica.com/cdn/shop/files/HERDELICA_PDP_PAGE_5.png?v=1765438607&amp;width=1080" alt="Herdelica Women’s Probiotic Gummies" loading="lazy">
+        </div>
+        <button type="button" class="hd-arrow hd-arrow-prev" aria-label="Previous">‹</button>
+        <button type="button" class="hd-arrow hd-arrow-next" aria-label="Next">›</button>
+        <div class="hd-carousel-dots">
+          <button type="button" class="hd-dot is-active" data-i="0" aria-label="Slide 1"></button>
+          <button type="button" class="hd-dot" data-i="1" aria-label="Slide 2"></button>
+          <button type="button" class="hd-dot" data-i="2" aria-label="Slide 3"></button>
+          <button type="button" class="hd-dot" data-i="3" aria-label="Slide 4"></button>
+          <button type="button" class="hd-dot" data-i="4" aria-label="Slide 5"></button>
+        </div>
+        <div class="hd-thumb-row">
+          <div class="hd-carousel-thumbs" id="hdThumbs">
+            <button type="button" class="hd-thumb is-active" data-i="0" aria-label="Slide 1"><img src="https://herdelica.com/cdn/shop/files/HERDELICA_PDP_PAGE_1.jpg?v=1778923693&amp;width=240" alt=""></button>
+            <button type="button" class="hd-thumb" data-i="1" aria-label="Slide 2"><img src="https://herdelica.com/cdn/shop/files/HERDELICA_PDP_PAGE_2.png?v=1764513074&amp;width=240" alt=""></button>
+            <button type="button" class="hd-thumb" data-i="2" aria-label="Slide 3"><img src="https://herdelica.com/cdn/shop/files/HERDELICA_PDP_PAGE_3_copy.png?v=1764513075&amp;width=240" alt=""></button>
+            <button type="button" class="hd-thumb" data-i="3" aria-label="Slide 4"><img src="https://herdelica.com/cdn/shop/files/HERDELICA_PDP_PAGE_4_copy.jpg?v=1778923693&amp;width=240" alt=""></button>
+            <button type="button" class="hd-thumb" data-i="4" aria-label="Slide 5"><img src="https://herdelica.com/cdn/shop/files/HERDELICA_PDP_PAGE_5.png?v=1765438607&amp;width=240" alt=""></button>
+          </div>
+          <button type="button" class="hd-thumb-arrow hd-thumb-arrow-prev" aria-label="Previous">‹</button>
+          <button type="button" class="hd-thumb-arrow hd-thumb-arrow-next" aria-label="Next">›</button>
+        </div>
+      </div>
+
+      <!-- rechterkolom: info -->
+      <div class="hd-product-info">
+        <h2 class="hd-product-title">Herdelica Women’s Probiotic Gummies.</h2>
+
+        <div class="hd-benefits">
+          <div class="hd-benefit">
+            <span class="hd-benefit-ic">🌺</span>
+            <span>Targets the Cycle, Not Just the Burning</span>
+          </div>
+          <div class="hd-benefit">
+            <span class="hd-benefit-ic">💖</span>
+            <span>Made by a Woman With 11 UTIs of Her Own</span>
+          </div>
+          <div class="hd-benefit">
+            <span class="hd-benefit-ic">⏰</span>
+            <span>Replaces a Drawer Full of Pills</span>
+          </div>
+          <div class="hd-benefit">
+            <span class="hd-benefit-ic">⭐</span>
+            <span>Built for the Long Game, Not the Flare-Up</span>
+          </div>
+        </div>
+
+        
+
+        <!-- Add to cart — werkende Shopify-cartform met de echte varianten -->
+        <div class="product-info__price hd-price-native">
+          <div class="rating-with-text">
+            <price-list class="price-list price-list--lg ">
+              <sale-price class="text-lg text-on-sale">
+                <span class="sr-only">Sale price</span>$34.95
+              </sale-price>
+              <compare-at-price class="text-subdued line-through">
+                <span class="sr-only">Regular price</span>$60.00
+              </compare-at-price>
+            </price-list>
+          </div>
+        </div>
+        <form method="post" action="/cart/add" id="product-form-15259696562502-advertorial" accept-charset="UTF-8" class="shopify-product-form hd-shopify-form" enctype="multipart/form-data" is="product-form">
+          <input type="hidden" name="form_type" value="product">
+          <input type="hidden" name="utf8" value="✓">
+          <input type="hidden" name="id" value="55617410040134">
+          <div id="hd-kaching-mount"></div>
+          <buy-buttons class="buy-buttons hd-buy-buttons" template="uti" form="product-form-15259696562502-advertorial">
+            <button type="submit" class="button button--xl hd-atc-native" style="--button-background: 247 4 94 / var(--button-background-opacity, 1);--button-outline-color: 247 4 94;width:100%;" is="custom-button">
+              <svg class="hd-atc-cart-icon" aria-hidden="true" focusable="false" width="18" height="18" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+              <span>Add to cart</span>
+            </button>
+          </buy-buttons>
+          <input type="hidden" name="product-id" value="15259696562502">
+        </form>
+
+        <a class="hd-view" href="/products/herdelica-probiotic-gummies">View Product</a>
+
+        <p class="hd-guarantee">
+          ✓ 30-Day Money-Back Guarantee  ·  Discreet shipping
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============ TRUST SIGNALS ============ -->
+  <div class="hd-trust">
+    <div class="hd-stars">★★★★★</div>
+    <p class="hd-reviews">10,000+ Trusted Customer Reviews</p>
+    <ul class="hd-checks">
+      <li>
+<span class="hd-check-ic">✓</span> Targets the root cause</li>
+      <li>
+<span class="hd-check-ic">✓</span> 30-Day Money-Back Guarantee</li>
+      <li>
+<span class="hd-check-ic">✓</span> Discreet shipping</li>
+    </ul>
+  </div>
+
+  <!-- ============ DISCLAIMER ============ -->
+  <p class="hd-disclaimer">
+    These statements have not been evaluated by a food or
+    medicines authority. This product is a dietary supplement and is not
+    intended to diagnose, treat, cure or prevent any disease. Results vary
+    per person. Consult a healthcare professional for recurring symptoms.
+  </p>
+
+  <!-- ============ FOOTER ============ -->
+  <div class="hd-footer">
+    <p>© 2026 Herdelica. All rights reserved.</p>
+    <p>
+      <a href="#">Privacy Policy</a> ·
+      <a href="#">Terms of Service</a>
+    </p>
+  </div>
+
+</div><!-- /.hd-wrap -->
+
+<script>
+(function(){
+  // ----- Carousel -----
+  var car=document.getElementById('hdCarousel');
+  if(car){
+    var dots=document.querySelectorAll('.hd-carousel-dots .hd-dot');
+    var thumbs=document.querySelectorAll('#hdThumbs .hd-thumb');
+    var prev=document.querySelector('.hd-arrow-prev');
+    var next=document.querySelector('.hd-arrow-next');
+    var tprev=document.querySelector('.hd-thumb-arrow-prev');
+    var tnext=document.querySelector('.hd-thumb-arrow-next');
+    var slides=car.querySelectorAll('img');
+    function active(){return Math.round(car.scrollLeft/car.clientWidth);}
+    function update(){
+      var i=active();
+      dots.forEach(function(d,k){d.classList.toggle('is-active',k===i);});
+      thumbs.forEach(function(t,k){t.classList.toggle('is-active',k===i);});
+      var act=document.querySelector('#hdThumbs .hd-thumb.is-active');
+      if(act&&act.scrollIntoView)act.scrollIntoView({behavior:'smooth',block:'nearest',inline:'nearest'});
+    }
+    car.addEventListener('scroll',update,{passive:true});
+    dots.forEach(function(d,i){d.addEventListener('click',function(){car.scrollTo({left:i*car.clientWidth,behavior:'smooth'});});});
+    thumbs.forEach(function(t,i){t.addEventListener('click',function(){car.scrollTo({left:i*car.clientWidth,behavior:'smooth'});});});
+    function go(delta){car.scrollTo({left:Math.max(0,Math.min(slides.length-1,active()+delta))*car.clientWidth,behavior:'smooth'});}
+    if(prev)prev.addEventListener('click',function(){go(-1);});
+    if(next)next.addEventListener('click',function(){go(1);});
+    if(tprev)tprev.addEventListener('click',function(){go(-1);});
+    if(tnext)tnext.addEventListener('click',function(){go(1);});
+  }
+
+  // ----- Move Kaching widget into the buy card -----
+  function moveKaching(){
+    var mount=document.getElementById('hd-kaching-mount');
+    var src=document.querySelector('.hd-advertorial-blocks');
+    if(!mount||!src)return false;
+    var kaching=src.querySelector('[class*="kaching"],[id*="kaching"]');
+    if(!kaching)return false;
+    mount.appendChild(src);
+    src.style.display='block';
+    return true;
+  }
+  if(!moveKaching()){
+    var obs=new MutationObserver(function(){if(moveKaching())obs.disconnect();});
+    obs.observe(document.body,{childList:true,subtree:true});
+    setTimeout(function(){obs.disconnect();},15000);
+  }
+
+  // ----- Equal-height bundle tier bars (geen MutationObserver) -----
+  var ebBusy=false, ebTries=0, ebRT;
+  function equalizeBars(){
+    if(ebBusy) return false;
+    ebBusy=true;
+    try{
+      var all=document.querySelectorAll('#hd-kaching-mount [data-deal-bar-id]');
+      // Filter alleen zichtbare bars (geen display:none, hidden mobile/desktop varianten)
+      var bars=[];
+      all.forEach(function(b){if(b.offsetParent!==null) bars.push(b);});
+      if(bars.length<2) return false;
+      bars.forEach(function(b){b.style.minHeight='';});
+      // force reflow
+      void document.body.offsetHeight;
+      var max=0;
+      bars.forEach(function(b){var h=b.getBoundingClientRect().height; if(h>max) max=h;});
+      if(max<=0) return false;
+      max=Math.ceil(max);
+      bars.forEach(function(b){b.style.minHeight=max+'px';});
+      return true;
+    } finally { ebBusy=false; }
+  }
+  function tryEqualize(){
+    if(equalizeBars()) return;
+    if(++ebTries<40) setTimeout(tryEqualize,300);
+  }
+  tryEqualize();
+  // Extra runs voor mobile (Kaching kan langzamer renderen) + na load + na font-loads
+  [1500,3000,5000].forEach(function(t){setTimeout(equalizeBars,t);});
+  window.addEventListener('load',function(){setTimeout(equalizeBars,200);});
+  if(document.fonts&&document.fonts.ready){document.fonts.ready.then(function(){setTimeout(equalizeBars,100);});}
+  window.addEventListener('resize',function(){
+    clearTimeout(ebRT);
+    ebRT=setTimeout(equalizeBars,200);
+  });
+  document.addEventListener('click',function(e){
+    if(e.target.closest && e.target.closest('#hd-kaching-mount [data-deal-bar-id]')){
+      setTimeout(equalizeBars,250);
+      setTimeout(equalizeBars,600);
+      setTimeout(equalizeBars,1200);
+    }
+  });
+
+  // ----- Currency-suffix toevoegen aan native price (zonder Kaching in de wielen te rijden) -----
+  // Kaching schrijft het bedrag (in visitor currency, instant). Wij hangen er alleen "AUD"/"CAD"/etc achter.
+  var curSuffix=(window.Shopify&&Shopify.currency&&Shopify.currency.active)||'';
+  var suffixBusy=false;
+  function appendCurrencySuffix(){
+    if(suffixBusy || !curSuffix) return;
+    suffixBusy=true;
+    try{
+      ['sale-price','compare-at-price'].forEach(function(sel){
+        var el=document.querySelector('.hd-price-native '+sel);
+        if(!el) return;
+        if(el.dataset.hdHidden==='1') return;
+        // Pak de zichtbare price text (laatste text node, na de sr-only span)
+        var nodes=el.childNodes;
+        for(var i=nodes.length-1;i>=0;i--){
+          var n=nodes[i];
+          if(n.nodeType===3){ // text node
+            var t=n.nodeValue;
+            var trimmed=t.replace(/\s+$/,'').replace(/\s+/g,' ');
+            if(!trimmed) continue;
+            // Heeft hij al een 3-letter currency code aan het eind?
+            if(/[A-Z]{3}\s*$/.test(trimmed)) return;
+            if(!/\d/.test(trimmed)) continue;
+            n.nodeValue=trimmed+' '+curSuffix;
+            return;
+          }
+        }
+      });
+    } finally {
+      setTimeout(function(){suffixBusy=false;},30);
+    }
+  }
+  // Initial — de hardcoded HTML heeft al "$34.95" zonder suffix, daar hangen we direct iets achter
+  appendCurrencySuffix();
+  // Narrow-scope observer op alleen het price-blok (geen body-wide observer!)
+  var priceBlock=document.querySelector('.hd-price-native');
+  if(priceBlock){
+    var pObs=new MutationObserver(function(){appendCurrencySuffix();});
+    pObs.observe(priceBlock,{childList:true,subtree:true,characterData:true});
+  }
+  // Compare-at hide als sale==compare (Kaching zorgt voor de waarde, wij voor de zichtbaarheid)
+  function maybeHideCompare(){
+    var sale=document.querySelector('.hd-price-native sale-price');
+    var cmp=document.querySelector('.hd-price-native compare-at-price');
+    if(!sale||!cmp) return;
+    var getNum=function(el){
+      var m=(el.textContent||'').replace(/[^\d.,]/g,'').replace(',','.');
+      return parseFloat(m)||0;
+    };
+    if(getNum(sale)>=getNum(cmp) && getNum(cmp)>0){
+      cmp.style.display='none'; cmp.dataset.hdHidden='1';
+    } else {
+      cmp.style.display=''; cmp.dataset.hdHidden='0';
+    }
+  }
+  maybeHideCompare();
+  if(priceBlock){
+    var cObs=new MutationObserver(function(){maybeHideCompare();});
+    cObs.observe(priceBlock,{childList:true,subtree:true,characterData:true});
+  }
+
+})();
+</script>

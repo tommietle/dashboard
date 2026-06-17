@@ -1,0 +1,382 @@
+{%- comment -%}
+  herd-subscribe-save
+  Subscribe & Save picker — bloomin-style.
+  Prices are read directly from product variants (no hardcoded numbers).
+  Per-day = variant.price / day_count, rounded to nearest cent.
+
+  === CONFIGURE SELLING PLAN IDS ===
+  Paste numeric IDs from Kaching Subscriptions admin into sp_buy2get1 / sp_buy1.
+  Leave empty ('') to fall back to one-time.
+{%- endcomment -%}
+
+{%- liquid
+  assign sp_buy2get1 = '693849293126'
+  assign sp_buy1 = '693849260358'
+
+  assign variant_id_buy2get1 = 56717079839046
+  assign variant_id_buy1 = 56717079871814
+  assign variant_id_onetime = 56718681440582
+
+  assign v_buy2get1 = nil
+  assign v_buy1 = nil
+  for v in product.variants
+    if v.id == variant_id_buy2get1
+      assign v_buy2get1 = v
+    endif
+    if v.id == variant_id_buy1
+      assign v_buy1 = v
+    endif
+  endfor
+
+  assign days_buy2get1 = 90
+  assign days_buy1 = 30
+
+  assign perd_buy2get1 = v_buy2get1.price | times: 10 | divided_by: days_buy2get1 | plus: 5 | divided_by: 10
+  assign perd_buy1 = v_buy1.price | times: 10 | divided_by: days_buy1 | plus: 5 | divided_by: 10
+  assign perd_buy2get1_onetime = v_buy2get1.compare_at_price | times: 10 | divided_by: days_buy2get1 | plus: 5 | divided_by: 10
+  assign perd_buy1_onetime = v_buy1.compare_at_price | times: 10 | divided_by: days_buy1 | plus: 5 | divided_by: 10
+-%}
+
+<style>
+  /* Prevent unintended horizontal scroll on mobile (something overflows viewport) */
+  html, body { overflow-x: hidden !important; max-width: 100% !important; }
+
+  .hd-sub-divider {
+    border: none;
+    border-top: 1px solid #e5e5e5;
+    margin: 0 0 18px;
+  }
+  .hd-sub-banner {
+    background: #eaf6ed;
+    color: #1f9c6e;
+    padding: 14px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 1.35;
+    margin: 0 0 18px;
+    text-align: left;
+  }
+  .hd-sub-banner strong { font-weight: 700; margin-right: 4px; }
+
+  .subscription-box h3 {
+    margin-bottom: 15px;
+    font-weight: 700;
+    font-size: 16px;
+  }
+  .hd-price-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    justify-content: flex-end;
+  }
+  .plan {
+    display: block;
+    border: 2px solid #eee;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    background: #fff;
+    cursor: pointer;
+    position: relative;
+    padding: 15px;
+  }
+  .plan input {
+    position: absolute;
+    top: 20px;
+    left: 15px;
+    opacity: 0;
+  }
+  .plan-content { margin-left: 30px; }
+  .plan:has(input:checked) {
+    border-color: #f5b5c0;
+    background: #fff6f8;
+  }
+
+  .plan-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  .plan-header strong { font-size: 16px; }
+  .plan-header p { margin: 3px 0 0; font-size: 13px; color: #777; }
+
+  .hd-sub-wrap .hd-price,
+  .hd-sub-wrap .hd-price * { color: #111 !important; }
+  .hd-sub-wrap .hd-price { text-align: right; }
+  .hd-sub-wrap .hd-price .hd-new { font-weight: 700 !important; font-size: 16px; color: #111 !important; }
+  .hd-sub-wrap .hd-price .hd-old {
+    text-decoration: line-through;
+    color: #999 !important;
+    font-size: 13px;
+    font-weight: 400 !important;
+  }
+  .hd-sub-wrap .hd-price small { font-size: 12px; color: #777 !important; display: block; font-weight: 400 !important; }
+  /* Disable theme's currency suffix observer on our prices (no "USD" suffix) */
+  .hd-sub-wrap .hd-price .hd-new::after,
+  .hd-sub-wrap .hd-price .hd-old::after,
+  .hd-sub-wrap .hd-price small::after { content: none !important; }
+
+  .hd-sub-wrap .plan .badge {
+    position: absolute;
+    top: -10px;
+    right: 15px;
+    background: #ff5c7c;
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: bold;
+  }
+  .hd-sub-wrap .plan .badge.secondary { background: #f4a261; }
+
+  .cus-select-round {
+    width: 19px;
+    min-width: 19px;
+    height: 19px;
+    border-radius: 50%;
+    border: 1px solid #000000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 18px;
+    left: 13px;
+    background: #fff;
+  }
+  label.plan input:checked + div div {
+    width: 10px;
+    height: 10px;
+    min-width: 8px;
+    border-radius: 50%;
+    background: #FF3CA0;
+    transition: all .3s ease;
+  }
+
+  .benefits {
+    margin-top: 10px;
+    padding-left: 0;
+    list-style: none;
+    font-size: 13px;
+    color: #444;
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .benefits li { margin: 5px 0; width: 50%; }
+
+  .one-time {
+    text-align: center;
+    margin-top: 10px;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 10px 14px;
+    border: 2px solid transparent;
+    border-radius: 12px;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .one-time.active {
+    border-color: #f5b5c0;
+    background: #fff6f8;
+  }
+  .one-time strong { color: #c0392b; }
+  .one-time span { color: #777; margin-left: 5px; }
+  .adding_pd .one-time.buy_once, .adding_pd button.hd-sub-atc {
+    opacity: 0.3 !important;
+    pointer-events: none;
+  }
+
+  /* "Only a few left!" pill bar — trybloomin style, brand colors */
+  .hd-only-few-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff0f5;
+    border-radius: 999px;
+    padding: 6px 12px;
+    margin: 12px 0 20px;
+  }
+  .hd-ofl-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #F7035E;
+    flex-shrink: 0;
+  }
+  .hd-ofl-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #111;
+    white-space: nowrap;
+  }
+  .hd-ofl-label strong {
+    color: #F7035E;
+    font-weight: 700;
+  }
+  .hd-ofl-track {
+    flex: 1;
+    height: 5px;
+    background: #ffd6e3;
+    border-radius: 999px;
+    overflow: hidden;
+    min-width: 50px;
+  }
+  .hd-ofl-fill {
+    height: 100%;
+    width: 8%;
+    background: #F7035E;
+    border-radius: 999px;
+  }
+
+  .hd-sub-atc {
+    display: block;
+    width: 100%;
+    margin-top: 8px;
+    padding: 16px 20px;
+    background: #F7035E;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    text-align: center;
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.05s;
+  }
+  .hd-sub-atc:hover { opacity: 0.88; }
+  .hd-sub-atc:active { transform: translateY(1px); }
+  .hd-sub-atc[disabled] { opacity: 0.6; cursor: wait; }
+  .hd-sub-error {
+    display: none;
+    margin-top: 10px;
+    padding: 10px 12px;
+    background: #fdecea;
+    color: #b71c1c;
+    border-radius: 6px;
+    font-size: 13px;
+  }
+  .hd-sub-error.is-visible { display: block; }
+
+  /* Native price block: put "On sale" badge inline next to the price */
+  .product-info__price .rating-with-text {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+  .product-info__price .product-info__badge-list {
+    display: inline-flex !important;
+    align-items: center !important;
+    margin: 0 !important;
+  }
+  .product-info__price on-sale-badge.badge--on-sale {
+    display: inline-flex !important;
+    align-items: center !important;
+    line-height: 1 !important;
+  }
+
+  /* Hide auto-injected Kaching widget — we use this custom picker */
+  kaching-bundles,
+  .kaching-bundles,
+  .kaching-bundles-app,
+  [data-kaching-bundles],
+  .kaching-subscription-app,
+  .kaching-subscriptions-widget,
+  .kaching-bundles-widget,
+  .ksb-widget,
+  .ksb-app,
+  [data-ksb-app],
+  [class*="kaching-bundles"],
+  [class*="kaching-subscription"] { display: none !important; }
+
+  @media (max-width: 600px) {
+    .benefits li { width: 100%; }
+  }
+</style>
+
+<div class="hd-sub-wrap subscription-box">
+  <hr class="hd-sub-divider" />
+  <div class="hd-sub-banner">
+    <strong>Limited Time Offer</strong>Buy 2 &amp; Get 1 Month Free!
+  </div>
+
+  {%- form 'product', product, id: 'hd-sub-form', class: 'hd-sub-form' -%}
+    <input type="hidden" name="id" value="{{ variant_id_buy2get1 }}" data-hd-variant>
+    <input type="hidden" name="selling_plan" value="{{ sp_buy2get1 }}" data-hd-plan>
+    <input type="hidden" name="quantity" value="1" data-hd-qty>
+
+    <h3>Subscribe &amp; Save</h3>
+
+    {%- comment -%} Plan 1 — BEST VALUE {%- endcomment -%}
+    <label class="plan"
+           data-variant="{{ variant_id_buy2get1 }}"
+           data-plan="{{ sp_buy2get1 }}"
+           data-onetime-variant="{{ variant_id_buy2get1 }}">
+      <input type="radio" class="plan_sid" name="hd-tier" value="1" checked
+             onetime="$72.00"
+             prs="$2.40/day">
+      <div class="cus-select-round"><div></div></div>
+      <div class="plan-content">
+        <div class="plan-header">
+          <div>
+            <strong>Buy 2 get 1 free</strong>
+            <p>90 Day Supply</p>
+          </div>
+          <div class="hd-price">
+            <div class="hd-price-row">
+              <span class="hd-new">{{ v_buy2get1.price | money | replace: ' USD', '' }}</span>
+              <span class="hd-old">{{ v_buy2get1.compare_at_price | money | replace: ' USD', '' }}</span>
+            </div>
+            <small>{{ perd_buy2get1 | money | replace: ' USD', '' }}/day</small>
+          </div>
+        </div>
+        <div class="badge">BEST VALUE</div>
+        <ul class="benefits">
+          <li>🚚 Free shipping on all orders</li>
+          <li>🛡️ Money back guarantee</li>
+          <li>📕 Free Balance Guide E-book</li>
+          <li>💰 20% OFF all future shipments</li>
+          <li>❌ Pause or cancel anytime</li>
+        </ul>
+      </div>
+    </label>
+
+    {%- comment -%} Plan 2 — ESSENTIAL {%- endcomment -%}
+    <label class="plan"
+           data-variant="{{ variant_id_buy1 }}"
+           data-plan="{{ sp_buy1 }}"
+           data-onetime-variant="{{ variant_id_buy1 }}">
+      <input type="radio" class="plan_sid" name="hd-tier" value="2"
+             onetime="$72.00"
+             prs="$2.40/day">
+      <div class="cus-select-round"><div></div></div>
+      <div class="plan-content">
+        <div class="plan-header">
+          <div>
+            <strong>Buy 1</strong>
+            <p>30 Day Supply</p>
+          </div>
+          <div class="hd-price">
+            <div class="hd-price-row">
+              <span class="hd-new">{{ v_buy1.price | money | replace: ' USD', '' }}</span>
+              <span class="hd-old">{{ v_buy1.compare_at_price | money | replace: ' USD', '' }}</span>
+            </div>
+            <small>{{ perd_buy1 | money | replace: ' USD', '' }}/day</small>
+          </div>
+        </div>
+        <div class="badge secondary">ESSENTIAL</div>
+      </div>
+    </label>
+
+    <div class="one-time buy_once" data-variant="{{ variant_id_onetime }}">
+      One-time purchase <strong>$72.00</strong> <span>$2.40/day </span>
+    </div>
+
+    <div class="hd-only-few-left">
+      <span class="hd-ofl-dot"></span>
+      <span class="hd-ofl-label">Only a few left! <strong>8%</strong></span>
+      <div class="hd-ofl-track"><div class="hd-ofl-fill"></div></div>
+    </div>
+
+  {%- endform -%}
+</div>

@@ -1,0 +1,201 @@
+{%- comment -%}
+  herd-subscribe-save-atc
+  ATC button that submits the form rendered by `herd-subscribe-save` snippet.
+  Uses HTML5 `form` attribute so the button can live outside the form.
+  Picker class names match trybloomin.com 1:1 (.plan, .plan_sid, .buy_once).
+{%- endcomment -%}
+
+<div class="hd-sub-atc-wrap">
+  <button type="submit" form="hd-sub-form" class="hd-sub-atc" data-hd-atc>
+    <span data-hd-atc-text>Add to Cart</span>
+  </button>
+  <div class="hd-sub-error" data-hd-error></div>
+</div>
+
+<script>
+(function() {
+  function init() {
+    var form = document.getElementById('hd-sub-form');
+    if (!form) return;
+    var variantInput = form.querySelector('[data-hd-variant]');
+    var planInput = form.querySelector('[data-hd-plan]');
+    var atc = document.querySelector('[data-hd-atc]');
+    var atcText = document.querySelector('[data-hd-atc-text]');
+    var errorEl = document.querySelector('[data-hd-error]');
+    var plans = form.querySelectorAll('label.plan');
+    var buyOnce = form.querySelector('.buy_once');
+
+    function updateBuyOnceDisplay(plan) {
+      if (!buyOnce) return;
+      var radio = plan.querySelector('input.plan_sid');
+      var onetime = radio ? radio.getAttribute('onetime') || '' : '';
+      var prs = radio ? radio.getAttribute('prs') || '' : '';
+      buyOnce.innerHTML = 'One-time purchase <strong>' + onetime + '</strong> <span>' + prs + '</span>';
+      // NB: do NOT overwrite buyOnce.dataset.variant — keep the initial buy1 variant
+      // so clicking "One-time purchase" always selects the 1-month bottle.
+    }
+
+    function moveOnSaleBadge() {
+      var badge = document.querySelector('.product-info__price on-sale-badge');
+      if (!badge) return;
+      var compareAt = document.querySelector('.product-info__price compare-at-price');
+      var salePrice = document.querySelector('.product-info__price sale-price');
+      var anchor = compareAt || salePrice;
+      if (anchor && anchor.parentElement && badge.parentElement !== anchor.parentElement) {
+        anchor.insertAdjacentElement('afterend', badge);
+      }
+      badge.style.cssText = 'display:inline-flex !important;align-items:center !important;vertical-align:middle !important;margin-left:8px !important;';
+    }
+
+    var syncCtrl = null;
+    async function syncNativeVariant(variantId) {
+      if (!variantId) return;
+      try {
+        var url = new URL(window.location.href);
+        url.searchParams.set('variant', variantId);
+        window.history.replaceState({}, '', url);
+      } catch (_) {}
+
+      // Dispatch variant change events for theme listeners
+      try {
+        var detail = { variant: { id: parseInt(variantId, 10) } };
+        ['variant:change', 'on:variant:change'].forEach(function(name) {
+          document.dispatchEvent(new CustomEvent(name, { bubbles: true, detail: detail }));
+          window.dispatchEvent(new CustomEvent(name, { bubbles: true, detail: detail }));
+        });
+      } catch (_) {}
+
+      // Re-render native price block via Shopify section rendering API
+      try {
+        if (syncCtrl) syncCtrl.abort();
+        syncCtrl = new AbortController();
+        var mainSection = document.querySelector('[id^="shopify-section-"] .product-info__price')
+          && document.querySelector('[id^="shopify-section-"] .product-info__price').closest('[id^="shopify-section-"]');
+        if (!mainSection) {
+          mainSection = document.querySelector('[id^="shopify-section-template--"][id*="main"]')
+            || document.querySelector('[id^="shopify-section-"][id*="main-product"]')
+            || document.querySelector('[id^="shopify-section-"]');
+        }
+        if (!mainSection) return;
+        var sectionId = mainSection.id.replace('shopify-section-', '');
+
+        var res = await fetch(window.location.pathname + '?variant=' + variantId + '&section_id=' + sectionId, { signal: syncCtrl.signal });
+        if (!res.ok) return;
+        var html = await res.text();
+        var parser = new DOMParser();
+        var doc = parser.parseFromString(html, 'text/html');
+
+        // Native price block — skip our own .hd-price inside the picker
+        var oldPrices = document.querySelectorAll('.product-info__price');
+        var newPrices = doc.querySelectorAll('.product-info__price');
+        oldPrices.forEach(function(oldEl, idx) {
+          if (oldEl.closest('.hd-sub-wrap')) return;
+          var newEl = newPrices[idx] || newPrices[0];
+          if (newEl) oldEl.innerHTML = newEl.innerHTML;
+        });
+
+        // Re-position badge after innerHTML replacement
+        moveOnSaleBadge();
+      } catch (_) {}
+    }
+
+    function selectPlan(plan) {
+      plans.forEach(function(p) { p.classList.remove('active'); });
+      plan.classList.add('active');
+      if (buyOnce) buyOnce.classList.remove('active');
+      var radio = plan.querySelector('input.plan_sid');
+      if (radio) radio.checked = true;
+      variantInput.value = plan.dataset.variant || '';
+      planInput.value = plan.dataset.plan || '';
+      updateBuyOnceDisplay(plan);
+      syncNativeVariant(plan.dataset.variant || '');
+    }
+
+    function selectOnetime() {
+      plans.forEach(function(p) {
+        p.classList.remove('active');
+        var r = p.querySelector('input.plan_sid');
+        if (r) r.checked = false;
+      });
+      if (buyOnce) buyOnce.classList.add('active');
+      variantInput.value = buyOnce.dataset.variant || '';
+      planInput.value = '';
+      syncNativeVariant(buyOnce.dataset.variant || '');
+    }
+
+    plans.forEach(function(plan) {
+      plan.addEventListener('click', function(e) {
+        if (e.target.tagName === 'A' || e.target.tagName === 'BUTTON') return;
+        selectPlan(plan);
+      });
+    });
+
+    if (buyOnce) buyOnce.addEventListener('click', selectOnetime);
+
+    // Sync buy_once display with the initial active plan
+    var initial = form.querySelector('label.plan.active') || plans[0];
+    if (initial) updateBuyOnceDisplay(initial);
+
+    // Move "On sale" badge inline next to the price on first paint
+    moveOnSaleBadge();
+
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      if (errorEl) { errorEl.classList.remove('is-visible'); errorEl.textContent = ''; }
+      if (atc) atc.disabled = true;
+      var originalText = atcText ? atcText.textContent : 'Add to Cart';
+      if (atcText) atcText.textContent = 'Adding...';
+
+      try {
+        var fd = new FormData(form);
+        fd.delete('hd-tier');
+        if (!fd.get('selling_plan')) fd.delete('selling_plan');
+
+        var res = await fetch('/cart/add.js', {
+          method: 'POST',
+          body: fd,
+          headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+        });
+
+        if (!res.ok) {
+          var errData = await res.json().catch(function() { return {}; });
+          throw new Error(errData.description || errData.message || 'Could not add to cart.');
+        }
+
+        var addedItem = await res.json().catch(function() { return {}; });
+
+        // Fire the events Impact / common themes listen for to refresh + open the drawer
+        var evts = ['on:cart:add','cart:added','cart:refresh','cart:open','theme:cart:open','dispatch:cart-drawer:open'];
+        evts.forEach(function(name) {
+          document.dispatchEvent(new CustomEvent(name, { bubbles: true, detail: { item: addedItem } }));
+          window.dispatchEvent(new CustomEvent(name, { bubbles: true, detail: { item: addedItem } }));
+        });
+
+        // Impact theme drawer: <cart-drawer id="cart-drawer"> + toggle <a aria-controls="cart-drawer">
+        var drawer = document.getElementById('cart-drawer');
+        var toggle = document.querySelector('a[aria-controls="cart-drawer"]');
+        if (drawer) {
+          if (typeof drawer.show === 'function') { try { drawer.show(); } catch (_) {} }
+          else if (typeof drawer.open === 'function') { try { drawer.open(); } catch (_) {} }
+        }
+        if (toggle) { setTimeout(function() { try { toggle.click(); } catch (_) {} }, 100); }
+
+        if (atc && atcText) { atc.disabled = false; atcText.textContent = originalText; }
+      } catch (err) {
+        if (errorEl) {
+          errorEl.textContent = err.message || 'Error adding to cart.';
+          errorEl.classList.add('is-visible');
+        }
+        if (atc) atc.disabled = false;
+        if (atcText) atcText.textContent = originalText;
+      }
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>

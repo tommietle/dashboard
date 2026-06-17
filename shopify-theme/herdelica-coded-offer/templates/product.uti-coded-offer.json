@@ -1,0 +1,1843 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-product",
+      "blocks": {
+        "judge_me_reviews_preview_badge_VdcMzL": {
+          "type": "shopify://apps/judge-me-reviews/blocks/preview_badge/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
+          "settings": {}
+        },
+        "title": {
+          "type": "title",
+          "settings": {
+            "heading_tag": "h2",
+            "title_color": "#373737"
+          }
+        },
+        "price": {
+          "type": "price",
+          "settings": {
+            "show_taxes_notice": false
+          }
+        },
+        "text_YCUr9f": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Scientifically backed, targeted probiotic strains for intimate flora and pH stability.</p>"
+          }
+        },
+        "liquid_h6nxcD": {
+          "type": "liquid",
+          "settings": {
+            "liquid": "<div class=\"product__icon__row\">\n   <div class=\"product__block product__icon__container product__icon__container--half block-padding\" style=\"--text: #000000;--block-padding-bottom: 8px;\">\n      <div class=\"product__icon aos-animate\" data-aos=\"img-in\" style=\"--icon-size: 20px; --text: #000000;\">\n         <img src=\"https://cdn.shopify.com/s/files/1/0939/7193/9654/files/HERDELICA_-_Website_Design_Needs-09.png?v=1765378329\" width=\"20\" height=\"16\" alt=\"Odor Control\">\n      </div>\n      <div class=\"product__icon__text body-size-2 aos-animate\" data-aos=\"fade\" data-aos-duration=\"500\">\n         <p>ODOR CONTROL</p>\n      </div>\n   </div>\n\n   <div class=\"product__block product__icon__container product__icon__container--half block-padding\" style=\"--text: #000000;--block-padding-bottom: 8px;\">\n      <div class=\"product__icon aos-animate\" data-aos=\"img-in\" style=\"--icon-size: 20px; --text: #000000;\">\n         <img src=\"https://cdn.shopify.com/s/files/1/0939/7193/9654/files/HERDELICA_-_Website_Design_Needs-11.png?v=1765378329\" width=\"22\" height=\"22\" alt=\"BV & Yeast Support\">\n      </div>\n      <div class=\"product__icon__text body-size-2 aos-animate\" data-aos=\"fade\" data-aos-duration=\"500\">\n         <p>BV & YEAST SUPPORT</p>\n      </div>\n   </div>\n\n   <div class=\"product__block product__icon__container product__icon__container--half block-padding\" style=\"--text: #000000;--block-padding-bottom: 8px;\">\n      <div class=\"product__icon aos-animate\" data-aos=\"img-in\" style=\"--icon-size: 20px; --text: #000000;\">\n         <img src=\"https://cdn.shopify.com/s/files/1/0939/7193/9654/files/HERDELICA_-_Website_Design_Needs-10.png?v=1765378329\" width=\"21\" height=\"22\" alt=\"PH Balance\">\n      </div>\n      <div class=\"product__icon__text body-size-2 aos-animate\" data-aos=\"fade\" data-aos-duration=\"500\">\n         <p>PH BALANCE</p>\n      </div>\n   </div>\n\n   <div class=\"product__block product__icon__container product__icon__container--half block-padding\" style=\"--text: #000000;--block-padding-bottom: 16px;\">\n      <div class=\"product__icon aos-animate\" data-aos=\"img-in\" style=\"--icon-size: 20px; --text: #000000;\">\n         <img src=\"https://cdn.shopify.com/s/files/1/0939/7193/9654/files/HERDELICA_-_Website_Design_Needs-12.png?v=1765378329\" width=\"24\" height=\"24\" alt=\"Irritation Relief\">\n      </div>\n      <div class=\"product__icon__text body-size-2 aos-animate\" data-aos=\"fade\" data-aos-duration=\"500\">\n         <p>IRRITATION RELIEF</p>\n      </div>\n   </div>\n</div>\n\n<style>\n.product__icon__row {\n    display: grid;\n    grid-template-columns: repeat(4, 1fr);\n    row-gap: 17px;\n    padding: 10px 0;\n}\n.product__block.product__icon__container {\n    display: flex;\n    gap: 10px;\n    align-items: center;\n    justify-content: center;\n}\n.product__block.product__icon__container .product__icon {\n    height: 40px;\n    width: 40px;\n    border: 1px solid #f7045e;\n    color: #f7045e;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    border-radius: 30px;\n}\n.product__icon__text p {\n    font-size: 12px;\n    font-weight: 600;\n    max-width: 80px;\n}\n.image-wrapper {\n   width: 20px;\n   height: 16px;\n}\n@media screen and (max-width: 768px) {\n   .product__icon__row {\n      grid-template-columns: repeat(2, 1fr);\n   }\n}\n</style>",
+            "show_under_gallery": false
+          }
+        },
+        "liquid_7CRiKy": {
+          "type": "liquid",
+          "name": "items left",
+          "settings": {
+            "liquid": "{% liquid\n  assign inventory_text = 'Only a few items left'\n  assign shipping_prefix = 'Ships by'\n  assign js_locale = request.locale.iso_code | default: 'en-US' | replace: '_', '-'\n  assign current_country_name = localization.country.name | default: 'United States'\n%}\n\n<div class=\"product-block usp_product\" data-usp-shipping>\n  <style>\n    .custom-inventory{\n      display:flex;\n      justify-content:space-between;\n      align-items:center;\n      flex-wrap:nowrap;\n      gap:10px;\n      width:100%;\n      margin:0 0 8px;\n      padding:6px 8px;\n      background:#fff;\n      border-radius:6px;\n      box-sizing:border-box;\n      box-shadow:0 1px 2px rgba(0,0,0,.05);\n      position:relative;\n      z-index:2;\n    }\n\n    .product-form__buttons,\n    .product__submit,\n    .add-to-cart{\n      margin-top:0 !important;\n    }\n\n    .cust-inv-left{\n      display:flex;\n      flex-direction:column;\n      gap:6px;\n      flex:1 1 auto;\n      min-width:0;\n    }\n\n    .low-inventory-text{\n      display:flex;\n      align-items:center;\n      gap:6px;\n      font-size:12px;\n      font-weight:500;\n      color:#1a1a1a;\n      line-height:1.2;\n    }\n\n    .cust-glowing-circle{\n      width:9px;\n      height:9px;\n      min-width:9px;\n      background:#ff8a00;\n      border-radius:50%;\n      box-shadow:0 0 6px rgba(255,138,0,.65);\n    }\n\n    .inventory-progress-bar{\n      width:140px;\n      height:4px;\n      background:#ececec;\n      border-radius:999px;\n      overflow:hidden;\n    }\n\n    .progress-inner{\n      width:29%;\n      height:100%;\n      background:#ff8a00;\n      border-radius:999px;\n    }\n\n    .cust-ship-right{\n      display:flex;\n      align-items:center;\n      gap:6px;\n      white-space:nowrap;\n      flex:0 0 auto;\n    }\n\n    .ship-flag-img{\n      width:20px;\n      height:15px;\n      display:block;\n      object-fit:cover;\n      border-radius:2px;\n      box-shadow:0 0 0 1px rgba(0,0,0,.06);\n    }\n\n    .ship-date-text{\n      margin:0;\n      font-size:12px;\n      font-weight:500;\n      color:#1a1a1a;\n      line-height:1.2;\n    }\n\n    @media (max-width:480px){\n      .custom-inventory{\n        padding:10px 12px;\n        gap:8px;\n        margin:0 0 6px;\n      }\n\n      .low-inventory-text,\n      .ship-date-text{\n        font-size:11px;\n      }\n\n      .inventory-progress-bar{\n        width:100px;\n      }\n\n      .ship-flag-img{\n        width:18px;\n        height:14px;\n      }\n    }\n  </style>\n\n  <div class=\"custom-inventory\">\n    <div class=\"cust-inv-left\">\n      <div class=\"low-inventory-text\">\n        <span class=\"cust-glowing-circle\"></span>\n        <span>{{ inventory_text }}</span>\n      </div>\n\n      <div class=\"inventory-progress-bar\">\n        <div class=\"progress-inner\"></div>\n      </div>\n    </div>\n\n    <div class=\"cust-ship-right\">\n      <img\n        src=\"{% if localization.country %}{{ localization.country | image_url: width: 40 }}{% else %}https://flagcdn.com/w40/us.png{% endif %}\"\n        width=\"20\"\n        height=\"15\"\n        alt=\"{{ current_country_name | escape }}\"\n        loading=\"lazy\"\n        class=\"ship-flag-img\"\n      >\n      <p class=\"ship-date-text js-ship-date\">\n        {{ shipping_prefix }} {{ 'now' | date: '%a, %-d %b' }}\n      </p>\n    </div>\n  </div>\n\n  <script>\n    (function () {\n      var USP_SELECTOR = '[data-usp-shipping]';\n      var locale = {{ js_locale | json }};\n      var prefix = {{ shipping_prefix | json }};\n\n      function getBlocks(scope) {\n        var items = [];\n\n        if (!scope) {\n          return Array.prototype.slice.call(document.querySelectorAll(USP_SELECTOR));\n        }\n\n        if (scope.matches && scope.matches(USP_SELECTOR)) {\n          items.push(scope);\n        }\n\n        if (scope.querySelectorAll) {\n          items = items.concat(Array.prototype.slice.call(scope.querySelectorAll(USP_SELECTOR)));\n        }\n\n        return items;\n      }\n\n      function getEstimatedDate() {\n        var estimatedDate = new Date();\n        estimatedDate.setDate(estimatedDate.getDate() + 1);\n\n        while (estimatedDate.getDay() === 0 || estimatedDate.getDay() === 6) {\n          estimatedDate.setDate(estimatedDate.getDate() + 1);\n        }\n\n        return estimatedDate;\n      }\n\n      function updateShippingDates(scope) {\n        var blocks = getBlocks(scope);\n        if (!blocks.length) return;\n\n        var formattedDate = getEstimatedDate().toLocaleDateString(locale, {\n          weekday: 'short',\n          month: 'short',\n          day: 'numeric'\n        });\n\n        blocks.forEach(function (block) {\n          var dateEl = block.querySelector('.js-ship-date');\n          if (dateEl) {\n            dateEl.textContent = prefix + ' ' + formattedDate;\n          }\n        });\n      }\n\n      function moveBlockAboveBuyButtons(block) {\n        if (!block) return;\n\n        var sectionRoot =\n          block.closest('.shopify-section') ||\n          block.closest('section[id*=\"shopify-section\"]') ||\n          block.closest('product-info') ||\n          block.closest('.product') ||\n          document;\n\n        var buyButtons = sectionRoot.querySelector('buy-buttons');\n\n        if (!buyButtons) {\n          buyButtons = document.querySelector('buy-buttons');\n        }\n\n        if (!buyButtons) return;\n\n        var targetWrapper = buyButtons.closest('.v-stack.gap-4') || buyButtons.parentElement;\n        if (!targetWrapper || !targetWrapper.parentNode) return;\n\n        if (targetWrapper.previousElementSibling === block) return;\n\n        targetWrapper.parentNode.insertBefore(block, targetWrapper);\n      }\n\n      function initUSP(scope) {\n        var blocks = getBlocks(scope);\n        if (!blocks.length) return;\n\n        blocks.forEach(function (block) {\n          moveBlockAboveBuyButtons(block);\n        });\n\n        updateShippingDates(scope || document);\n      }\n\n      function onReady(callback) {\n        if (document.readyState === 'loading') {\n          document.addEventListener('DOMContentLoaded', callback);\n        } else {\n          callback();\n        }\n      }\n\n      var scheduled = false;\n\n      function scheduleInit(scope) {\n        if (scheduled) return;\n        scheduled = true;\n\n        window.requestAnimationFrame(function () {\n          scheduled = false;\n          initUSP(scope || document);\n        });\n      }\n\n      onReady(function () {\n        initUSP(document);\n      });\n\n      document.addEventListener('shopify:section:load', function (event) {\n        initUSP(event.target || document);\n      });\n\n      document.addEventListener('shopify:section:reorder', function (event) {\n        initUSP(event.target || document);\n      });\n\n      var observer = new MutationObserver(function () {\n        scheduleInit(document);\n      });\n\n      if (document.documentElement) {\n        observer.observe(document.documentElement, {\n          childList: true,\n          subtree: true\n        });\n      }\n    })();\n  </script>\n</div>",
+            "show_under_gallery": false
+          }
+        },
+        "liquid_mCtw8i": {
+          "type": "liquid",
+          "disabled": true,
+          "settings": {
+            "liquid": "<script>\ndocument.addEventListener(\"DOMContentLoaded\", function () {\n  function fixMoneyButton() {\n    document.querySelectorAll(\"button, .button\").forEach(function(btn) {\n      if (btn.textContent.includes(\"<span class=\\\"money\\\">\")) {\n        btn.innerHTML = btn.textContent;\n      }\n    });\n  }\n\n  fixMoneyButton();\n  setInterval(fixMoneyButton, 1000);\n});\n</script>",
+            "show_under_gallery": false
+          }
+        },
+        "liquid_Gm7RU7": {
+          "type": "liquid",
+          "settings": {
+            "liquid": "<div class=\"product__block product__custom-code block-padding\" style=\"--block-padding-bottom: 6px; \">\n  <div class=\"mobe_back\">\n    <svg width=\"14\" height=\"14\" viewBox=\"0 0 50 50\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n      <g clip-path=\"url(#clip0_421_679)\">\n        <path d=\"M24.9987 47.5C24.9987 47.5 43.6654 38.5 43.6654 25V9.25L24.9987 2.5L6.33203 9.25V25C6.33203 38.5 24.9987 47.5 24.9987 47.5Z\" fill=\"black\" stroke=\"black\" stroke-width=\"4\" stroke-linejoin=\"round\"></path>\n        <rect x=\"17.2031\" y=\"21.4072\" width=\"12.7029\" height=\"4.78795\" rx=\"2.39397\" transform=\"rotate(42 17.2031 21.4072)\" fill=\"white\"></rect>\n        <rect x=\"36.4492\" y=\"20.3857\" width=\"18.5844\" height=\"4.78795\" rx=\"2.39397\" transform=\"rotate(135 36.4492 20.3857)\" fill=\"white\"></rect>\n      </g>\n      <defs>\n        <clipPath id=\"clip0_421_679\">\n          <rect width=\"50\" height=\"50\" fill=\"white\"></rect>\n        </clipPath>\n      </defs>\n    </svg>\n    <h4><strong>30-Day </strong>Money-Back Guarantee</h4>\n  </div>\n</div>\n\n<div class=\"product__block product__custom-code block-padding\" style=\"--block-padding-bottom: 16px; margin-bottom:12px;\">\n  <div class=\"day_monyback\"></div>\n  <center>\n    <div class=\"center\">\n      <!-- Visa -->\n      <svg viewBox=\"0 0 38 24\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" width=\"38\" height=\"24\" aria-labelledby=\"pi-visa\">\n        <title id=\"pi-visa\">Visa</title>\n        <path opacity=\".07\" d=\"M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z\"></path>\n        <path fill=\"#fff\" d=\"M35 1c1.1 0 2 .9 2 2v18c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V3c0-1.1.9-2 2-2h32\"></path>\n        <path d=\"M28.3 10.1H28c-.4 1-.7 1.5-1 3h1.9c-.3-1.5-.3-2.2-.6-3zm2.9 5.9h-1.7c-.1 0-.1 0-.2-.1l-.2-.9-.1-.2h-2.4c-.1 0-.2 0-.2.2l-.3.9c0 .1-.1.1-.1.1h-2.1l.2-.5L27 8.7c0-.5.3-.7.8-.7h1.5c.1 0 .2 0 .2.2l1.4 6.5c.1.4.2.7.2 1.1.1.1.1.1.1.2zm-13.4-.3l.4-1.8c.1 0 .2.1.2.1.7.3 1.4.5 2.1.4.2 0 .5-.1.7-.2.5-.2.5-.7.1-1.1-.2-.2-.5-.3-.8-.5-.4-.2-.8-.4-1.1-.7-1.2-1-.8-2.4-.1-3.1.6-.4.9-.8 1.7-.8 1.2 0 2.5 0 3.1.2h.1c-.1.6-.2 1.1-.4 1.7-.5-.2-1-.4-1.5-.4-.3 0-.6 0-.9.1-.2 0-.3.1-.4.2-.2.2-.2.5 0 .7l.5.4c.4.2.8.4 1.1.6.5.3 1 .8 1.1 1.4.2.9-.1 1.7-.9 2.3-.5.4-.7.6-1.4.6-1.4 0-2.5.1-3.4-.2-.1.2-.1.2-.2.1zm-3.5.3c.1-.7.1-.7.2-1 .5-2.2 1-4.5 1.4-6.7.1-.2.1-.3.3-.3H18c-.2 1.2-.4 2.1-.7 3.2-.3 1.5-.6 3-1 4.5 0 .2-.1.2-.3.2M5 8.2c0-.1.2-.2.3-.2h3.4c.5 0 .9.3 1 .8l.9 4.4c0 .1 0 .1.1.2 0-.1.1-.1.1-.1l2.1-5.1c-.1-.1 0-.2.1-.2h2.1c0 .1 0 .1-.1.2l-3.1 7.3c-.1.2-.1.3-.2.4-.1.1-.3 0-.5 0H9.7c-.1 0-.2 0-.2-.2L7.9 9.5c-.2-.2-.5-.5-.9-.6-.6-.3-1.7-.5-1.9-.5L5 8.2z\" fill=\"#142688\"></path>\n      </svg>\n\n      <!-- Mastercard -->\n      <svg viewBox=\"0 0 38 24\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" width=\"38\" height=\"24\" aria-labelledby=\"pi-master\">\n        <title id=\"pi-master\">Mastercard</title>\n        <path opacity=\".07\" d=\"M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z\"></path>\n        <path fill=\"#fff\" d=\"M35 1c1.1 0 2 .9 2 2v18c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V3c0-1.1.9-2 2-2h32\"></path>\n        <circle fill=\"#EB001B\" cx=\"15\" cy=\"12\" r=\"7\"></circle>\n        <circle fill=\"#F79E1B\" cx=\"23\" cy=\"12\" r=\"7\"></circle>\n        <path fill=\"#FF5F00\" d=\"M22 12c0-2.4-1.2-4.5-3-5.7-1.8 1.3-3 3.4-3 5.7s1.2 4.5 3 5.7c1.8-1.2 3-3.3 3-5.7z\"></path>\n      </svg>\n\n      <!-- Shop Pay -->\n      <svg xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" viewBox=\"0 0 38 24\" width=\"38\" height=\"24\" aria-labelledby=\"pi-shopify_pay\">\n        <title id=\"pi-shopify_pay\">Shop Pay</title>\n        <path opacity=\".07\" d=\"M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z\" fill=\"#000\"></path>\n        <path d=\"M35.889 0C37.05 0 38 .982 38 2.182v19.636c0 1.2-.95 2.182-2.111 2.182H2.11C.95 24 0 23.018 0 21.818V2.182C0 .982.95 0 2.111 0H35.89z\" fill=\"#5A31F4\"></path>\n        <path d=\"M9.35 11.368c-1.017-.223-1.47-.31-1.47-.705 0-.372.306-.558.92-.558.54 0 .934.238 1.225.704a.079.079 0 0 0 .104.03l1.146-.584a.082.082 0 0 0 .032-.114c-.475-.831-1.353-1.286-2.51-1.286-1.52 0-2.464.755-2.464 1.956 0 1.275 1.15 1.597 2.17 1.82 1.02.222 1.474.31 1.474.705 0 .396-.332.582-.993.582-.612 0-1.065-.282-1.34-.83a.08.08 0 0 0-.107-.035l-1.143.57a.083.083 0 0 0-.036.111c.454.92 1.384 1.437 2.627 1.437 1.583 0 2.539-.742 2.539-1.98s-1.155-1.598-2.173-1.82v-.003zM15.49 8.855c-.65 0-1.224.232-1.636.646a.04.04 0 0 1-.069-.03v-2.64a.08.08 0 0 0-.08-.081H12.27a.08.08 0 0 0-.08.082v8.194a.08.08 0 0 0 .08.082h1.433a.08.08 0 0 0 .081-.082v-3.594c0-.695.528-1.227 1.239-1.227.71 0 1.226.521 1.226 1.227v3.594a.08.08 0 0 0 .081.082h1.433a.08.08 0 0 0 .081-.082v-3.594c0-1.51-.981-2.577-2.355-2.577zM20.753 8.62c-.778 0-1.507.24-2.03.588a.082.082 0 0 0-.027.109l.632 1.088a.08.08 0 0 0 .11.03 2.5 2.5 0 0 1 1.318-.366c1.25 0 2.17.891 2.17 2.068 0 1.003-.736 1.745-1.669 1.745-.76 0-1.288-.446-1.288-1.077 0-.361.152-.657.548-.866a.08.08 0 0 0 .032-.113l-.596-1.018a.08.08 0 0 0-.098-.035c-.799.299-1.359 1.018-1.359 1.984 0 1.46 1.152 2.55 2.76 2.55 1.877 0 3.227-1.313 3.227-3.195 0-2.018-1.57-3.492-3.73-3.492zM28.675 8.843c-.724 0-1.373.27-1.845.746-.026.027-.069.007-.069-.029v-.572a.08.08 0 0 0-.08-.082h-1.397a.08.08 0 0 0-.08.082v8.182a.08.08 0 0 0 .08.081h1.433a.08.08 0 0 0 .081-.081v-2.683c0-.036.043-.054.069-.03a2.6 2.6 0 0 0 1.808.7c1.682 0 2.993-1.373 2.993-3.157s-1.313-3.157-2.993-3.157zm-.271 4.929c-.956 0-1.681-.768-1.681-1.783s.723-1.783 1.681-1.783c.958 0 1.68.755 1.68 1.783 0 1.027-.713 1.783-1.681 1.783h.001z\" fill=\"#fff\"></path>\n      </svg>\n\n      <!-- Apple Pay -->\n      <svg version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" x=\"0\" y=\"0\" width=\"38\" height=\"24\" viewBox=\"0 0 165.521 105.965\" xml:space=\"preserve\" aria-labelledby=\"pi-apple_pay\">\n        <title id=\"pi-apple_pay\">Apple Pay</title>\n        <path fill=\"#000\" d=\"M150.698 0H14.823c-.566 0-1.133 0-1.698.003-.477.004-.953.009-1.43.022-1.039.028-2.087.09-3.113.274a10.51 10.51 0 0 0-2.958.975 9.932 9.932 0 0 0-4.35 4.35 10.463 10.463 0 0 0-.975 2.96C.113 9.611.052 10.658.024 11.696a70.22 70.22 0 0 0-.022 1.43C0 13.69 0 14.256 0 14.823v76.318c0 .567 0 1.132.002 1.699.003.476.009.953.022 1.43.028 1.036.09 2.084.275 3.11a10.46 10.46 0 0 0 .974 2.96 9.897 9.897 0 0 0 1.83 2.52 9.874 9.874 0 0 0 2.52 1.83c.947.483 1.917.79 2.96.977 1.025.183 2.073.245 3.112.273.477.011.953.017 1.43.02.565.004 1.132.004 1.698.004h135.875c.565 0 1.132 0 1.697-.004.476-.002.952-.009 1.431-.02 1.037-.028 2.085-.09 3.113-.273a10.478 10.478 0 0 0 2.958-.977 9.955 9.955 0 0 0 4.35-4.35c.483-.947.789-1.917.974-2.96.186-1.026.246-2.074.274-3.11.013-.477.02-.954.022-1.43.004-.567.004-1.132.004-1.699V14.824c0-.567 0-1.133-.004-1.699a63.067 63.067 0 0 0-.022-1.429c-.028-1.038-.088-2.085-.274-3.112a10.4 10.4 0 0 0-.974-2.96 9.94 9.94 0 0 0-4.35-4.35A10.52 10.52 0 0 0 156.939.3c-1.028-.185-2.076-.246-3.113-.274a71.417 71.417 0 0 0-1.431-.022C151.83 0 151.263 0 150.698 0z\"></path>\n        <path fill=\"#FFF\" d=\"M150.698 3.532l1.672.003c.452.003.905.008 1.36.02.793.022 1.719.065 2.583.22.75.135 1.38.34 1.984.648a6.392 6.392 0 0 1 2.804 2.807c.306.6.51 1.226.645 1.983.154.854.197 1.783.218 2.58.013.45.019.9.02 1.36.005.557.005 1.113.005 1.671v76.318c0 .558 0 1.114-.004 1.682-.002.45-.008.9-.02 1.35-.022.796-.065 1.725-.221 2.589a6.855 6.855 0 0 1-.645 1.975 6.397 6.397 0 0 1-2.808 2.807c-.6.306-1.228.511-1.971.645-.881.157-1.847.2-2.574.22-.457.01-.912.017-1.379.019-.555.004-1.113.004-1.669.004H14.801c-.55 0-1.1 0-1.66-.004a74.993 74.993 0 0 1-1.35-.018c-.744-.02-1.71-.064-2.584-.22a6.938 6.938 0 0 1-1.986-.65 6.337 6.337 0 0 1-1.622-1.18 6.355 6.355 0 0 1-1.178-1.623 6.935 6.935 0 0 1-.646-1.985c-.156-.863-.2-1.788-.22-2.578a66.088 66.088 0 0 1-.02-1.355l-.003-1.327V14.474l.002-1.325a66.7 66.7 0 0 1 .02-1.357c.022-.792.065-1.717.222-2.587a6.924 6.924 0 0 1 .646-1.981c.304-.598.7-1.144 1.18-1.623a6.386 6.386 0 0 1 1.624-1.18 6.96 6.96 0 0 1 1.98-.646c.865-.155 1.792-.198 2.586-.22.452-.012.905-.017 1.354-.02l1.677-.003h135.875\"></path>\n        <g>\n          <g>\n            <path fill=\"#000\" d=\"M43.508 35.77c1.404-1.755 2.356-4.112 2.105-6.52-2.054.102-4.56 1.355-6.012 3.112-1.303 1.504-2.456 3.959-2.156 6.266 2.306.2 4.61-1.152 6.063-2.858\"></path>\n            <path fill=\"#000\" d=\"M45.587 39.079c-3.35-.2-6.196 1.9-7.795 1.9-1.6 0-4.049-1.8-6.698-1.751-3.447.05-6.645 2-8.395 5.1-3.598 6.2-.95 15.4 2.55 20.45 1.699 2.5 3.747 5.25 6.445 5.151 2.55-.1 3.549-1.65 6.647-1.65 3.097 0 3.997 1.65 6.696 1.6 2.798-.05 4.548-2.5 6.247-5 1.95-2.85 2.747-5.6 2.797-5.75-.05-.05-5.396-2.101-5.446-8.251-.05-5.15 4.198-7.6 4.398-7.751-2.399-3.548-6.147-3.948-7.447-4.048\"></path>\n          </g>\n          <g>\n            <path fill=\"#000\" d=\"M78.973 32.11c7.278 0 12.347 5.017 12.347 12.321 0 7.33-5.173 12.373-12.529 12.373h-8.058V69.62h-5.822V32.11h14.062zm-8.24 19.807h6.68c5.07 0 7.954-2.729 7.954-7.46 0-4.73-2.885-7.434-7.928-7.434h-6.706v14.894z\"></path>\n            <path fill=\"#000\" d=\"M92.764 61.847c0-4.809 3.665-7.564 10.423-7.98l7.252-.442v-2.08c0-3.04-2.001-4.704-5.562-4.704-2.938 0-5.07 1.507-5.51 3.82h-5.252c.157-4.86 4.731-8.395 10.918-8.395 6.654 0 10.995 3.483 10.995 8.89v18.663h-5.38v-4.497h-.13c-1.534 2.937-4.914 4.782-8.579 4.782-5.406 0-9.175-3.222-9.175-8.057zm17.675-2.417v-2.106l-6.472.416c-3.64.234-5.536 1.585-5.536 3.95 0 2.288 1.975 3.77 5.068 3.77 3.95 0 6.94-2.522 6.94-6.03z\"></path>\n            <path fill=\"#000\" d=\"M120.975 79.652v-4.496c.364.051 1.247.103 1.715.103 2.573 0 4.029-1.09 4.913-3.899l.52-1.663-9.852-27.293h6.082l6.863 22.146h.13l6.862-22.146h5.927l-10.216 28.67c-2.34 6.577-5.017 8.735-10.683 8.735-.442 0-1.872-.052-2.261-.157z\"></path>\n          </g>\n        </g>\n      </svg>\n\n      <!-- Google Pay -->\n      <svg xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" viewBox=\"0 0 38 24\" width=\"38\" height=\"24\" aria-labelledby=\"pi-google_pay\">\n        <title id=\"pi-google_pay\">Google Pay</title>\n        <path d=\"M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z\" fill=\"#000\" opacity=\".07\"></path>\n        <path d=\"M35 1c1.1 0 2 .9 2 2v18c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V3c0-1.1.9-2 2-2h32\" fill=\"#FFF\"></path>\n        <path d=\"M18.093 11.976v3.2h-1.018v-7.9h2.691a2.447 2.447 0 0 1 1.747.692 2.28 2.28 0 0 1 .11 3.224l-.11.116c-.47.447-1.098.69-1.747.674l-1.673-.006zm0-3.732v2.788h1.698c.377.012.741-.135 1.005-.404a1.391 1.391 0 0 0-1.005-2.354l-1.698-.03zm6.484 1.348c.65-.03 1.286.188 1.778.613.445.43.682 1.03.65 1.649v3.334h-.969v-.766h-.049a1.93 1.93 0 0 1-1.673.931 2.17 2.17 0 0 1-1.496-.533 1.667 1.667 0 0 1-.613-1.324 1.606 1.606 0 0 1 .613-1.336 2.746 2.746 0 0 1 1.698-.515c.517-.02 1.03.093 1.49.331v-.208a1.134 1.134 0 0 0-.417-.901 1.416 1.416 0 0 0-.98-.368 1.545 1.545 0 0 0-1.319.717l-.895-.564a2.488 2.488 0 0 1 2.182-1.06zM23.29 13.52a.79.79 0 0 0 .337.662c.223.176.5.269.785.263.429-.001.84-.17 1.146-.472.305-.286.478-.685.478-1.103a2.047 2.047 0 0 0-1.324-.374 1.716 1.716 0 0 0-1.03.294.883.883 0 0 0-.392.73zm9.286-3.75l-3.39 7.79h-1.048l1.281-2.728-2.224-5.062h1.103l1.612 3.885 1.569-3.885h1.097z\" fill=\"#5F6368\"></path>\n        <path d=\"M13.986 11.284c0-.308-.024-.616-.073-.92h-4.29v1.747h2.451a2.096 2.096 0 0 1-.9 1.373v1.134h1.464a4.433 4.433 0 0 0 1.348-3.334z\" fill=\"#4285F4\"></path>\n        <path d=\"M9.629 15.721a4.352 4.352 0 0 0 3.01-1.097l-1.466-1.14a2.752 2.752 0 0 1-4.094-1.44H5.577v1.17a4.53 4.53 0 0 0 4.052 2.507z\" fill=\"#34A853\"></path>\n        <path d=\"M7.079 12.05a2.709 2.709 0 0 1 0-1.735v-1.17H5.577a4.505 4.505 0 0 0 0 4.075l1.502-1.17z\" fill=\"#FBBC04\"></path>\n        <path d=\"M9.629 8.44a2.452 2.452 0 0 1 1.74.68l1.3-1.293a4.37 4.37 0 0 0-3.065-1.183 4.53 4.53 0 0 0-4.027 2.5l1.502 1.171a2.715 2.715 0 0 1 2.55-1.875z\" fill=\"#EA4335\"></path>\n      </svg>\n\n    </div>\n    <style>\n      .center {\n        margin: auto;\n        width: 100%;\n      }\n    </style>\n  </center>\n</div>",
+            "show_under_gallery": false
+          }
+        },
+        "liquid_jrMgXr": {
+          "type": "liquid",
+          "disabled": true,
+          "settings": {
+            "liquid": "<div class=\"custom-benefits\">\n  <ul class=\"benefit-list\">\n\n    <li>\n      <img\n        src=\"https://cdn.shopify.com/s/files/1/0939/7193/9654/files/Scherm_afbeelding-2026-04-20-om-16.13.58.svg?v=1776694730\"\n        alt=\"Check icon\"\n        width=\"11\"\n        height=\"11\"\n      >\n      <div class=\"product-info__block-item\" data-block-id=\"price\" data-block-type=\"price\" style=\"display: inline-block; padding-right: 5px\">\n        <div class=\"product-info__price\">\n          <div class=\"rating-with-text\">\n            <price-list class=\"price-list price-list--lg\">\n              <div class=\"text-lg text-on-sale\">\n                {% case localization.country.currency.iso_code %}\n                  {% when 'EUR' %}\n                    \u20ac54,95\n                  {% when 'AUD' %}\n                    $54,95\n                  {% when 'CAD' %}\n                    $49.95\n                  {% when 'GBP' %}\n                    \u00a324,5\n                  {% else %}\n                    $39,95\n                {% endcase %}\n              </div>\n            </price-list>\n          </div>\n        </div>\n      </div>\n      <span>Refill ships in 30 days</span>\n    </li>\n\n    <li>\n      <img\n        src=\"https://cdn.shopify.com/s/files/1/0939/7193/9654/files/Scherm_afbeelding-2026-04-20-om-16.13.58.svg?v=1776694730\"\n        alt=\"Check icon\"\n        width=\"11\"\n        height=\"11\"\n      >\n      <span>Adjust / cancel anytime</span>\n    </li>\n\n  </ul>\n</div>\n\n<style>\n  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap');\n\n  .custom-benefits {\n    font-family: 'Montserrat', sans-serif;\n    font-size: 11px;\n    font-weight: 500;\n    color: #000000;\n  }\n\n  .benefit-list {\n    list-style: none;\n    padding: 0;\n    margin: 0;\n    color: #000000;\n  }\n\n  .benefit-list li {\n    margin-bottom: 8px;\n    display: flex;\n    align-items: center;\n    font-size: 11px;\n    color: #000000;\n  }\n\n  .benefit-list li img {\n    width: 11px;\n    height: 11px;\n    margin-right: 8px;\n    flex: 0 0 11px;\n  }\n\n  .benefit-list .text-on-sale,\n  .benefit-list .text-lg,\n  .benefit-list span,\n  .benefit-list price-list,\n  .benefit-list sale-price,\n  .benefit-list compare-at-price,\n  .benefit-list .product-info__price,\n  .benefit-list .rating-with-text {\n    color: #000000 !important;\n    font-size: 11px !important;\n  }\n\n  .benefit-list .text-on-sale,\n  .benefit-list .text-lg {\n    font-weight: 600 !important;\n  }\n</style>",
+            "show_under_gallery": false
+          }
+        },
+        "liquid_UcWMPh": {
+          "type": "liquid",
+          "settings": {
+            "liquid": "<div id=\"ss-tabs-icon-insert-block\"></div>",
+            "show_under_gallery": false
+          }
+        },
+        "liquid_fqTpWX": {
+          "type": "liquid",
+          "settings": {
+            "liquid": "<div id='ss-product-videos'></div>",
+            "show_under_gallery": false
+          }
+        },
+        "liquid_LPmAzN": {
+          "type": "liquid",
+          "settings": {
+            "liquid": "<div id=\"ss-product-videos\" class=\"hidden sm:block\"></div>",
+            "show_under_gallery": true
+          }
+        },
+        "liquid_DjCwn3": {
+          "type": "liquid",
+          "settings": {
+            "liquid": "<div id=\"ss-product-videos1\" class=\"sm:hidden\"></div>",
+            "show_under_gallery": false
+          }
+        },
+        "hd_sub_save": {
+          "type": "liquid",
+          "settings": {
+            "liquid": "{% render 'herd-subscribe-save' %}"
+          }
+        },
+        "hd_sub_save_atc": {
+          "type": "liquid",
+          "settings": {
+            "liquid": "{% render 'herd-subscribe-save-atc' %}"
+          }
+        },
+        "uti_benefits": {
+          "type": "liquid",
+          "name": "UTI benefits",
+          "settings": {
+            "liquid": "<div class=\"herd-uti-benefits\">\n  <ul class=\"herd-uti-benefits__list\">\n    <li>Odor control</li>\n    <li>BV &amp; Yeast support</li>\n    <li>PH Balance</li>\n    <li>Irritation relief</li>\n  </ul>\n</div>\n\n<style>\n  .herd-uti-benefits { margin: 8px 0 12px; }\n  .herd-uti-benefits__list { list-style: none; padding: 0; margin: 0; }\n  .herd-uti-benefits__list li { display: flex; align-items: center; padding: 2px 0; font-size: 15px; line-height: 1.4; color: #111; }\n  .herd-uti-benefits__list li::before {\n    content: \"\";\n    display: inline-block;\n    width: 18px; height: 18px;\n    margin-right: 10px;\n    flex-shrink: 0;\n    background-image: url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23198754' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='20 6 9 17 4 12'/></svg>\");\n    background-repeat: no-repeat;\n    background-size: 18px 18px;\n    background-position: center;\n  }\n</style>"
+          }
+        }
+      },
+      "block_order": [
+        "judge_me_reviews_preview_badge_VdcMzL",
+        "title",
+        "price",
+        "text_YCUr9f",
+        "uti_benefits",
+        "liquid_h6nxcD",
+        "hd_sub_save",
+        "hd_sub_save_atc",
+        "liquid_7CRiKy",
+        "liquid_mCtw8i",
+        "liquid_Gm7RU7",
+        "liquid_jrMgXr",
+        "liquid_UcWMPh",
+        "liquid_fqTpWX",
+        "liquid_LPmAzN",
+        "liquid_DjCwn3"
+      ],
+      "custom_css": [
+        "#ss-product-videos p,p strong,#ss-product-videos1 p,p strong {color: black !important;}",
+        ".kaching-bundles .kaching-bundles__progressive-gifts {margin-bottom: 5px;}",
+        "button.button.button--xl {margin-top: 3px;}"
+      ],
+      "settings": {
+        "full_width": true,
+        "show_fixed_add_to_cart": false,
+        "desktop_media_width": 45,
+        "desktop_media_layout": "carousel_thumbnails_bottom",
+        "mobile_media_size": "expanded",
+        "mobile_carousel_control": "thumbnails",
+        "enable_video_autoplay": true,
+        "enable_video_looping": true,
+        "enable_image_zoom": false,
+        "max_image_zoom_level": 3,
+        "background": "#ffffff",
+        "background_gradient": "",
+        "text_color": "#111111",
+        "input_background": "rgba(0,0,0,0)",
+        "input_text_color": ""
+      }
+    },
+    "slideshow_cdKkky": {
+      "type": "slideshow",
+      "blocks": {
+        "image_cYMnfH": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/3_Images_for_Web.jpg",
+            "mobile_image": "shopify://shop_images/3_Images_for_Web.jpg",
+            "content_max_width": 780,
+            "mobile_text_position": "place-self-center text-center",
+            "desktop_text_position": "sm:place-self-center sm:text-center",
+            "subheading": "",
+            "title": "",
+            "heading_tag": "h0",
+            "button_text": "",
+            "button_link": "",
+            "text_color": "#ffffff",
+            "button_background": "#ffffff",
+            "button_text_color": "#000000",
+            "overlay_color": "#000000",
+            "overlay_opacity": 0,
+            "background": "",
+            "background_gradient": ""
+          }
+        }
+      },
+      "block_order": [
+        "image_cYMnfH"
+      ],
+      "disabled": true,
+      "name": "Slideshow",
+      "settings": {
+        "full_width": true,
+        "allow_transparent_header": true,
+        "show_initial_transition": false,
+        "image_size": "auto",
+        "controls_type": "dots",
+        "transition_type": "fade_with_text",
+        "autoplay": false,
+        "cycle_speed": 6,
+        "background": "#f2f2f2",
+        "background_gradient": ""
+      }
+    },
+    "future_11_slider_tDD3zC": {
+      "type": "future_11_slider",
+      "blocks": {
+        "item_RqRNtK": {
+          "type": "item",
+          "settings": {
+            "image_desktop": "shopify://shop_images/Insecure_Women.jpg",
+            "image_mobile": "shopify://shop_images/Insecure_Women.jpg",
+            "title": "OUT OF BALANCE",
+            "text": "Antibiotics, birth control, stress, right underwear, even scented soaps... all wipe out the good bacteria your body needs to protect itself. The result? Odor. discharge, dryness, or repeated infections."
+          }
+        },
+        "item_xEDaUy": {
+          "type": "item",
+          "settings": {
+            "image_desktop": "shopify://shop_images/Confidence_Women.jpg",
+            "image_mobile": "shopify://shop_images/Confidence_Women.jpg",
+            "title": "THE RESET",
+            "text": "Restoring the right probiotic strains helps rebalance pH by supporting needed bacteria. As balance returns, odor fades, discharge normalizes, irritation eases, and flare-ups stop. Your body feels fresh again."
+          }
+        },
+        "item_b4bxqH": {
+          "type": "item",
+          "settings": {
+            "image_desktop": "shopify://shop_images/Packaging_with_White_Background.jpg",
+            "image_mobile": "shopify://shop_images/Packaging_with_White_Background.jpg",
+            "title": "THE DAILY SOLUTION",
+            "text": "One gummy delivering clinically studied probiotics, prebiotics and cranberry extract to support beneficial bacteria. Daily use helps keep your intimate microbiome resilient and balanced."
+          }
+        }
+      },
+      "block_order": [
+        "item_RqRNtK",
+        "item_xEDaUy",
+        "item_b4bxqH"
+      ],
+      "disabled": true,
+      "name": "LL \u2022 What's Happening",
+      "settings": {
+        "color_scheme": "scheme-de803cd7-be78-4f77-a3ee-d56c77445fb0",
+        "full_width": false,
+        "max_width": 1200,
+        "web_height_desktop": 220,
+        "web_height_mobile": 180,
+        "wave_color": "#ff8cc6",
+        "heading": "What\u2019s Happening",
+        "subtitle_main": "Modern life throws your balance off. Here\u2019s why,",
+        "subtitle_pill": "and how to fix it.",
+        "subtitle_color": "#111111",
+        "pill_bg": "#ff3f81",
+        "pill_text": "#ffffff",
+        "heading_size_desktop": 44,
+        "heading_size_mobile": 30,
+        "subtitle_size_desktop": 18,
+        "subtitle_size_mobile": 15,
+        "card_color_scheme": "scheme-4561646c-07a5-4260-9072-062a3b737df1",
+        "card_padding": 10,
+        "card_radius": 40,
+        "card_title_size_desktop": 18,
+        "card_title_size_mobile": 16,
+        "card_text_size_desktop": 14,
+        "card_text_size_mobile": 13,
+        "card_gap_desktop": 30,
+        "card_gap_mobile": 24,
+        "padding_top": 60,
+        "padding_bottom": 60,
+        "dots_offset_mobile": 0
+      }
+    },
+    "ss_video_grid_socials_3_f9E9YD": {
+      "type": "ss-video-grid-socials-3",
+      "blocks": {
+        "video_qUdedi": {
+          "type": "video",
+          "settings": {
+            "video": "shopify://files/videos/review3.mp4",
+            "video_url": "https://www.youtube.com/watch?v=_9VUPq3SxOc",
+            "info": "Tell your story",
+            "url": ""
+          }
+        },
+        "video_cjb7Em": {
+          "type": "video",
+          "settings": {
+            "video": "shopify://files/videos/d7f6630b50a24fe3a9a16ae40a7d404c.mp4",
+            "video_url": "https://www.youtube.com/watch?v=_9VUPq3SxOc",
+            "info": "Tell your story",
+            "url": ""
+          }
+        },
+        "video_hTH4MJ": {
+          "type": "video",
+          "settings": {
+            "video": "shopify://files/videos/a6b0a77a-ee01-4b94-b410-3ccbf29aa458.mp4",
+            "video_url": "https://www.youtube.com/watch?v=_9VUPq3SxOc",
+            "info": "Tell your story",
+            "url": ""
+          }
+        },
+        "video_8bjjHG": {
+          "type": "video",
+          "settings": {
+            "video": "shopify://files/videos/review1_e1e0be5d-e8f3-4d54-adfc-5cc1e879d23b.mp4",
+            "video_url": "https://www.youtube.com/watch?v=_9VUPq3SxOc",
+            "info": "Tell your story",
+            "url": ""
+          }
+        },
+        "video_ABnfKP": {
+          "type": "video",
+          "settings": {
+            "video": "shopify://files/videos/1253459b-a7c0-4b8f-af7e-1474f77a59a4.mp4",
+            "video_url": "https://www.youtube.com/watch?v=_9VUPq3SxOc",
+            "info": "Tell your story",
+            "url": ""
+          }
+        },
+        "video_9DGL7a": {
+          "type": "video",
+          "settings": {
+            "video": "shopify://files/videos/52d46584f6db4b509428047d064dcd63.mp4",
+            "video_url": "https://www.youtube.com/watch?v=_9VUPq3SxOc",
+            "info": "Tell your story",
+            "url": ""
+          }
+        },
+        "video_g33exr": {
+          "type": "video",
+          "settings": {
+            "video": "shopify://files/videos/de76dc5b1af74b47862b34a6eb34be03_2.mp4",
+            "video_url": "https://www.youtube.com/watch?v=_9VUPq3SxOc",
+            "info": "Tell your story",
+            "url": ""
+          }
+        },
+        "video_Phmyw6": {
+          "type": "video",
+          "settings": {
+            "video": "shopify://files/videos/c46dfeb8087a4ed0bb3b19ca7c699c22.mp4",
+            "video_url": "https://www.youtube.com/watch?v=_9VUPq3SxOc",
+            "info": "Tell your story",
+            "url": ""
+          }
+        }
+      },
+      "block_order": [
+        "video_qUdedi",
+        "video_cjb7Em",
+        "video_hTH4MJ",
+        "video_8bjjHG",
+        "video_ABnfKP",
+        "video_9DGL7a",
+        "video_g33exr",
+        "video_Phmyw6"
+      ],
+      "disabled": true,
+      "name": "SS - Video Grid Socials #3",
+      "settings": {
+        "heading": "<h2>Loved by 200,000+ Happy customers</h2>",
+        "heading_custom": false,
+        "heading_font": "josefin_sans_n4",
+        "heading_size": 36,
+        "heading_size_mobile": 26,
+        "heading_height": 130,
+        "heading_align": "center",
+        "heading_align_mobile": "center",
+        "sub_heading": "",
+        "sub_heading_custom": false,
+        "sub_heading_font": "josefin_sans_n4",
+        "sub_heading_size": 18,
+        "sub_heading_size_mobile": 16,
+        "sub_heading_height": 150,
+        "sub_heading_align": "center",
+        "sub_heading_align_mobile": "center",
+        "sub_heading_mt": 24,
+        "sub_heading_mt_mobile": 20,
+        "slider_view": 4,
+        "slider_view_mobile": 1.3,
+        "slider_gap": 20,
+        "slider_gap_mobile": 20,
+        "slider_mt": 24,
+        "slider_mt_mobile": 36,
+        "card_radius": 0,
+        "card_border_thickness": 0,
+        "video_ratio": "portrait",
+        "video_ratio_mobile": "portrait",
+        "info_custom": false,
+        "info_font": "josefin_sans_n4",
+        "info_size": 15,
+        "info_size_mobile": 18,
+        "info_height": 150,
+        "info_align": "left",
+        "info_align_mobile": "left",
+        "arrow_size": 48,
+        "arrow_size_mobile": 48,
+        "arrow_icon_size": 8,
+        "arrow_icon_size_mobile": 8,
+        "arrow_border_thickness": 1,
+        "arrow_radius": 100,
+        "arrow_hover_effect": "color",
+        "arrow_show_desktop": true,
+        "arrow_show_mobile": true,
+        "action_size": 48,
+        "action_size_mobile": 48,
+        "action_icon_size": 28,
+        "action_icon_size_mobile": 28,
+        "action_border_thickness": 0,
+        "card_border_color": "#000000",
+        "info_color": "#ffffff",
+        "arrow_color": "#000000",
+        "arrow_hover_color": "#ffffff",
+        "arrow_bg_color": "#ffffff",
+        "arrow_bg_hover_color": "#555555",
+        "arrow_border_color": "#f6f6f6",
+        "arrow_border_hover_color": "#555555",
+        "action_color": "#ffffff",
+        "action_hover_color": "#ffffff",
+        "action_bg_color": "#ffffff",
+        "action_bg_hover_color": "#ffffff",
+        "action_border_color": "#ffffff",
+        "action_border_hover_color": "#ffffff",
+        "heading_color": "#000000",
+        "sub_heading_color": "#000000",
+        "background_color": "#ffffff",
+        "background_gradient": "",
+        "border_color": "#000000",
+        "margin_top": 0,
+        "margin_bottom": 0,
+        "margin_horizontal": 0,
+        "margin_horizontal_mobile": 0,
+        "padding_top": 36,
+        "padding_bottom": 36,
+        "padding_horizontal": 5,
+        "padding_horizontal_mobile": 1.5,
+        "full_width": false,
+        "content_width": 80,
+        "border_thickness": 0,
+        "section_radius": 0,
+        "lazy": true
+      }
+    },
+    "features_media_trio_hA8dXM": {
+      "type": "features-media-trio",
+      "blocks": {
+        "feature_XrNrTY": {
+          "type": "feature",
+          "settings": {
+            "icon": "shopify://shop_images/Untitled_design_-_2024-04-14T110259.416.png",
+            "title": "100% Real Coffee",
+            "caption": "Coffee"
+          }
+        },
+        "feature_NixQNC": {
+          "type": "feature",
+          "settings": {
+            "icon": "shopify://shop_images/Untitled_design_-_2024-04-14T110224.568.png",
+            "title": "Clean Label,",
+            "caption": "Nothing Fake"
+          }
+        },
+        "feature_3gxheh": {
+          "type": "feature",
+          "settings": {
+            "icon": "shopify://shop_images/Untitled_design_-_2024-04-14T110209.558.png",
+            "title": "0g of Sugar,",
+            "caption": "Zero Guilt"
+          }
+        },
+        "feature_w8XNGj": {
+          "type": "feature",
+          "settings": {
+            "icon": "shopify://shop_images/Untitled_design_-_2024-04-14T110244.477.png",
+            "title": "Only 5 Calories per",
+            "caption": "Cup"
+          }
+        },
+        "feature_KNkFd6": {
+          "type": "feature",
+          "settings": {
+            "icon": "shopify://shop_images/Untitled_design_-_2024-04-14T110259.416.png",
+            "title": "Under $1 per",
+            "caption": "Serving"
+          }
+        },
+        "feature_bj9JMn": {
+          "type": "feature",
+          "settings": {
+            "icon": "shopify://shop_images/Untitled_design_-_2024-04-14T110224.568.png",
+            "title": "10+ Indulgent",
+            "caption": "Flavors"
+          }
+        },
+        "card_RVciM4": {
+          "type": "card",
+          "settings": {
+            "media_type": "image",
+            "image": "shopify://shop_images/1a8d55f3-7d33-4c66-ad1e-472bf0ecd137_2d4ccb2a-2f4c-4091-9d37-9fdb59e3e991.png",
+            "video_mp4": "",
+            "title": "Incredibly convenient \ud83c\udf89",
+            "body": "Caf\u00e9 vibes without the commute. Add Javvy to water or milk, stir, and enjoy smooth, rich coffee that tastes like it took hours."
+          }
+        },
+        "card_m9FMLT": {
+          "type": "card",
+          "settings": {
+            "media_type": "image",
+            "image": "shopify://shop_images/1ad36df3-e396-4338-97fb-aa9293667dbd_ffa20137-873d-4c0f-bf0c-8c8812fd4850.png",
+            "video_mp4": "",
+            "title": "Ultra-affordable \ud83d\udcb0",
+            "body": "Caf\u00e9 vibes without the commute. Add Javvy to water or milk, stir, and enjoy smooth, rich coffee that tastes like it took hours."
+          }
+        },
+        "card_7UFGMC": {
+          "type": "card",
+          "settings": {
+            "media_type": "image",
+            "image": "shopify://shop_images/bf5604d2-f685-4ae0-badf-d957174588b2_4fe08262-575b-440c-b011-d182ef9292df.png",
+            "video_mp4": "",
+            "title": "Guilt-free flavor \ud83d\ude0b",
+            "body": "Caf\u00e9 vibes without the commute. Add Javvy to water or milk, stir, and enjoy smooth, rich coffee that tastes like it took hours."
+          }
+        }
+      },
+      "block_order": [
+        "feature_XrNrTY",
+        "feature_NixQNC",
+        "feature_3gxheh",
+        "feature_w8XNGj",
+        "feature_KNkFd6",
+        "feature_bj9JMn",
+        "card_RVciM4",
+        "card_m9FMLT",
+        "card_7UFGMC"
+      ],
+      "disabled": true,
+      "name": "Coffee benefits",
+      "settings": {
+        "heading": "Delicious Coffee in Literally Seconds",
+        "subheading": "\u201cFaster than instant, better tasting than gourmet, easier than coffee pods\u201d",
+        "bg_start": "#fff7ef",
+        "bg_end": "#ffffff",
+        "text_color": "#1a1a1a",
+        "muted_color": "#6b7280",
+        "ring_color": "#e5e7eb",
+        "card_bg": "#ffffff",
+        "radius": 16,
+        "pad_y": 56,
+        "gap": 20,
+        "max_width": 1200
+      }
+    },
+    "sleep_hero_split_mQFKhq": {
+      "type": "sleep-hero-split",
+      "blocks": {
+        "bullet_N8en7m": {
+          "type": "bullet",
+          "settings": {
+            "text": "Diepere, ononderbroken Slaap"
+          }
+        },
+        "bullet_6FYcrX": {
+          "type": "bullet",
+          "settings": {
+            "text": "Moeiteloos in slaap vallen"
+          }
+        },
+        "bullet_4XNFtz": {
+          "type": "bullet",
+          "settings": {
+            "text": "Bevordert REM-slaap"
+          }
+        }
+      },
+      "block_order": [
+        "bullet_N8en7m",
+        "bullet_6FYcrX",
+        "bullet_4XNFtz"
+      ],
+      "disabled": true,
+      "name": "Sleep hero",
+      "settings": {
+        "kicker": "",
+        "heading": "Het geheim voor een perfecte slaap",
+        "body": "<p>Ervaar moeiteloos slapen met ons 100% lichtblokkerende Deep Sleep Masker. Dit masker is ontworpen om je sneller in slaap te laten vallen en de hele nacht door te laten slapen. Het bevordert diepere slaap en verlengde REM-slaap, zodat je elke ochtend uitgerust wakker wordt.</p>",
+        "image": "shopify://shop_images/12_25ad373b-cf11-4cc7-8da7-b20be6cb5629.png",
+        "image_alt": "Deep Sleep Mask",
+        "bg": "#ffffff",
+        "text_color": "#0f172a",
+        "muted_color": "#64748b",
+        "check_color": "#f7045e",
+        "radius": 20,
+        "pad_y": 40,
+        "pad_x": 0
+      }
+    },
+    "hear_clearly_pwdbzJ": {
+      "type": "hear-clearly",
+      "blocks": {
+        "feature_8t8jNi": {
+          "type": "feature",
+          "settings": {
+            "image_icon": "shopify://shop_images/Untitled_design_-_2024-04-14T110259.416.png",
+            "icon": "",
+            "title": "Clinically-Backed Probiotic Strains",
+            "text": "Formulated with research-supported strains shown to help balance vaginal flora and reduce recurring issues."
+          }
+        },
+        "feature_D3CRtn": {
+          "type": "feature",
+          "settings": {
+            "image_icon": "shopify://shop_images/Untitled_design_-_2024-04-14T110224.568.png",
+            "icon": "record_voice_over",
+            "title": "Targeted Intimate Health Support",
+            "text": "Designed specifically for vaginal & urinary comfort. Not a generic probiotic."
+          }
+        },
+        "feature_XgJ3K4": {
+          "type": "feature",
+          "settings": {
+            "image_icon": "shopify://shop_images/Untitled_design_-_2024-04-14T110209.558.png",
+            "icon": "health_and_safety",
+            "title": "Gentle & Safe for Daily Use",
+            "text": "A clean, irritation-free formula you can trust to support your body long-term."
+          }
+        }
+      },
+      "block_order": [
+        "feature_8t8jNi",
+        "feature_D3CRtn",
+        "feature_XgJ3K4"
+      ],
+      "disabled": true,
+      "name": "Hear Clearly \u2014 Split",
+      "settings": {
+        "heading": "Science You Can Trust. Support You Can Feel.",
+        "body": "<p>Our vaginal specific probiotic blend is crafted to support healthy flora, pH stability and long term comfort, using clean ingredients your body can rely on daily.</p>",
+        "image": "shopify://shop_images/4_Image_Professional-04.jpg",
+        "image_left": false,
+        "bg": "rgba(0,0,0,0)",
+        "text_color": "#1a1a1a",
+        "muted_color": "#6b7280",
+        "card_bg": "rgba(0,0,0,0)",
+        "accent": "#f59e0b",
+        "radius": 0,
+        "pad_y": 28,
+        "gap": 0,
+        "max_width": 1200
+      }
+    },
+    "hear_clearly_video_LehkHb": {
+      "type": "hear-clearly-video",
+      "blocks": {
+        "feature_QdjAPy": {
+          "type": "feature",
+          "settings": {
+            "image_icon": "shopify://shop_images/Icon_Herdelica_Website-19.png",
+            "icon": "graphic_eq",
+            "title": "Clinically-Backed Probiotic Strains",
+            "text": "Formulated with research-supported strains shown to help balance vaginal flora and reduce recurring issues."
+          }
+        },
+        "feature_WTKyNN": {
+          "type": "feature",
+          "settings": {
+            "image_icon": "shopify://shop_images/Icon_Herdelica_Website-20.png",
+            "icon": "record_voice_over",
+            "title": "Targeted Intimate Health Support",
+            "text": "Designed specifically for vaginal & urinary comfort. Not a generic probiotic."
+          }
+        },
+        "feature_mQzcFF": {
+          "type": "feature",
+          "settings": {
+            "image_icon": "shopify://shop_images/Icon_Herdelica_Website-21.png",
+            "icon": "health_and_safety",
+            "title": "Gentle & Safe for Daily Use",
+            "text": "A clean, irritation-free formula you can trust to support your body long-term."
+          }
+        }
+      },
+      "block_order": [
+        "feature_QdjAPy",
+        "feature_WTKyNN",
+        "feature_mQzcFF"
+      ],
+      "disabled": true,
+      "custom_css": [
+        "@media (max-width: 900px) {div.hc__content {border: 1px solid #ddd !important; border-radius: 15px !important; border-bottom-right-radius: 0 !important; border-bottom-left-radius: 0 !important; } div.hc__media {border-top-right-radius: 0 !important; border-bottom-right-radius: 0 !important; border-bottom-right-radius: 15px !important; border-bottom-left-radius: 15px !important; }}",
+        "@media (max-width: 425px) {div.hc__content {padding: 30px 15px !important; }}",
+        ".hc__icon {background: transparent;}"
+      ],
+      "name": "Hear VIDEO",
+      "settings": {
+        "heading": "Science You Can Trust. Support You Can Feel.",
+        "body": "<p>Our vaginal specific probiotic blend is crafted to support healthy flora, pH stability and long term comfort, using clean ingredients your body can rely on daily.</p>",
+        "video": "shopify://files/videos/2.webm",
+        "image_left": false,
+        "bgGradient": "linear-gradient(270deg, rgba(247, 4, 94, 1), rgba(148, 85, 213, 1) 100%)",
+        "bg": "#f7045e",
+        "text_color": "#111111",
+        "muted_color": "#000000",
+        "card_bg": "#f5f5f5",
+        "accent": "#f59e0b",
+        "radius": 0,
+        "pad_y": 80,
+        "gap": 0,
+        "max_width": 1200
+      }
+    },
+    "vaginal_health_cards_QCGePi": {
+      "type": "Vaginal-Health-Cards",
+      "blocks": {
+        "odor_6A9Ap3": {
+          "type": "odor",
+          "settings": {
+            "icon": "shopify://shop_images/HERDELICA_-_Website_Design_Needs_Your_Vagina_Has_A.png",
+            "title": "Your Vagina Has A Natural Defense",
+            "text": "A slightly acidic pH and friendly bacteria keep odor causing microbes under control when everything is in balance."
+          }
+        },
+        "odor_fK6j6i": {
+          "type": "odor",
+          "settings": {
+            "icon": "shopify://shop_images/HERDELICA_-_Website_Design_Needs_When_pH_Shifts.png",
+            "title": "When pH Shifts, Odor Starts",
+            "text": "Hormones, antibiotics, stress and harsh soaps can raise pH and weaken that natural defense."
+          }
+        },
+        "odor_A6Mnfk": {
+          "type": "odor",
+          "settings": {
+            "icon": "shopify://shop_images/HERDELICA_-_Website_Design_Needs_Why_Washing_More.png",
+            "title": "Why Washing More Does Not Help",
+            "text": "Extra washing or scented products can irritate tissue and strip away helpful bacteria, which often makes odor worse."
+          }
+        },
+        "odor_iaMWf8": {
+          "type": "odor",
+          "settings": {
+            "icon": "shopify://shop_images/HERDELICA_-_Website_Design_Needs_How_Targeted.png",
+            "title": "How Targeted Probiotics Help",
+            "text": "Vaginal specific probiotic strains support good bacteria so pH can rebalance and everyday freshness and comfort feels normal again."
+          }
+        },
+        "infection_Fdkrzr": {
+          "type": "infection",
+          "settings": {
+            "icon": "shopify://shop_images/HERDELICA_-_Website_Design_Needs_Candida_Lives.png",
+            "title": "Candida Lives There Naturally",
+            "text": "Yeast is a normal part of the vaginal ecosystem and usually stays quiet when protective bacteria are strong."
+          }
+        },
+        "infection_ML3cyC": {
+          "type": "infection",
+          "settings": {
+            "icon": "shopify://shop_images/HERDELICA_-_Website_Design_Needs_Flare_Ups_Begin.png",
+            "title": "Flare Ups Begin With Imbalance",
+            "text": "Antibiotics, hormones, stress and tight clothing can disturb flora and give yeast or BV type bacteria room to grow."
+          }
+        },
+        "infection_GimGmP": {
+          "type": "infection",
+          "settings": {
+            "icon": "shopify://shop_images/HERDELICA_-_Website_Design_Needs_Why_Usual_Fixes.png",
+            "title": "Why Usual Fixes Keep Failing",
+            "text": "Creams and pills calm symptoms for a while but they do not rebuild the bacteria that help prevent repeats."
+          }
+        },
+        "infection_KedBRG": {
+          "type": "infection",
+          "settings": {
+            "icon": "shopify://shop_images/HERDELICA_-_Website_Design_Needs_Why_Targeted.png",
+            "title": "Why Targeted Probiotics Matter",
+            "text": "Most gummies use gut strains that stay in the digestive tract. Vaginal specific strains support the flora that defend against infections."
+          }
+        }
+      },
+      "block_order": [
+        "odor_6A9Ap3",
+        "odor_fK6j6i",
+        "odor_A6Mnfk",
+        "odor_iaMWf8",
+        "infection_Fdkrzr",
+        "infection_ML3cyC",
+        "infection_GimGmP",
+        "infection_KedBRG"
+      ],
+      "disabled": true,
+      "custom_css": [
+        "h1,h2,h3,h4,p,span,strong,button,a {font-family: \"Montserrat\", sans-serif !important;}"
+      ],
+      "name": "Vaginal Health - Cards",
+      "settings": {
+        "bg": "#f5f5f5",
+        "max_width": 1250,
+        "pad_y": 80,
+        "badge": "Herdelica Health Guide",
+        "badge_align": "center",
+        "badge_bg": "#9455d5",
+        "badge_color": "#ffffff",
+        "badge_border": "#9455d5",
+        "title": "<p>Odor And Infections<strong> Explained Simply</strong></p>",
+        "title_color": "#231f20",
+        "title_align": "center",
+        "title_size_d": 44,
+        "title_size_m": 28,
+        "subtitle": "Why it keeps happening",
+        "sub_color": "#303030",
+        "sub_align": "center",
+        "sub_size_d": 20,
+        "sub_size_m": 14,
+        "tab1_label": "ABOUT ODOR",
+        "tab2_label": "ABOUT INFECTIONS",
+        "tab_fs": 14,
+        "cards_bg": "rgba(0,0,0,0)",
+        "cards_radius": 14,
+        "grid_gap": 12,
+        "cols_d": 4,
+        "cols_t": 3,
+        "cols_m": 2,
+        "icon_size": 120,
+        "card_title_color": "#f7045e",
+        "card_title_align": "center",
+        "card_title_size_d": 18,
+        "card_title_size_m": 16,
+        "card_text_color": "#111111",
+        "card_text_align": "center",
+        "card_text_size_d": 14,
+        "card_text_size_m": 13
+      }
+    },
+    "timeline_text_6h3LNh": {
+      "type": "timeline-text",
+      "blocks": {
+        "timeline_TWYXjh": {
+          "type": "timeline",
+          "settings": {
+            "title": "Days 1-10",
+            "subtitle": "Rebuilding what antibiotics stripped away",
+            "description": "The protective Lactobacillus strains begin to colonize your vaginal and urinary microbiome, the same strains antibiotics wipe out. Many women notice subtle shifts first: less of that \"something's about to start\" feeling, slightly less urgency, fewer false alarms."
+          }
+        },
+        "timeline_qQ9P8Q": {
+          "type": "timeline",
+          "settings": {
+            "title": "Days 11-20",
+            "subtitle": "The cycle starts breaking",
+            "description": "Your microbiome grows stronger and more stable. The protective barrier that stops E. coli from climbing up the urinary tract is being rebuilt. Many women report fewer flare-ups, less post-sex anxiety, and a noticeable change in how their body feels day to day."
+          }
+        },
+        "timeline_TW6g8j": {
+          "type": "timeline",
+          "settings": {
+            "title": "Days 21-30",
+            "subtitle": "Full resilience. Life back.",
+            "description": "Your microbiome reaches a stable, Lactobacillus-dominant state, the way it should have been all along. For many women, this is the first time in months (or years) they go a full month without a UTI scare. Sex without dread. No urgent care visits. No bracing for the next round of antibiotics."
+          }
+        }
+      },
+      "block_order": [
+        "timeline_TWYXjh",
+        "timeline_qQ9P8Q",
+        "timeline_TW6g8j"
+      ],
+      "name": "Timeline",
+      "settings": {
+        "heading_clr_dsk": "#f7045e",
+        "heading_clr_mob": "#111111",
+        "dot_bg": "#f7045e",
+        "content_bg": "#fce5ef",
+        "content_text": "#111111"
+      }
+    },
+    "benefits_vivanu_nBErrh": {
+      "type": "benefits-vivanu",
+      "blocks": {
+        "benefit_Jb7RJj": {
+          "type": "benefit",
+          "settings": {
+            "icon": "shopify://shop_images/HERDELICA_-_Website_Design_Needs-19.png",
+            "title": "5 Billion CFU Active Probiotic Blend",
+            "text": "A high-potency dose of Bacillus coagulans delivering 5 billion colony-forming units to help populate and support a resilient intimate microbiome."
+          }
+        },
+        "benefit_eheYNr": {
+          "type": "benefit",
+          "settings": {
+            "icon": "shopify://shop_images/HERDELICA_-_Website_Design_Needs-20.png",
+            "title": "Clinically Relevant Lactobacillus Strains",
+            "text": "Includes L. rhamnosus, L. reuteri, L. plantarum, L. acidophilus and L. paracasei at 50 million CFU each, supporting Lactobacillus dominance and healthy vaginal pH."
+          }
+        },
+        "benefit_8q9JBr": {
+          "type": "benefit",
+          "settings": {
+            "icon": "shopify://shop_images/HERDELICA_-_Website_Design_Needs-21.png",
+            "title": "Standardized Cranberry Extract (PACs)",
+            "text": "Cranberry extract standardized to active proanthocyanidins that help reduce bacterial adhesion to urinary walls, offering targeted support against recurring irritation."
+          }
+        },
+        "benefit_jUpWPD": {
+          "type": "benefit",
+          "settings": {
+            "icon": "shopify://shop_images/HERDELICA_-_Website_Design_Needs-22.png",
+            "title": "Prebiotic Inulin for Enhanced Colonization",
+            "text": "A selective prebiotic fiber that feeds beneficial bacteria, improving survival through the digestive tract and amplifying the effectiveness of every probiotic strain."
+          }
+        }
+      },
+      "block_order": [
+        "benefit_Jb7RJj",
+        "benefit_eheYNr",
+        "benefit_8q9JBr",
+        "benefit_jUpWPD"
+      ],
+      "name": "Vivanu \u2014 Benefits (4-up)",
+      "settings": {
+        "heading": "The Clinical-Grade <strong>Formula Behind Herdelica</strong>",
+        "subheading": "A precise blend of quantified probiotic strains, standardized cranberry PACs and supportive prebiotics built to nourish and stabilize the vaginal microbiome from within.",
+        "heading_color": "#ffffff",
+        "bg": "#000000",
+        "bgGradient": "linear-gradient(270deg, rgba(247, 4, 94, 1), rgba(148, 85, 213, 1) 100%)",
+        "ink": "#111111",
+        "muted": "#ffffff",
+        "card": "#ffffff",
+        "card_heading": "#f7045e"
+      }
+    },
+    "ss_scrolling_images_MnwcTy": {
+      "type": "ss-scrolling-images",
+      "blocks": {
+        "image_nYgDbQ": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/IMG_4982.jpg",
+            "url": ""
+          }
+        },
+        "image_X3f6jC": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/IMG_0032_7ad3b5b0-7ada-432c-bab9-78265f1036ba.jpg",
+            "url": ""
+          }
+        },
+        "image_WHQEYn": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/ezgif-frame-018_2.jpg",
+            "url": ""
+          }
+        },
+        "image_CkYTGU": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/Nina.jpg",
+            "url": ""
+          }
+        },
+        "image_jBnAxD": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/ezgif-frame-002_1.jpg",
+            "url": ""
+          }
+        },
+        "image_N8UydX": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/Julie_2.jpg",
+            "url": ""
+          }
+        },
+        "image_mVGiig": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/Amy.jpg",
+            "url": ""
+          }
+        },
+        "image_4YYK47": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/ezgif-frame-002.jpg",
+            "url": ""
+          }
+        },
+        "image_Lbf9rw": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/Sierra.jpg",
+            "url": ""
+          }
+        },
+        "image_g9CkNk": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/ezgif-frame-004.jpg",
+            "url": ""
+          }
+        },
+        "image_4rY9W9": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/Julie.jpg",
+            "url": ""
+          }
+        }
+      },
+      "block_order": [
+        "image_nYgDbQ",
+        "image_X3f6jC",
+        "image_WHQEYn",
+        "image_CkYTGU",
+        "image_jBnAxD",
+        "image_N8UydX",
+        "image_mVGiig",
+        "image_4YYK47",
+        "image_Lbf9rw",
+        "image_g9CkNk",
+        "image_4rY9W9"
+      ],
+      "name": "SS - Scrolling Images",
+      "settings": {
+        "heading": "<h3>Loved by <strong>Women Everywhere</strong></h3>",
+        "heading_custom": false,
+        "heading_font": "josefin_sans_n7",
+        "heading_size": 44,
+        "heading_height": 130,
+        "heading_align": "center",
+        "slider_speed": 40,
+        "slider_gap": 10,
+        "slider_gap_mobile": 10,
+        "slider_mt": 30,
+        "slider_direction": "left",
+        "pause_hover": true,
+        "image_width_desktop": 300,
+        "image_width_mobile": 120,
+        "image_height_desktop": 400,
+        "image_height_mobile": 200,
+        "image_radius": 10,
+        "use_content": true,
+        "content_position": "center",
+        "content_max_width": 340,
+        "content_max_width_mobile": 340,
+        "content_padding_vertical": 30,
+        "content_padding_horizontal": 30,
+        "content_distance": 60,
+        "content_radius": 10,
+        "content_border_thickness": 0,
+        "use_shadow": true,
+        "text": "<p></p><p>Thousands of women trust Herdelica daily</p><p></p>",
+        "text_custom": false,
+        "text_font": "assistant_n4",
+        "text_size": 24,
+        "text_height": 130,
+        "heading_color": "#000000",
+        "heading_color_strong": "#f7045e",
+        "content_bg": "#ffffff",
+        "content_border_color": "#000000",
+        "text_color": "#000000",
+        "background_color": "#ffffff",
+        "background_gradient": "",
+        "border_color": "#000000",
+        "margin_top": 0,
+        "margin_bottom": 0,
+        "padding_top": 60,
+        "padding_bottom": 60,
+        "padding_horizontal": 0,
+        "padding_horizontal_mobile": 0,
+        "full_width": true,
+        "content_width": 120,
+        "border_thickness": 0,
+        "lazy": true
+      }
+    },
+    "custom_html_mh6jD6": {
+      "type": "custom-html",
+      "disabled": true,
+      "name": "Custom HTML",
+      "settings": {
+        "full_width": true,
+        "remove_vertical_spacing": false,
+        "remove_horizontal_spacing": false,
+        "html": "<!--bold red-->\n<script>\ndocument.addEventListener(\"DOMContentLoaded\", function() {\n const imagesScrolling_red = document.querySelectorAll('.images-scrolling__content');\n\nimagesScrolling_red.forEach((block, index) => {\n  if (index < 8) {\n    const strongs = block.querySelectorAll('strong');\n    strongs.forEach(el => el.style.color = 'red');\n  }\n});\n  \n});\n\n</script>",
+        "background": "",
+        "background_gradient": "",
+        "text_color": ""
+      }
+    },
+    "results_proof_grid_8GwLaM": {
+      "type": "results-proof-grid",
+      "blocks": {
+        "card_kXcrkg": {
+          "type": "card",
+          "settings": {
+            "image": "shopify://shop_images/1ad36df3-e396-4338-97fb-aa9293667dbd_ffa20137-873d-4c0f-bf0c-8c8812fd4850.png",
+            "badge_text": "90%",
+            "badge_position": "bl",
+            "caption": "Reported No More Embarrassing Odor or Discharge Within 3 Weeks",
+            "subtext": ""
+          }
+        },
+        "card_gEJEmR": {
+          "type": "card",
+          "settings": {
+            "image": "shopify://shop_images/bf5604d2-f685-4ae0-badf-d957174588b2_4fe08262-575b-440c-b011-d182ef9292df.png",
+            "badge_text": "90%",
+            "badge_position": "bl",
+            "caption": "Reported No More Embarrassing Odor or Discharge Within 3 Weeks",
+            "subtext": ""
+          }
+        },
+        "card_WJGTY4": {
+          "type": "card",
+          "settings": {
+            "image": "shopify://shop_images/f408e705-3c8c-46e1-a876-06a12cb0be65_2abeb8f0-9ca6-48cd-bbba-5caf6e269e3f.png",
+            "badge_text": "90%",
+            "badge_position": "bl",
+            "caption": "Reported No More Embarrassing Odor or Discharge Within 3 Weeks",
+            "subtext": ""
+          }
+        }
+      },
+      "block_order": [
+        "card_kXcrkg",
+        "card_gEJEmR",
+        "card_WJGTY4"
+      ],
+      "disabled": true,
+      "name": "Results Proof Grid",
+      "settings": {
+        "heading": "The Results Speak For Themselves",
+        "intro": "<p>Intro</p>",
+        "bg": "#fff7f3",
+        "text": "#111111",
+        "muted": "#4b5563",
+        "max_width": 1200,
+        "pad_y": 28,
+        "gap": 20,
+        "radius": 16,
+        "shadow": true,
+        "aspect_w": 4,
+        "aspect_h": 3,
+        "cols_tablet": 2,
+        "cols_desktop": 3,
+        "badge_bg": "#ef4444",
+        "badge_text": "#ffffff",
+        "badge_ring": "#ffffff",
+        "badge_size": 56
+      }
+    },
+    "proven_benefits_FCNLd7": {
+      "type": "proven-benefits",
+      "blocks": {
+        "stat_PKd6xA": {
+          "type": "stat",
+          "settings": {
+            "percent": "89%",
+            "title": "Reported fewer UTI flare-ups within 30 days",
+            "caption": "\"Based on a four-week independent customer panel\""
+          }
+        },
+        "stat_b39RW6": {
+          "type": "stat",
+          "settings": {
+            "percent": "84%",
+            "title": "Said sex no longer triggered symptoms",
+            "caption": "\"Based on a four-week independent customer panel\""
+          }
+        },
+        "stat_rkPD69": {
+          "type": "stat",
+          "settings": {
+            "percent": "91%",
+            "title": "Felt more in control of their intimate health",
+            "caption": "\"Based on a four-week independent customer panel\""
+          }
+        }
+      },
+      "block_order": [
+        "stat_PKd6xA",
+        "stat_b39RW6",
+        "stat_rkPD69"
+      ],
+      "name": "Proven Benefits \u2014 Stat Cards",
+      "settings": {
+        "heading_before": "Proven benefits,",
+        "heading_underlined": "proven results",
+        "bg": "rgba(0,0,0,0)",
+        "bgGradient": "linear-gradient(270deg, rgba(247, 4, 94, 1), rgba(148, 85, 213, 1) 100%)",
+        "heading": "#ffffff",
+        "text": "#111827",
+        "muted": "#6b7280",
+        "accent": "#f7045e",
+        "card_bg": "#ffffff",
+        "radius": 14,
+        "pad_y": 60,
+        "gap": 20,
+        "max_width": 1020,
+        "cols_tablet": 3,
+        "cols_desktop": 3
+      }
+    },
+    "ss_comparison_table_6_P8Bt3b": {
+      "type": "ss-comparison-table-6",
+      "blocks": {
+        "table_row_c3NkWE": {
+          "type": "table_row",
+          "settings": {
+            "row_heading": "Targeted Strains",
+            "first_column": "",
+            "first_column_icon": "check",
+            "second_column": "",
+            "second_column_icon": "cross",
+            "third_column": "",
+            "third_column_icon": "none",
+            "four_column": "",
+            "four_column_icon": "none"
+          }
+        },
+        "table_row_iMwdMw": {
+          "type": "table_row",
+          "settings": {
+            "row_heading": "Vaginal Support",
+            "first_column": "",
+            "first_column_icon": "check",
+            "second_column": "",
+            "second_column_icon": "cross",
+            "third_column": "",
+            "third_column_icon": "none",
+            "four_column": "",
+            "four_column_icon": "none"
+          }
+        },
+        "table_row_7XDkHz": {
+          "type": "table_row",
+          "settings": {
+            "row_heading": "pH Balance",
+            "first_column": "",
+            "first_column_icon": "check",
+            "second_column": "",
+            "second_column_icon": "cross",
+            "third_column": "",
+            "third_column_icon": "none",
+            "four_column": "",
+            "four_column_icon": "none"
+          }
+        },
+        "table_row_W8Rxim": {
+          "type": "table_row",
+          "settings": {
+            "row_heading": "Clean Formula",
+            "first_column": "",
+            "first_column_icon": "check",
+            "second_column": "",
+            "second_column_icon": "cross",
+            "third_column": "",
+            "third_column_icon": "none",
+            "four_column": "",
+            "four_column_icon": "none"
+          }
+        },
+        "table_row_dVJqd8": {
+          "type": "table_row",
+          "settings": {
+            "row_heading": "3rd Party Tested",
+            "first_column": "",
+            "first_column_icon": "check",
+            "second_column": "",
+            "second_column_icon": "cross",
+            "third_column": "",
+            "third_column_icon": "none",
+            "four_column": "",
+            "four_column_icon": "none"
+          }
+        },
+        "table_row_TFnyh4": {
+          "type": "table_row",
+          "settings": {
+            "row_heading": "Low Sugar",
+            "first_column": "",
+            "first_column_icon": "check",
+            "second_column": "",
+            "second_column_icon": "cross",
+            "third_column": "",
+            "third_column_icon": "none",
+            "four_column": "",
+            "four_column_icon": "none"
+          }
+        }
+      },
+      "block_order": [
+        "table_row_c3NkWE",
+        "table_row_iMwdMw",
+        "table_row_7XDkHz",
+        "table_row_W8Rxim",
+        "table_row_dVJqd8",
+        "table_row_TFnyh4"
+      ],
+      "disabled": true,
+      "name": "SS - Comparison Table #6",
+      "settings": {
+        "body_gap": 32,
+        "body_gap_mobile": 32,
+        "content_horizontal_align": "center",
+        "content_horizontal_align_mobile": "center",
+        "heading": "<p>Herdelica <em><strong>VS</strong></em><strong> </strong>Other<strong> </strong></p>",
+        "heading_custom": false,
+        "heading_font": "josefin_sans_n4",
+        "heading_size": 44,
+        "heading_size_mobile": 32,
+        "heading_height": 150,
+        "text": "",
+        "text_custom": false,
+        "text_font": "josefin_sans_n4",
+        "text_size": 18,
+        "text_size_mobile": 18,
+        "text_height": 150,
+        "text_mt": 4,
+        "list_mt": 50,
+        "list_mt_mobile": 32,
+        "list_gap": 30,
+        "list_gap_mobile": 30,
+        "list_hide_mobile": true,
+        "icon_size": 28,
+        "icon_size_mobile": 28,
+        "icon_margin_right": 16,
+        "list_text_custom": false,
+        "list_text_font": "josefin_sans_n4",
+        "list_text_size": 20,
+        "list_text_size_mobile": 18,
+        "list_text_height": 150,
+        "button": "",
+        "button_url": "",
+        "button_custom": false,
+        "button_font": "josefin_sans_n4",
+        "button_size": 18,
+        "button_size_mobile": 18,
+        "button_height": 100,
+        "button_width": 305,
+        "button_mt": 50,
+        "button_mt_mobile": 32,
+        "button_padding_vertical": 16,
+        "button_padding_vertical_mobile": 16,
+        "button_padding_horizontal": 48,
+        "button_padding_horizontal_mobile": 48,
+        "button_radius": 100,
+        "button_border_thickness": 0,
+        "button_style": "non_outline",
+        "button_position_mobile": "bottom",
+        "table_columns": 2,
+        "table_mt_mobile": 32,
+        "table_column_active": "1",
+        "table_radius": 16,
+        "table_border_thickness": 1,
+        "table_heading_image_size": 100,
+        "table_heading_image_size_mobile": 80,
+        "first_heading": "SECTION STORE",
+        "first_heading_image": "shopify://shop_images/Icons_cl.png",
+        "second_heading": "Other Brands",
+        "second_heading_image": "shopify://shop_images/Icon_Herdelica-35.png",
+        "third_heading": "Third",
+        "four_heading": "Fourth",
+        "table_heading_custom": false,
+        "table_heading_font": "assistant_n4",
+        "table_heading_size": 20,
+        "table_heading_size_mobile": 16,
+        "table_heading_height": 100,
+        "table_heading_align": "center",
+        "table_heading_padding_horizontal": 18,
+        "table_heading_padding_horizontal_mobile": 18,
+        "table_heading_padding_vertical": 18,
+        "table_heading_padding_vertical_mobile": 18,
+        "table_row_padding_horizontal": 14,
+        "table_row_padding_horizontal_mobile": 14,
+        "table_row_padding_vertical": 16,
+        "table_row_padding_vertical_mobile": 16,
+        "table_row_heading_width_mobile": 66,
+        "table_row_heading_custom": false,
+        "table_row_heading_font": "assistant_n4",
+        "table_row_heading_size": 16,
+        "table_row_heading_size_mobile": 16,
+        "table_row_heading_weight": 600,
+        "table_row_heading_height": 130,
+        "table_row_heading_align": "left",
+        "table_row_text_custom": false,
+        "table_row_text_font": "assistant_n4",
+        "table_row_text_size": 20,
+        "table_row_text_size_mobile": 16,
+        "table_row_text_height": 130,
+        "table_row_text_align": "center",
+        "table_row_image_size": 24,
+        "table_row_image_size_mobile": 24,
+        "heading_color": "#f7045e",
+        "heading_color_strong": "#9455d5",
+        "text_color": "#000000",
+        "icon_color": "#000000",
+        "list_text_color": "#000000",
+        "button_color": "#ffffff",
+        "button_hover_color": "#dad0ff",
+        "button_bg_color": "#16142b",
+        "button_bg_hover_color": "#16142b",
+        "button_border_color": "#16142b",
+        "button_border_hover_color": "#16142b",
+        "table_border_color": "#f7045e",
+        "table_active_border_color": "#f7045e",
+        "table_heading_color": "#1a192e",
+        "table_heading_active_color": "#ffffff",
+        "table_heading_bg_active_color": "#fce5ef",
+        "table_column_active_bg_color": "#fce5ef",
+        "table_column_active_icon_color": "#f7045e",
+        "table_row_heading_color": "#1a1a1a",
+        "table_row_text_color": "#1a192e",
+        "table_row_active_text_color": "#ffffff",
+        "background_color": "#fefefe",
+        "background_gradient": "",
+        "border_color": "#000000",
+        "margin_top": 0,
+        "margin_bottom": 0,
+        "padding_top": 60,
+        "padding_bottom": 60,
+        "padding_horizontal": 5,
+        "padding_horizontal_mobile": 1.5,
+        "full_width": false,
+        "content_width": 65,
+        "border_thickness": 0,
+        "lazy": true
+      }
+    },
+    "faq_accordion_FzaJAL": {
+      "type": "faq-accordion",
+      "blocks": {
+        "faq_HP6aPT": {
+          "type": "faq",
+          "settings": {
+            "q": "Are these actually for vaginal health?",
+            "a": "<p>Yes. Herdelica is formulated with targeted lactobacillus strains selected for vaginal flora, not generic \u201cgut health\u201d strains. Most gummies on the market use one random probiotic that never reaches the areas women actually struggle with. We built this formula specifically for odor, discharge, pH balance and recurring discomfort.</p>"
+          }
+        },
+        "faq_Fe8zzP": {
+          "type": "faq",
+          "settings": {
+            "q": "Are there any side effects?",
+            "a": "<p>Most women tolerate Herdelica very well. Some may experience mild bloating or digestive changes in the first few days as the body adjusts to the probiotics. This is normal and temporary.</p><p>Herdelica is gentle, non-hormonal and formulated with strains that are well studied for vaginal health.</p>"
+          }
+        },
+        "faq_xnUFw7": {
+          "type": "faq",
+          "settings": {
+            "q": "Can an oral probiotic really reach the vaginal microbiome?",
+            "a": "<p>Yes. Research shows that certain lactobacillus strains can move through the digestive tract and colonize the vaginal environment. This only works if the strains are scientifically aligned with vaginal flora. That\u2019s why strain selection is so important. Herdelica uses strains chosen specifically for intimate balance.</p>"
+          }
+        },
+        "faq_QYHpb9": {
+          "type": "faq",
+          "settings": {
+            "q": "I\u2019ve tried everything. What makes this different?",
+            "a": "<p>The internet is full of women who tried it all: antifungals, antibiotics, boric acid, cotton underwear, unscented soaps, new detergents, eating yogurt, garlic pills and still kept ending up in the same cycle.</p><p>Herdelica targets the root cause: bacterial imbalance. Instead of masking symptoms or wiping out everything, it helps replenish the healthy bacteria your body needs for stability.</p>"
+          }
+        },
+        "faq_WPpDmG": {
+          "type": "faq",
+          "settings": {
+            "q": "Can this support recurring BV or yeast tendencies?",
+            "a": "<p>Many women use vaginal probiotics for support with recurring BV or yeast symptoms. Herdelica isn\u2019t a medication, but it supports the internal environment that makes recurring discomfort less likely. Women often report improvements within a few weeks of consistent use.</p>"
+          }
+        },
+        "faq_k7EFf6": {
+          "type": "faq",
+          "settings": {
+            "q": "How long does it take to notice a difference?",
+            "a": "<p>Every body is unique, but most women report feeling fresher or more balanced within 2 to 4 weeks of daily use. That\u2019s why we offer a 30-day difference guarantee. If you don\u2019t notice a change, you can request a refund within that period.</p>"
+          }
+        },
+        "faq_EQytwF": {
+          "type": "faq",
+          "settings": {
+            "q": "What is your 30-day difference guarantee?",
+            "a": "<p>Take Herdelica daily for 30 days. If you don\u2019t notice a meaningful change in freshness, comfort or balance, contact us within that window and we\u2019ll refund your purchase.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "faq_HP6aPT",
+        "faq_Fe8zzP",
+        "faq_xnUFw7",
+        "faq_QYHpb9",
+        "faq_WPpDmG",
+        "faq_k7EFf6",
+        "faq_EQytwF"
+      ],
+      "name": "FAQ Accordion",
+      "settings": {
+        "full_width": false,
+        "max_w": 1150,
+        "list_max_w": 880,
+        "pad_y": 60,
+        "bg": "#444444",
+        "bgGradient": "linear-gradient(270deg, rgba(247, 4, 94, 1), rgba(148, 85, 213, 1) 100%)",
+        "eyebrow": "",
+        "eyebrow_color": "#0f2540",
+        "eyebrow_size": 27,
+        "title": "Got questions? <strong>We've got answers...</strong>",
+        "title_color": "#ffffff",
+        "title_color_strong": "#ffffff",
+        "title_size": 44,
+        "head_gap": 30,
+        "card_bg": "#ffffff",
+        "card_border": "#fce5ef",
+        "card_radius": 17,
+        "item_gap": 8,
+        "q_color": "#1a1a1a",
+        "q_size": 20,
+        "a_color": "#1a1a1a",
+        "a_size": 16,
+        "icon_color": "#f7045e",
+        "focus_color": "rgba(0,0,0,0)",
+        "open_first": false
+      }
+    },
+    "ss_product_vidoes_MntKCG": {
+      "type": "ss-product-vidoes",
+      "blocks": {
+        "video_gWNjLQ": {
+          "type": "video",
+          "settings": {
+            "video": "shopify://files/videos/Jordynn - Testimonial.mp4",
+            "video_url": "https://www.youtube.com/watch?v=_9VUPq3SxOc"
+          }
+        },
+        "video_VXyj6N": {
+          "type": "video",
+          "disabled": true,
+          "settings": {
+            "video": "shopify://files/videos/Dakota - Testimonial.mp4",
+            "video_url": "https://www.youtube.com/watch?v=_9VUPq3SxOc"
+          }
+        },
+        "video_CV84jn": {
+          "type": "video",
+          "settings": {
+            "video": "shopify://files/videos/Natasha - Testimonial.mov",
+            "video_url": "https://www.youtube.com/watch?v=_9VUPq3SxOc"
+          }
+        },
+        "video_GH9FGr": {
+          "type": "video",
+          "disabled": true,
+          "settings": {
+            "video": "shopify://files/videos/Sofiia - Testimonial.mov",
+            "video_url": "https://www.youtube.com/watch?v=_9VUPq3SxOc"
+          }
+        },
+        "video_AJptzC": {
+          "type": "video",
+          "settings": {
+            "video": "shopify://files/videos/Maria - Testimonial.mov",
+            "video_url": "https://www.youtube.com/watch?v=_9VUPq3SxOc"
+          }
+        },
+        "video_CPL4h6": {
+          "type": "video",
+          "settings": {
+            "video": "shopify://files/videos/Isabela - Testimonial.mp4",
+            "video_url": "https://www.youtube.com/watch?v=_9VUPq3SxOc"
+          }
+        },
+        "video_RUPTaK": {
+          "type": "video",
+          "settings": {
+            "video": "shopify://files/videos/Motorola - Testimonial.mov",
+            "video_url": "https://www.youtube.com/watch?v=_9VUPq3SxOc"
+          }
+        }
+      },
+      "block_order": [
+        "video_gWNjLQ",
+        "video_VXyj6N",
+        "video_CV84jn",
+        "video_GH9FGr",
+        "video_AJptzC",
+        "video_CPL4h6",
+        "video_RUPTaK"
+      ],
+      "name": "SS - Product Videos",
+      "settings": {
+        "videos_position": "above_description",
+        "use_metafield": false,
+        "heading": "<p>Loved by <strong>30,000+ women</strong></p>",
+        "heading_custom": false,
+        "heading_font": "josefin_sans_n4",
+        "heading_size": 18,
+        "heading_size_mobile": 18,
+        "heading_height": 130,
+        "heading_align": "left",
+        "heading_align_mobile": "left",
+        "slider_view": 3,
+        "slider_view_mobile": 3,
+        "slider_gap": 16,
+        "slider_gap_mobile": 16,
+        "slider_mt": 20,
+        "card_radius": 10,
+        "card_border_thickness": 0,
+        "card_shadow": false,
+        "video_ratio": "portrait",
+        "video_ratio_mobile": "portrait",
+        "video_overlay": 0.3,
+        "icon_size": 34,
+        "icon_size_mobile": 34,
+        "icon_border_thickness": 1,
+        "icon_position_mobile": "bottom_left",
+        "icon_position": "bottom_left",
+        "hide_icon": false,
+        "arrow_size": 35,
+        "arrow_size_mobile": 35,
+        "arrow_radius": 5,
+        "arrow_border_thickness": 0,
+        "arrow_hover_shadow": true,
+        "arrow_show_desktop": true,
+        "arrow_show_mobile": true,
+        "card_bg_color": "#ffffff",
+        "card_border_color": "#000000",
+        "card_shadow_color": "#000000",
+        "video_overlay_color": "#000000",
+        "icon_bg_color": "#000000",
+        "icon_border_color": "#ffffff",
+        "icon_color": "#ffffff",
+        "arrow_bg_color": "#ffffff",
+        "arrow_bg_hover_color": "#ffffff",
+        "arrow_border_color": "#000000",
+        "arrow_border_hover_color": "#000000",
+        "arrow_icon_color": "#1c1c1c",
+        "arrow_icon_hover_color": "#1c1c1c",
+        "heading_color": "#ffffff",
+        "background_color": "#ffffff",
+        "background_gradient": "",
+        "border_color": "#000000",
+        "margin_top": 0,
+        "margin_bottom": 0,
+        "padding_top": 20,
+        "padding_bottom": 20,
+        "padding_horizontal": 0,
+        "padding_horizontal_mobile": 0,
+        "border_thickness": 0,
+        "lazy": true
+      }
+    },
+    "ll_product_videos_5_AV9Ffi": {
+      "type": "ll-product-videos-5",
+      "blocks": {
+        "video_3mRykN": {
+          "type": "video",
+          "settings": {
+            "source": "file",
+            "video_file": "shopify://files/videos/review3_7b98c64c-f3cc-4536-bf48-460ba9e3e449.mp4",
+            "video_url": ""
+          }
+        },
+        "video_WWPBcK": {
+          "type": "video",
+          "settings": {
+            "source": "file",
+            "video_file": "shopify://files/videos/6243275e165b420284a9236a61c12ef3.HD-1080p-3.3Mbps-50348017.mp4",
+            "video_url": ""
+          }
+        },
+        "video_thWawy": {
+          "type": "video",
+          "settings": {
+            "source": "file",
+            "video_file": "shopify://files/videos/6a6ded652ef34abd8819e406bed49e90.HD-1080p-3.3Mbps-50347335.mp4",
+            "video_url": ""
+          }
+        },
+        "video_bGdLPi": {
+          "type": "video",
+          "settings": {
+            "source": "file",
+            "video_file": "shopify://files/videos/f0f506054ff5471685f7352a8055bf90.HD-720p-1.6Mbps-49162363.mp4",
+            "video_url": ""
+          }
+        },
+        "video_XwtEFM": {
+          "type": "video",
+          "settings": {
+            "source": "file",
+            "video_file": "shopify://files/videos/6a6ded652ef34abd8819e406bed49e90.HD-1080p-3.3Mbps-50347335.mp4",
+            "video_url": ""
+          }
+        }
+      },
+      "block_order": [
+        "video_3mRykN",
+        "video_WWPBcK",
+        "video_thWawy",
+        "video_bGdLPi",
+        "video_XwtEFM"
+      ],
+      "disabled": true,
+      "name": "LL - Product videos #5",
+      "settings": {
+        "max_width": 1100,
+        "section_bg": "#ffffff",
+        "card_bg": "#ffffff",
+        "card_shadow": true,
+        "card_radius": 16,
+        "pad_top": 40,
+        "pad_bottom": 40,
+        "pad_top_m": 24,
+        "pad_bottom_m": 24
+      }
+    },
+    "1765457110a48fca9d": {
+      "type": "apps",
+      "blocks": {
+        "judge_me_reviews_review_widget_Cgbyx4": {
+          "type": "shopify://apps/judge-me-reviews/blocks/review_widget/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
+          "settings": {
+            "review_data": "sample_data",
+            "max_width": 1200,
+            "show_shop_reviews": false,
+            "empty_state": "empty_widget"
+          }
+        }
+      },
+      "block_order": [
+        "judge_me_reviews_review_widget_Cgbyx4"
+      ],
+      "settings": {
+        "full_width": true,
+        "remove_vertical_spacing": false,
+        "remove_horizontal_spacing": false,
+        "background": "",
+        "background_gradient": "",
+        "text_color": ""
+      }
+    },
+    "ss_tabs_block_KcJc7P": {
+      "type": "ss-tabs-block",
+      "blocks": {
+        "tab_b4WhYM": {
+          "type": "tab",
+          "settings": {
+            "svg_color": "#f7045e",
+            "icon": "heart",
+            "image": "shopify://shop_images/HERDELICA_-_Website_Design_Needs-16.png",
+            "question": "Why It Works",
+            "answer": "<p>Recurrent UTIs almost always trace back to one root cause: a vaginal microbiome low in protective Lactobacillus. </p><p>Without those strains, E. coli travels from the gut to the urinary tract, again and again. </p><p>Herdelica delivers the clinically-studied probiotic strains your body needs to rebuild that protective barrier, supported by cranberry PACs and prebiotic inulin. </p><p>The result: a more resilient microbiome, fewer flare-ups, and a body that finally feels like it's on your side.</p>",
+            "answer_html": ""
+          }
+        },
+        "tab_nWbjKq": {
+          "type": "tab",
+          "settings": {
+            "svg_color": "#f7045e",
+            "icon": "plant",
+            "image": "shopify://shop_images/HERDELICA_-_Website_Design_Needs-17.png",
+            "question": "What makes Herdelica different from other probiotic gummies?",
+            "answer": "<p>Most probiotic gummies use generic gut strains that never reach the vaginal microbiome, which is why they don\u2019t help with odor, discharge or recurring BV and yeast flare-ups.</p><p>Herdelica is different. It\u2019s formulated with scientifically backed, vaginal-specific probiotic strains shown to survive the digestive tract and support intimate flora and pH balance.</p><p>This means they actually reach the areas where women struggle most, helping promote fresher days, healthier flora and fewer recurring issues.</p>",
+            "answer_html": ""
+          }
+        },
+        "tab_q7aamh": {
+          "type": "tab",
+          "settings": {
+            "svg_color": "#f7045e",
+            "icon": "return_arrow",
+            "image": "shopify://shop_images/HERDELICA_-_Website_Design_Needs-18.png",
+            "question": "Do I need to change my routine for Herdelica to work?",
+            "answer": "<p>No. Herdelica is designed to fit into your life without changing your daily routine.</p><p>You don\u2019t need to switch detergents, avoid sex, stop using your favorite products or follow strict hygiene rules.</p><p>Just take your gummies consistently each day. The targeted, vaginal-specific probiotic strains do the work from the inside out by supporting healthy flora and a balanced pH.</p>",
+            "answer_html": ""
+          }
+        },
+        "tab_wKzqgh": {
+          "type": "tab",
+          "settings": {
+            "svg_color": "#f7045e",
+            "icon": "time",
+            "question": "Shipping & Returns",
+            "answer": "<p>Your wellness, delivered quickly.</p><ul><li>Choose a <strong>60-day or 90-day supply</strong> and get <strong>free shipping</strong> on us.</li><li>Processing time:\u00a0<strong>1 business day</strong></li><li>Delivery:\u00a0<strong>3-7 business days</strong></li><li>Tracking provided on\u00a0<strong>all</strong>\u00a0orders</li></ul><p><em>See our\u00a0</em><a href=\"https://histrips.com/policies/refund-policy\" title=\"Refund Policy\"><em>return policy</em></a><em>\u00a0for more information.</em></p><p>You'll get an email with tracking info as soon as your order leaves the building. Fast, reliable, and ready when you are.</p>",
+            "answer_html": ""
+          }
+        }
+      },
+      "block_order": [
+        "tab_b4WhYM",
+        "tab_nWbjKq",
+        "tab_q7aamh",
+        "tab_wKzqgh"
+      ],
+      "name": "SS - Product Tabs",
+      "settings": {
+        "close_other": true,
+        "open_default": true,
+        "subtitle": "",
+        "subtitle_color": "#121212",
+        "subtitle_font_size": 10,
+        "title": "",
+        "title_font_size": 10,
+        "title_color": "#111111",
+        "arrow_size": 14,
+        "arrow_color": "#111111",
+        "icon_width": 22,
+        "text_color": "#111111",
+        "question_font_size": 13,
+        "answer_color": "#111111",
+        "answer_font_size": 12,
+        "border_color": "#dedede",
+        "background-color": "rgba(0,0,0,0)",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "padding_x_desktop": 0,
+        "padding_x": 0,
+        "margin_top": 0,
+        "margin_bottom": 0,
+        "button_padding_y": 10
+      }
+    }
+  },
+  "order": [
+    "main",
+    "slideshow_cdKkky",
+    "future_11_slider_tDD3zC",
+    "ss_video_grid_socials_3_f9E9YD",
+    "features_media_trio_hA8dXM",
+    "sleep_hero_split_mQFKhq",
+    "hear_clearly_pwdbzJ",
+    "hear_clearly_video_LehkHb",
+    "vaginal_health_cards_QCGePi",
+    "timeline_text_6h3LNh",
+    "benefits_vivanu_nBErrh",
+    "ss_scrolling_images_MnwcTy",
+    "custom_html_mh6jD6",
+    "results_proof_grid_8GwLaM",
+    "proven_benefits_FCNLd7",
+    "ss_comparison_table_6_P8Bt3b",
+    "faq_accordion_FzaJAL",
+    "ss_product_vidoes_MntKCG",
+    "ll_product_videos_5_AV9Ffi",
+    "1765457110a48fca9d",
+    "ss_tabs_block_KcJc7P"
+  ]
+}

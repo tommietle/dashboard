@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/herdelica/advertorial-health?rollback=1",
+      "schedule": "0 6 * * *"
+    }
+  ]
+}
