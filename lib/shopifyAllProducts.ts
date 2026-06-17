@@ -84,5 +84,9 @@ async function fetchAllShopifyProductsUncached(
     if (!pageInfo) break;
   }
 
+  // Lege respons nooit cachen — bij een tijdelijk Shopify-probleem zou de lege array
+  // anders 6 minuten lang gecached worden. Door te throwen slaat cached() niets op.
+  if (all.length === 0) throw new Error(`Shopify all products ${storeKey}: empty response`);
+
   return all;
 }

@@ -10,6 +10,7 @@ interface SavedFilter {
     status: string;
     roasMin: string; roasMax: string;
     spendMin: string; spendMax: string;
+    spend90Min: string; spend90Max: string;
     clicksMin: string; clicksMax: string;
     cpcMin: string; cpcMax: string;
     customStart: string; customEnd: string;
@@ -69,8 +70,10 @@ export default function ProductsPage() {
   const [showFilters, setShowFilters] = useState(false);
   const [roasMin,   setRoasMin]   = useState('');
   const [roasMax,   setRoasMax]   = useState('');
-  const [spendMin,  setSpendMin]  = useState('');
-  const [spendMax,  setSpendMax]  = useState('');
+  const [spendMin,   setSpendMin]   = useState('');
+  const [spendMax,   setSpendMax]   = useState('');
+  const [spend90Min, setSpend90Min] = useState('');
+  const [spend90Max, setSpend90Max] = useState('');
   const [clicksMin, setClicksMin] = useState('');
   const [clicksMax, setClicksMax] = useState('');
   const [cpcMin,    setCpcMin]    = useState('');
@@ -253,7 +256,7 @@ export default function ProductsPage() {
   }, []);
 
   function currentFilterSnapshot() {
-    return { status, roasMin, roasMax, spendMin, spendMax, clicksMin, clicksMax, cpcMin, cpcMax, customStart, customEnd };
+    return { status, roasMin, roasMax, spendMin, spendMax, spend90Min, spend90Max, clicksMin, clicksMax, cpcMin, cpcMax, customStart, customEnd };
   }
 
   function saveCurrentFilter() {
@@ -271,6 +274,7 @@ export default function ProductsPage() {
     setStatus(f.filters.status);
     setRoasMin(f.filters.roasMin);   setRoasMax(f.filters.roasMax);
     setSpendMin(f.filters.spendMin); setSpendMax(f.filters.spendMax);
+    setSpend90Min(f.filters.spend90Min ?? ''); setSpend90Max(f.filters.spend90Max ?? '');
     setClicksMin(f.filters.clicksMin); setClicksMax(f.filters.clicksMax);
     setCpcMin(f.filters.cpcMin ?? ''); setCpcMax(f.filters.cpcMax ?? '');
     setCustomStart(f.filters.customStart); setCustomEnd(f.filters.customEnd);
@@ -284,12 +288,12 @@ export default function ProductsPage() {
   }
 
   // Count active filters for badge
-  const activeFilterCount = [roasMin, roasMax, spendMin, spendMax, clicksMin, clicksMax, cpcMin, cpcMax]
+  const activeFilterCount = [roasMin, roasMax, spendMin, spendMax, spend90Min, spend90Max, clicksMin, clicksMax, cpcMin, cpcMax]
     .filter(v => v !== '').length + (status !== 'all' ? 1 : 0) + (customActive ? 1 : 0);
 
   function clearFilters() {
     setRoasMin(''); setRoasMax('');
-    setSpendMin(''); setSpendMax('');
+    setSpendMin(''); setSpendMax(''); setSpend90Min(''); setSpend90Max('');
     setClicksMin(''); setClicksMax('');
     setCpcMin(''); setCpcMax('');
     setStatus('all');
@@ -324,15 +328,17 @@ export default function ProductsPage() {
         }
         if (roasMin  !== '' && p.d30.roas   < Number(roasMin))  return false;
         if (roasMax  !== '' && p.d30.roas   > Number(roasMax))  return false;
-        if (spendMin !== '' && p.d30.spend  < Number(spendMin)) return false;
-        if (spendMax !== '' && p.d30.spend  > Number(spendMax)) return false;
+        if (spendMin   !== '' && p.d30.spend < Number(spendMin))   return false;
+        if (spendMax   !== '' && p.d30.spend > Number(spendMax))   return false;
+        if (spend90Min !== '' && p.d90.spend < Number(spend90Min)) return false;
+        if (spend90Max !== '' && p.d90.spend > Number(spend90Max)) return false;
         if (clicksMin !== '' && p.d30.clicks < Number(clicksMin)) return false;
         if (clicksMax !== '' && p.d30.clicks > Number(clicksMax)) return false;
         if (cpcMin !== '' && p.d30.cpc < Number(cpcMin)) return false;
         if (cpcMax !== '' && p.d30.cpc > Number(cpcMax)) return false;
         return true;
       });
-  }, [products, selectedStore, collectionProductIds, excludedProductIds, brandOverrides, search, status, roasMin, roasMax, spendMin, spendMax, clicksMin, clicksMax, cpcMin, cpcMax]);
+  }, [products, selectedStore, collectionProductIds, excludedProductIds, brandOverrides, search, status, roasMin, roasMax, spendMin, spendMax, spend90Min, spend90Max, clicksMin, clicksMax, cpcMin, cpcMax]);
 
   const filteredRoas = useMemo(() => {
     let spend = 0, revenue = 0;
@@ -673,10 +679,16 @@ export default function ProductsPage() {
                 <div className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Ad Spend</div>
                 <div className="space-y-2.5">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-600 w-20 shrink-0">Ad Cost</span>
+                    <span className="text-sm text-gray-600 w-20 shrink-0">Ad Cost 30D</span>
                     <NumInput value={spendMin} onChange={setSpendMin} placeholder="Min" />
                     <Dash />
                     <NumInput value={spendMax} onChange={setSpendMax} placeholder="Max" />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-600 w-20 shrink-0">Ad Cost 90D</span>
+                    <NumInput value={spend90Min} onChange={setSpend90Min} placeholder="Min" />
+                    <Dash />
+                    <NumInput value={spend90Max} onChange={setSpend90Max} placeholder="Max" />
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-gray-600 w-20 shrink-0">Clicks</span>
