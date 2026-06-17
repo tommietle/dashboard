@@ -133,6 +133,7 @@ async function buildProductsForStore(
       variantCount: p.variantCount,
       imageUrl:     p.imageUrl,
       brandName:    p.brandName,
+      activeDays:   p.publishedAt ? Math.floor((Date.now() - new Date(p.publishedAt).getTime()) / 86400000) : undefined,
       d90: include90 ? buildPeriod(s?.d90 ?? ZERO, rev?.d90 ?? 0) : ZERO,
       d30: buildPeriod(s?.d30 ?? ZERO, rev?.d30 ?? 0),
       d14: buildPeriod(s?.d14 ?? ZERO, rev?.d14 ?? 0),

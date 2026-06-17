@@ -59,6 +59,7 @@ export interface ProductRoas {
   variantCount: number;
   imageUrl?: string;
   brandName?: string;
+  activeDays?: number;
   d90: ProductPeriodMetrics;
   d30: ProductPeriodMetrics;
   d14: ProductPeriodMetrics;

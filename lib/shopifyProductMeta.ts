@@ -180,5 +180,5 @@ export async function setShopifyProductStatus(
 
   // Cache invalideren zodat de UI direct de nieuwe status ziet.
   await invalidateCache(`shopify:product-meta:v6:${storeKey}:${productId}`);
-  await invalidateCache(`shopify:all-products:v2:${storeKey}`);
+  await invalidateCache(`shopify:all-products:v3:${storeKey}`);
 }

@@ -27,13 +27,14 @@ export interface ShopifyProductBasic {
   variantIds: string[];
   imageUrl?: string;
   brandName?: string;
+  publishedAt?: string;
 }
 
 export function fetchAllShopifyProducts(
   storeKey: 'luhvia' | 'cecole' | 'luvande',
 ): Promise<ShopifyProductBasic[]> {
   return cached(
-    `shopify:all-products:v2:${storeKey}`,
+    `shopify:all-products:v3:${storeKey}`,
     120,
     () => fetchAllShopifyProductsUncached(storeKey),
   );
@@ -51,10 +52,10 @@ async function fetchAllShopifyProductsUncached(
   while (true) {
     let url: string;
     if (isFirst) {
-      url = `https://${cfg.store}/admin/api/2024-04/products.json?limit=250&fields=id,title,status,variants,image,tags`;
+      url = `https://${cfg.store}/admin/api/2024-04/products.json?limit=250&fields=id,title,status,published_at,variants,image,tags`;
       isFirst = false;
     } else if (pageInfo) {
-      url = `https://${cfg.store}/admin/api/2024-04/products.json?page_info=${pageInfo}&limit=250&fields=id,title,status,variants,image,tags`;
+      url = `https://${cfg.store}/admin/api/2024-04/products.json?page_info=${pageInfo}&limit=250&fields=id,title,status,published_at,variants,image,tags`;
     } else {
       break;
     }
@@ -76,6 +77,7 @@ async function fetchAllShopifyProductsUncached(
         variantIds: Array.isArray(p.variants) ? p.variants.map((v: any) => String(v.id)) : [],
         imageUrl: p.image?.src,
         brandName: extractBrand(p.tags || ''),
+        publishedAt: p.published_at ?? undefined,
       });
     }
 
