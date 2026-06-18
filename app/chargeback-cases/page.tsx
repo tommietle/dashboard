@@ -46,8 +46,39 @@ const OUTCOME = {
   open: { label: 'Open', cls: 'bg-amber-100 text-amber-700 border-amber-200' },
 } as const;
 
+interface ConvoData {
+  threads: { subject: string; url: string | null; messages: { role: string; name: string; at: string; body: string }[] }[];
+  suggestions: string[];
+}
+
 function CaseCard({ c }: { c: ChargebackCase }) {
   const o = OUTCOME[c.outcome];
+  const [open, setOpen] = useState(false);
+  const [convo, setConvo] = useState<ConvoData | null>(null);
+  const [loadingConvo, setLoadingConvo] = useState(false);
+
+  async function toggle() {
+    if (open) {
+      setOpen(false);
+      return;
+    }
+    setOpen(true);
+    if (convo || !c.customerEmail) return;
+    setLoadingConvo(true);
+    try {
+      const res = await fetch(
+        `/api/chargeback-cases/conversation?store=${c.store}&email=${encodeURIComponent(
+          c.customerEmail,
+        )}&before=${encodeURIComponent(c.initiatedAt)}`,
+      );
+      setConvo(await res.json());
+    } catch {
+      setConvo({ threads: [], suggestions: [] });
+    } finally {
+      setLoadingConvo(false);
+    }
+  }
+
   return (
     <div className="bg-white rounded-2xl border border-gray-200 p-4 flex flex-col gap-3">
       {/* header */}
@@ -120,6 +151,14 @@ function CaseCard({ c }: { c: ChargebackCase }) {
 
       {/* actions */}
       <div className="flex items-center gap-2">
+        {c.customerEmail && (
+          <button
+            onClick={toggle}
+            className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition-colors"
+          >
+            {open ? 'Hide conversation' : '💬 Read full conversation'}
+          </button>
+        )}
         {c.reamazeUrl && (
           <a
             href={c.reamazeUrl}
@@ -139,6 +178,65 @@ function CaseCard({ c }: { c: ChargebackCase }) {
           </a>
         )}
       </div>
+
+      {/* expandable conversation + coaching */}
+      {open && (
+        <div className="border-t border-gray-100 pt-3 space-y-3">
+          {loadingConvo ? (
+            <div className="text-xs text-gray-400">Loading conversation…</div>
+          ) : (
+            <>
+              {convo?.suggestions && convo.suggestions.length > 0 && (
+                <div className="bg-indigo-50/60 border border-indigo-100 rounded-xl px-3 py-2.5">
+                  <div className="text-[10px] font-bold text-indigo-700 uppercase tracking-wider mb-1.5">
+                    Coaching — what could&apos;ve been better
+                  </div>
+                  <ul className="space-y-1.5">
+                    {convo.suggestions.map((s, i) => (
+                      <li key={i} className="text-[13px] text-gray-700 leading-snug flex gap-2">
+                        <span className="text-indigo-400">•</span>
+                        <span>{s}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {convo?.threads?.length ? (
+                convo.threads.map((t, ti) => (
+                  <div key={ti} className="space-y-2">
+                    <div className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">
+                      {t.subject}
+                    </div>
+                    {t.messages.map((m, mi) => {
+                      const cust = m.role === 'customer';
+                      return (
+                        <div key={mi} className={`flex ${cust ? 'justify-start' : 'justify-end'}`}>
+                          <div
+                            className={`max-w-[80%] rounded-2xl px-3 py-2 ${
+                              cust
+                                ? 'bg-gray-100 text-gray-800'
+                                : 'bg-blue-50 text-blue-900 border border-blue-100'
+                            }`}
+                          >
+                            <div className="text-[10px] font-semibold mb-0.5 opacity-70">
+                              {cust ? '👤 ' : '🧑‍💼 '}
+                              {m.name} · {m.at.slice(0, 16).replace('T', ' ')}
+                            </div>
+                            <div className="text-[13px] leading-snug whitespace-pre-line">{m.body}</div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ))
+              ) : (
+                <div className="text-xs text-gray-400">No conversation found for this customer.</div>
+              )}
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 }
