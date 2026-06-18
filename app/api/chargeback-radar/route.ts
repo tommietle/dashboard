@@ -37,6 +37,8 @@ export interface RadarItem {
   severity: number;
   answered: boolean;
   waitingDays: number | null;
+  readyToClose: boolean;  // answered + 5+ days quiet → safe to resolve
+  quietDays: number | null;
 }
 
 const SCAN_PAGES = 5;
@@ -132,6 +134,11 @@ async function buildStore(store: ShopKey): Promise<RadarItem[]> {
     const waitingDays = answered || !lastCust
       ? null
       : Math.max(0, Math.round((now - lastCust) / 86_400_000));
+    const lastActivity = Math.max(lastStaff, lastCust);
+    const quietDays = lastActivity > 0
+      ? Math.max(0, Math.round((now - lastActivity) / 86_400_000))
+      : null;
+    const readyToClose = answered && (quietDays ?? 0) >= 5;
 
     items.push({
       store,
@@ -153,6 +160,8 @@ async function buildStore(store: ShopKey): Promise<RadarItem[]> {
       severity: 0,
       answered,
       waitingDays,
+      readyToClose,
+      quietDays,
     });
   }
 
@@ -179,11 +188,12 @@ export async function GET(req: NextRequest) {
   const keys = STORE_KEYS.filter((k) => store === 'all' || k === store);
 
   try {
-    const items = await cached(`radar:v3:${store}`, 300, async () => {
+    const items = await cached(`radar:v4:${store}`, 300, async () => {
       const all = (
         await Promise.all(keys.map((k) => buildStore(k).catch(() => [] as RadarItem[])))
       ).flat();
       all.sort((a, b) => {
+        if (a.readyToClose !== b.readyToClose) return a.readyToClose ? 1 : -1;
         if (a.tier !== b.tier) return a.tier === 'red' ? -1 : 1;
         if (a.answered !== b.answered) return a.answered ? 1 : -1;
         return b.severity - a.severity;

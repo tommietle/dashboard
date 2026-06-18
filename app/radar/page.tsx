@@ -31,6 +31,8 @@ interface RadarItem {
   severity: number;
   answered: boolean;
   waitingDays: number | null;
+  readyToClose: boolean;
+  quietDays: number | null;
 }
 
 const STORES: { key: StoreKey; label: string }[] = [
@@ -71,7 +73,11 @@ function Card({ item }: { item: RadarItem }) {
             <span className="font-semibold text-gray-900 text-sm truncate">
               {item.customerName || item.customerEmail}
             </span>
-            {item.answered ? (
+            {item.readyToClose ? (
+              <span className="text-[10px] font-medium text-green-700 bg-green-50 border border-green-200 px-1.5 py-0.5 rounded">
+                🟢 Ready to close{item.quietDays != null ? ` · ${item.quietDays}d quiet` : ''}
+              </span>
+            ) : item.answered ? (
               <span className="text-[10px] font-medium text-gray-400 bg-gray-50 border border-gray-200 px-1.5 py-0.5 rounded">
                 ✓ Replied
               </span>
@@ -183,10 +189,11 @@ export default function RadarPage() {
 
   useEffect(() => { load(); }, [load]);
 
-  const red        = items.filter((i) => i.tier === 'red');
-  const watch      = items.filter((i) => i.tier === 'watch');
-  const unanswered = items.filter((i) => !i.answered).length;
-  const atRisk     = red.reduce((s, i) => s + (i.orderValue || 0), 0);
+  const red          = items.filter((i) => i.tier === 'red');
+  const watch        = items.filter((i) => i.tier === 'watch');
+  const unanswered   = items.filter((i) => !i.answered).length;
+  const readyToClose = items.filter((i) => i.readyToClose).length;
+  const atRisk       = red.reduce((s, i) => s + (i.orderValue || 0), 0);
 
   return (
     <div className="min-h-screen bg-[#f0f2f7]">
@@ -238,10 +245,11 @@ export default function RadarPage() {
         ) : (
           <>
             <div className="flex gap-4">
-              <Kpi label="Red flags"  value={String(red.length)}     accent="text-red-600"   />
-              <Kpi label="Watch"      value={String(watch.length)}   accent="text-amber-500" />
-              <Kpi label="Unanswered" value={String(unanswered)}     accent="text-red-600"   />
-              <Kpi label="At risk"    value={money(atRisk || null, red[0]?.currency || 'USD')} />
+              <Kpi label="Red flags"      value={String(red.length)}          accent="text-red-600"   />
+              <Kpi label="Watch"          value={String(watch.length)}        accent="text-amber-500" />
+              <Kpi label="Unanswered"     value={String(unanswered)}          accent="text-red-600"   />
+              <Kpi label="Ready to close" value={String(readyToClose)}        accent="text-green-600" />
+              <Kpi label="At risk"        value={money(atRisk || null, red[0]?.currency || 'USD')} />
             </div>
 
             {error && (
