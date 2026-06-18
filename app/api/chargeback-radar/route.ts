@@ -42,6 +42,7 @@ export interface RadarItem {
 }
 
 const SCAN_PAGES = 5;
+const READY_TO_CLOSE_DAYS = 5;
 
 function extractOrderRef(text: string): string | null {
   const m =
@@ -138,7 +139,7 @@ async function buildStore(store: ShopKey): Promise<RadarItem[]> {
     const quietDays = lastActivity > 0
       ? Math.max(0, Math.round((now - lastActivity) / 86_400_000))
       : null;
-    const readyToClose = answered && (quietDays ?? 0) >= 5;
+    const readyToClose = answered && quietDays != null && quietDays >= READY_TO_CLOSE_DAYS;
 
     items.push({
       store,
@@ -193,9 +194,9 @@ export async function GET(req: NextRequest) {
         await Promise.all(keys.map((k) => buildStore(k).catch(() => [] as RadarItem[])))
       ).flat();
       all.sort((a, b) => {
-        if (a.readyToClose !== b.readyToClose) return a.readyToClose ? 1 : -1;
         if (a.tier !== b.tier) return a.tier === 'red' ? -1 : 1;
         if (a.answered !== b.answered) return a.answered ? 1 : -1;
+        if (a.readyToClose !== b.readyToClose) return a.readyToClose ? 1 : -1;
         return b.severity - a.severity;
       });
       return all;

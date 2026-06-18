@@ -74,7 +74,7 @@ function Card({ item }: { item: RadarItem }) {
               {item.customerName || item.customerEmail}
             </span>
             {item.readyToClose ? (
-              <span className="text-[10px] font-medium text-green-700 bg-green-50 border border-green-200 px-1.5 py-0.5 rounded">
+              <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded">
                 🟢 Ready to close{item.quietDays != null ? ` · ${item.quietDays}d quiet` : ''}
               </span>
             ) : item.answered ? (
@@ -189,11 +189,11 @@ export default function RadarPage() {
 
   useEffect(() => { load(); }, [load]);
 
-  const red          = items.filter((i) => i.tier === 'red');
-  const watch        = items.filter((i) => i.tier === 'watch');
-  const unanswered   = items.filter((i) => !i.answered).length;
-  const readyToClose = items.filter((i) => i.readyToClose).length;
-  const atRisk       = red.reduce((s, i) => s + (i.orderValue || 0), 0);
+  const red        = items.filter((i) => i.tier === 'red');
+  const watch      = items.filter((i) => i.tier === 'watch');
+  const unanswered = items.filter((i) => !i.answered).length;
+  const readyClose = items.filter((i) => i.readyToClose).length;
+  const atRisk     = red.reduce((s, i) => s + (i.orderValue || 0), 0);
 
   return (
     <div className="min-h-screen bg-[#f0f2f7]">
@@ -245,10 +245,10 @@ export default function RadarPage() {
         ) : (
           <>
             <div className="flex gap-4">
-              <Kpi label="Red flags"      value={String(red.length)}          accent="text-red-600"   />
-              <Kpi label="Watch"          value={String(watch.length)}        accent="text-amber-500" />
-              <Kpi label="Unanswered"     value={String(unanswered)}          accent="text-red-600"   />
-              <Kpi label="Ready to close" value={String(readyToClose)}        accent="text-green-600" />
+              <Kpi label="Red flags"      value={String(red.length)}   accent="text-red-600"     />
+              <Kpi label="Unanswered"     value={String(unanswered)}   accent="text-red-600"     />
+              <Kpi label="Watch"          value={String(watch.length)} accent="text-amber-500"   />
+              <Kpi label="Ready to close" value={String(readyClose)}   accent="text-emerald-600" />
               <Kpi label="At risk"        value={money(atRisk || null, red[0]?.currency || 'USD')} />
             </div>
 
