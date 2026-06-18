@@ -17,6 +17,7 @@ interface ChargebackCase {
   status: string;
   statusLabel: string;
   outcome: 'lost' | 'won' | 'open';
+  disposition: 'came_in' | 'prevented' | 'refunded';
   initiatedAt: string;
   daysOrderToCb: number | null;
   products: string[];
@@ -42,9 +43,22 @@ function money(v: number, currency: string): string {
 
 const OUTCOME = {
   lost: { label: 'Lost', cls: 'bg-red-100 text-red-700 border-red-200' },
-  won: { label: 'Won / Prevented', cls: 'bg-emerald-100 text-emerald-700 border-emerald-200' },
+  won: { label: 'Won', cls: 'bg-emerald-100 text-emerald-700 border-emerald-200' },
   open: { label: 'Open', cls: 'bg-amber-100 text-amber-700 border-amber-200' },
 } as const;
+
+const DISPOSITION = {
+  came_in: { label: 'Came in', cls: 'bg-red-50 text-red-700 border-red-200' },
+  prevented: { label: 'Prevented', cls: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+  refunded: { label: 'Auto-refunded', cls: 'bg-blue-50 text-blue-700 border-blue-200' },
+} as const;
+
+const DISPOSITIONS = [
+  { key: 'all', label: 'All' },
+  { key: 'came_in', label: '🔴 Came in' },
+  { key: 'prevented', label: '🟢 Prevented' },
+  { key: 'refunded', label: '💸 Auto-refund' },
+];
 
 interface ConvoData {
   threads: { subject: string; url: string | null; messages: { role: string; name: string; at: string; body: string }[] }[];
@@ -53,6 +67,7 @@ interface ConvoData {
 
 function CaseCard({ c }: { c: ChargebackCase }) {
   const o = OUTCOME[c.outcome];
+  const disp = DISPOSITION[c.disposition];
   const [open, setOpen] = useState(false);
   const [convo, setConvo] = useState<ConvoData | null>(null);
   const [loadingConvo, setLoadingConvo] = useState(false);
@@ -85,6 +100,9 @@ function CaseCard({ c }: { c: ChargebackCase }) {
       <div className="flex items-start gap-3">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2 flex-wrap">
+            <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full border ${disp.cls}`}>
+              {disp.label}
+            </span>
             <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full border ${o.cls}`}>
               {o.label}
             </span>
@@ -253,6 +271,7 @@ function Kpi({ label, value, accent }: { label: string; value: string; accent?: 
 export default function ChargebackCasesPage() {
   const [store, setStore] = useState('all');
   const [currency, setCurrency] = useState('all');
+  const [disposition, setDisposition] = useState('all');
   const [cases, setCases] = useState<ChargebackCase[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -261,7 +280,9 @@ export default function ChargebackCasesPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/chargeback-cases?store=${store}&currency=${currency}`);
+      const res = await fetch(
+        `/api/chargeback-cases?store=${store}&currency=${currency}&disposition=${disposition}`,
+      );
       const data = await res.json();
       setCases(data.cases || []);
       if (data.error) setError(data.error);
@@ -270,17 +291,17 @@ export default function ChargebackCasesPage() {
     } finally {
       setLoading(false);
     }
-  }, [store, currency]);
+  }, [store, currency, disposition]);
 
   useEffect(() => {
     load();
   }, [load]);
 
+  const cameIn = cases.filter((c) => c.disposition === 'came_in').length;
+  const prevented = cases.filter((c) => c.disposition === 'prevented').length;
+  const refunded = cases.filter((c) => c.disposition === 'refunded').length;
   const lost = cases.filter((c) => c.outcome === 'lost');
   const lostAmt = lost.reduce((s, c) => s + c.amount, 0);
-  const contactedPct = cases.length
-    ? Math.round((cases.filter((c) => c.contactedBefore).length / cases.length) * 100)
-    : 0;
 
   return (
     <div className="min-h-screen bg-[#f0f2f7]">
@@ -320,6 +341,20 @@ export default function ChargebackCasesPage() {
           ))}
         </div>
 
+        <div className="flex items-center gap-1">
+          {DISPOSITIONS.map((d) => (
+            <button
+              key={d.key}
+              onClick={() => setDisposition(d.key)}
+              className={`px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                disposition === d.key ? 'bg-gray-900 text-white' : 'text-gray-500 hover:bg-gray-100'
+              }`}
+            >
+              {d.label}
+            </button>
+          ))}
+        </div>
+
         <button
           onClick={load}
           disabled={loading}
@@ -331,10 +366,10 @@ export default function ChargebackCasesPage() {
 
       <div className="p-6 space-y-6 max-w-4xl">
         <div className="flex gap-4">
-          <Kpi label="Chargebacks" value={String(cases.length)} />
-          <Kpi label="Lost" value={String(lost.length)} accent="text-red-600" />
+          <Kpi label="Came in" value={String(cameIn)} accent="text-red-600" />
+          <Kpi label="Prevented" value={String(prevented)} accent="text-emerald-600" />
+          <Kpi label="Auto-refunded" value={String(refunded)} accent="text-blue-600" />
           <Kpi label="Lost amount" value={cases.length ? money(lostAmt, lost[0]?.currency || cases[0].currency) : '—'} accent="text-red-600" />
-          <Kpi label="Contacted first" value={`${contactedPct}%`} accent="text-blue-600" />
         </div>
 
         {error && (

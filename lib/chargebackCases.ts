@@ -41,6 +41,7 @@ export interface ChargebackCase {
   status: string;
   statusLabel: string;
   outcome: 'lost' | 'won' | 'open';
+  disposition: 'came_in' | 'prevented' | 'refunded';
   initiatedAt: string;
   daysOrderToCb: number | null;
   products: string[];
@@ -80,6 +81,16 @@ function outcomeOf(status: string): 'lost' | 'won' | 'open' {
   if (status === 'lost' || status === 'charge_refunded') return 'lost';
   if (status === 'won' || status === 'prevented') return 'won';
   return 'open';
+}
+
+// Did the chargeback actually come in, or was it stopped before becoming one?
+//   prevented      — caught by an alert / prevention tool (e.g. Disputifier) → did not become a chargeback
+//   refunded       — the charge was refunded before it finalised (often an auto-refund by Disputifier)
+//   came_in        — proceeded as a real chargeback (counts toward the chargeback rate)
+function dispositionOf(status: string): 'came_in' | 'prevented' | 'refunded' {
+  if (status === 'prevented') return 'prevented';
+  if (status === 'charge_refunded') return 'refunded';
+  return 'came_in';
 }
 
 function classify(text: string): { grievance: string; rootCause: string } {
@@ -152,6 +163,7 @@ async function buildStoreCases(store: CaseStore): Promise<ChargebackCase[]> {
         status: d.status || 'open',
         statusLabel: STATUS_LABEL[d.status || 'open'] || d.status || 'Open',
         outcome: outcomeOf(d.status || 'open'),
+        disposition: dispositionOf(d.status || 'open'),
         initiatedAt: d.initiated_at || '',
         daysOrderToCb: null,
         products: [],
