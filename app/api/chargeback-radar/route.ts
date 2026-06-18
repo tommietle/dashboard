@@ -4,7 +4,7 @@ import { STORES, getShopifyAccessToken, isShopifyConfigured } from '@/lib/shopif
 import {
   REAMAZE_BRANDS,
   isReamazeConfigured,
-  fetchRecentConversations,
+  fetchOpenConversations,
   htmlToText,
   type ShopKey,
 } from '@/lib/reamaze';
@@ -35,6 +35,8 @@ export interface RadarItem {
   tier: 'red' | 'watch';
   reamazeUrl: string | null;
   severity: number;
+  answered: boolean;
+  waitingDays: number | null;
 }
 
 const SCAN_PAGES = 5;
@@ -95,7 +97,7 @@ async function enrich(store: ShopKey, it: RadarItem): Promise<void> {
 
 async function buildStore(store: ShopKey): Promise<RadarItem[]> {
   const brand = REAMAZE_BRANDS[store];
-  const convs = await fetchRecentConversations(brand, SCAN_PAGES);
+  const convs = await fetchOpenConversations(brand, SCAN_PAGES);
   const now = Date.now();
   const items: RadarItem[] = [];
 
@@ -122,6 +124,15 @@ async function buildStore(store: ShopKey): Promise<RadarItem[]> {
 
     const daysOpen = Math.max(0, Math.round((now - new Date(c.created_at).getTime()) / 86_400_000));
 
+    const lastCust  = lcm?.created_at ? new Date(lcm.created_at).getTime() : 0;
+    const lastStaff = c.last_staff_message?.created_at
+      ? new Date(c.last_staff_message.created_at).getTime()
+      : 0;
+    const answered    = lastStaff > 0 && lastStaff >= lastCust;
+    const waitingDays = answered || !lastCust
+      ? null
+      : Math.max(0, Math.round((now - lastCust) / 86_400_000));
+
     items.push({
       store,
       storeName: STORES[store].name,
@@ -140,6 +151,8 @@ async function buildStore(store: ShopKey): Promise<RadarItem[]> {
       tier: isThreat ? 'red' : 'watch',
       reamazeUrl: c.perma_url || null,
       severity: 0,
+      answered,
+      waitingDays,
     });
   }
 
@@ -166,12 +179,13 @@ export async function GET(req: NextRequest) {
   const keys = STORE_KEYS.filter((k) => store === 'all' || k === store);
 
   try {
-    const items = await cached(`radar:v2:${store}`, 300, async () => {
+    const items = await cached(`radar:v3:${store}`, 300, async () => {
       const all = (
         await Promise.all(keys.map((k) => buildStore(k).catch(() => [] as RadarItem[])))
       ).flat();
       all.sort((a, b) => {
         if (a.tier !== b.tier) return a.tier === 'red' ? -1 : 1;
+        if (a.answered !== b.answered) return a.answered ? 1 : -1;
         return b.severity - a.severity;
       });
       return all;

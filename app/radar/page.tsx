@@ -29,6 +29,8 @@ interface RadarItem {
   tier: 'red' | 'watch';
   reamazeUrl: string | null;
   severity: number;
+  answered: boolean;
+  waitingDays: number | null;
 }
 
 const STORES: { key: StoreKey; label: string }[] = [
@@ -69,6 +71,15 @@ function Card({ item }: { item: RadarItem }) {
             <span className="font-semibold text-gray-900 text-sm truncate">
               {item.customerName || item.customerEmail}
             </span>
+            {item.answered ? (
+              <span className="text-[10px] font-medium text-gray-400 bg-gray-50 border border-gray-200 px-1.5 py-0.5 rounded">
+                ✓ Replied
+              </span>
+            ) : (
+              <span className="text-[10px] font-bold text-red-700 bg-red-100 border border-red-200 px-1.5 py-0.5 rounded">
+                ⏳ Awaiting reply{item.waitingDays != null ? ` · ${item.waitingDays}d` : ''}
+              </span>
+            )}
             {item.ordersCount === 1 && (
               <span className="text-[10px] font-semibold text-violet-700 bg-violet-50 border border-violet-200 px-1.5 py-0.5 rounded">
                 1st order
@@ -172,10 +183,10 @@ export default function RadarPage() {
 
   useEffect(() => { load(); }, [load]);
 
-  const red     = items.filter((i) => i.tier === 'red');
-  const watch   = items.filter((i) => i.tier === 'watch');
-  const atRisk  = red.reduce((s, i) => s + (i.orderValue || 0), 0);
-  const avgDays = red.length ? Math.round(red.reduce((s, i) => s + i.daysOpen, 0) / red.length) : 0;
+  const red        = items.filter((i) => i.tier === 'red');
+  const watch      = items.filter((i) => i.tier === 'watch');
+  const unanswered = items.filter((i) => !i.answered).length;
+  const atRisk     = red.reduce((s, i) => s + (i.orderValue || 0), 0);
 
   return (
     <div className="min-h-screen bg-[#f0f2f7]">
@@ -183,7 +194,7 @@ export default function RadarPage() {
         <div>
           <h1 className="text-lg font-bold text-gray-900 leading-tight">Chargeback Radar</h1>
           <p className="text-[11px] text-gray-400 leading-tight">
-            Customers signalling a chargeback — resolve before it&apos;s filed
+            Open support cases signalling a chargeback — unanswered first
           </p>
         </div>
 
@@ -227,10 +238,10 @@ export default function RadarPage() {
         ) : (
           <>
             <div className="flex gap-4">
-              <Kpi label="Red flags"     value={String(red.length)}   accent="text-red-600"   />
-              <Kpi label="Watch"         value={String(watch.length)} accent="text-amber-500" />
-              <Kpi label="At risk"       value={money(atRisk || null, red[0]?.currency || 'USD')} />
-              <Kpi label="Avg days open" value={red.length ? `${avgDays}d` : '—'} />
+              <Kpi label="Red flags"  value={String(red.length)}     accent="text-red-600"   />
+              <Kpi label="Watch"      value={String(watch.length)}   accent="text-amber-500" />
+              <Kpi label="Unanswered" value={String(unanswered)}     accent="text-red-600"   />
+              <Kpi label="At risk"    value={money(atRisk || null, red[0]?.currency || 'USD')} />
             </div>
 
             {error && (

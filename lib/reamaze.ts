@@ -67,6 +67,7 @@ export interface ReamazeConversation {
   perma_url?: string;
   author?: ReamazeAuthor;
   last_customer_message?: ReamazeMessage | null;
+  last_staff_message?: ReamazeMessage | null;
   message?: ReamazeMessage | null;
 }
 
@@ -79,6 +80,23 @@ export async function fetchRecentConversations(
     const data = await reamazeGet<{ conversations?: ReamazeConversation[] }>(
       brand,
       `conversations?page=${page}`,
+    );
+    const convs = data.conversations || [];
+    if (convs.length === 0) break;
+    out.push(...convs);
+  }
+  return out;
+}
+
+export async function fetchOpenConversations(
+  brand: string,
+  pages = 4,
+): Promise<ReamazeConversation[]> {
+  const out: ReamazeConversation[] = [];
+  for (let page = 1; page <= pages; page++) {
+    const data = await reamazeGet<{ conversations?: ReamazeConversation[] }>(
+      brand,
+      `conversations?filter=open&page=${page}`,
     );
     const convs = data.conversations || [];
     if (convs.length === 0) break;
