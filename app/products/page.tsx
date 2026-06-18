@@ -56,6 +56,7 @@ export default function ProductsPage() {
   const [error, setError]                   = useState<string | null>(null);
   const [endDate, setEndDate]               = useState('');
   const [brandOverrides, setBrandOverrides] = useState<Record<string, string>>({});
+  const fetchIdRef = useRef(0);
 
   // Collection filter
   const [collections, setCollections]               = useState<Collection[]>([]);
@@ -97,6 +98,7 @@ export default function ProductsPage() {
   const savedMenuRef = useRef<HTMLDivElement>(null);
 
   const fetchData = useCallback(async () => {
+    const myId = ++fetchIdRef.current;
     setLoading(true);
     setError(null);
     try {
@@ -109,6 +111,7 @@ export default function ProductsPage() {
         fetch(`/api/product-roas?store=${selectedStore}&end=${end}${customQuery}&d90=1`),
         fetch(`/api/shopify-product-revenue?store=${selectedStore}&end=${end}${customQuery}&d90=1`),
       ]);
+      if (myId !== fetchIdRef.current) return; // stale — a newer fetch is in flight
       const json = await roasRes.json();
       if (json.error) throw new Error(json.error);
       const base: ProductRoas[] = json.products;
@@ -162,6 +165,7 @@ export default function ProductsPage() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ store: selectedStore, luhvia: luhviaIds, cecole: cecoleIds, luvande: luvandeIds, modemeister: modemeisterIds }),
           });
+          if (myId !== fetchIdRef.current) return; // stale
           if (metaRes.ok) {
             const meta = await metaRes.json();
             setProducts(prev => prev.map(p => {
@@ -174,6 +178,7 @@ export default function ProductsPage() {
         }
       }
     } catch (e: any) {
+      if (myId !== fetchIdRef.current) return; // stale
       setError(e.message);
       setLoading(false);
     }
