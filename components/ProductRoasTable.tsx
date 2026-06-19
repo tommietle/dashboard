@@ -121,6 +121,8 @@ export default function ProductRoasTable({ products, selectedStore, show3m = fal
   const actionMenuRef = useRef<HTMLDivElement>(null);
   const [showActionMenu, setShowActionMenu] = useState(false);
 
+  useEffect(() => { setPage(1); }, [products]);
+
   useEffect(() => {
     function handler(e: MouseEvent) {
       if (actionMenuRef.current && !actionMenuRef.current.contains(e.target as Node)) {
