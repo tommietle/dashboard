@@ -1,4 +1,8 @@
 {
+  "functions": {
+    "app/api/shopify-product-revenue/route.ts": { "maxDuration": 60 },
+    "app/api/product-roas/route.ts": { "maxDuration": 60 }
+  },
   "crons": [
     {
       "path": "/api/herdelica/advertorial-health?rollback=1",

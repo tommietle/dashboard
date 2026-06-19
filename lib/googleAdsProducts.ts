@@ -281,44 +281,26 @@ export function fetchProductSpendMap(
   return cached(cacheKey, 600, () => fetchProductSpendMapUncached(storeKey, endDate, refreshToken, customRange, include90));
 }
 
-async function fetchProductSpendMapUncached(
-  storeKey: AdsStoreKey,
-  endDate: string,
-  refreshToken: string,
-  customRange?: { start: string; end: string },
-  include90 = false,
-): Promise<Record<string, SpendEntry>> {
-  const account = ADS_ACCOUNTS[storeKey];
-  if (!account.customerId) return {};
-
-  const end = new Date(endDate + 'T12:00:00');
-  const start = new Date(end);
-  start.setDate(start.getDate() - (include90 ? 89 : 29));
-  let startStr = start.toISOString().slice(0, 10);
-  let queryEnd = endDate;
-  if (customRange) {
-    if (customRange.start < startStr) startStr = customRange.start;
-    if (customRange.end > queryEnd) queryEnd = customRange.end;
+function adsMonthChunks(startStr: string, endStr: string): { start: string; end: string }[] {
+  const chunks: { start: string; end: string }[] = [];
+  let cur = new Date(startStr + 'T12:00:00Z');
+  const last = new Date(endStr + 'T12:00:00Z');
+  while (cur <= last) {
+    const chunkStart = cur.toISOString().slice(0, 10);
+    const nextMonth = new Date(cur.getFullYear(), cur.getMonth() + 1, 1);
+    const chunkEnd = new Date(Math.min(nextMonth.getTime() - 1, last.getTime() + 43200000)).toISOString().slice(0, 10);
+    chunks.push({ start: chunkStart, end: chunkEnd });
+    cur = nextMonth;
   }
+  return chunks;
+}
 
-  const accessToken = await getAccessToken(refreshToken);
-  const customerId = account.customerId.replace(/-/g, '');
-
-  const query = `
-    SELECT
-      segments.product_item_id,
-      segments.product_title,
-      segments.date,
-      metrics.cost_micros,
-      metrics.conversions_value,
-      metrics.conversions,
-      metrics.clicks,
-      metrics.impressions
-    FROM shopping_performance_view
-    WHERE segments.date BETWEEN '${startStr}' AND '${queryEnd}'
-      AND metrics.impressions > 0
-  `;
-
+async function fetchAdsRows(
+  customerId: string,
+  accessToken: string,
+  query: string,
+  storeKey: string,
+): Promise<any[]> {
   const results: any[] = [];
   let pageToken: string | undefined;
   do {
@@ -338,15 +320,111 @@ async function fetchProductSpendMapUncached(
     );
     if (!res.ok) {
       const err = await res.text();
-      throw new Error(`Google Ads spend map ${storeKey}: ${res.status} ${err.slice(0, 200)}`);
+      throw new Error(`Google Ads ${storeKey}: ${res.status} ${err.slice(0, 200)}`);
     }
     const data = await res.json();
     results.push(...(data.results || []));
     pageToken = data.nextPageToken;
   } while (pageToken);
+  return results;
+}
+
+async function fetchProductSpendMapUncached(
+  storeKey: AdsStoreKey,
+  endDate: string,
+  refreshToken: string,
+  customRange?: { start: string; end: string },
+  include90 = false,
+): Promise<Record<string, SpendEntry>> {
+  const account = ADS_ACCOUNTS[storeKey];
+  if (!account.customerId) return {};
+
+  const end = new Date(endDate + 'T12:00:00');
+  const start = new Date(end);
+  start.setDate(start.getDate() - (include90 ? 89 : 29));
+  const startStr = start.toISOString().slice(0, 10);
+
+  const accessToken = await getAccessToken(refreshToken);
+  const customerId = account.customerId.replace(/-/g, '');
+
+  // Main query: standard window with segments.date for d7/d14/d30/d90 calculations.
+  const mainQuery = `
+    SELECT
+      segments.product_item_id,
+      segments.product_title,
+      segments.date,
+      metrics.cost_micros,
+      metrics.conversions_value,
+      metrics.conversions,
+      metrics.clicks,
+      metrics.impressions
+    FROM shopping_performance_view
+    WHERE segments.date BETWEEN '${startStr}' AND '${endDate}'
+      AND metrics.impressions > 0
+  `;
+
+  // Custom range: parallel maandelijkse queries (elk geaggregeerd per product, geen date-segment).
+  // Dit vermijdt sequentieel pagineren over 17+ maanden aan dagelijkse rijen.
+  type AggRow = { productId: string; title: string; costMicros: number; convValue: number; conversions: number; clicks: number; impressions: number };
+
+  async function fetchCustomMonthly(start: string, end: string): Promise<AggRow[]> {
+    const q = `
+      SELECT
+        segments.product_item_id,
+        segments.product_title,
+        metrics.cost_micros,
+        metrics.conversions_value,
+        metrics.conversions,
+        metrics.clicks,
+        metrics.impressions
+      FROM shopping_performance_view
+      WHERE segments.date BETWEEN '${start}' AND '${end}'
+        AND metrics.impressions > 0
+    `;
+    const rows = await fetchAdsRows(customerId, accessToken, q, storeKey);
+    return rows.flatMap(row => {
+      const itemId = row.segments?.productItemId ?? '';
+      const productId = extractProductId(itemId);
+      if (!productId) return [];
+      return [{
+        productId,
+        title:        row.segments?.productTitle ?? '',
+        costMicros:   Number(row.metrics?.costMicros ?? 0),
+        convValue:    Number(row.metrics?.conversionsValue ?? 0),
+        conversions:  Number(row.metrics?.conversions ?? 0),
+        clicks:       Number(row.metrics?.clicks ?? 0),
+        impressions:  Number(row.metrics?.impressions ?? 0),
+      }];
+    });
+  }
+
+  // Splits een datumrange in maandchunks en fetcht parallel.
+  async function fetchCustomRangeAgg(start: string, end: string): Promise<Map<string, AggRow>> {
+    const chunks = adsMonthChunks(start, end);
+    const allRows = (await Promise.all(chunks.map((c: { start: string; end: string }) => fetchCustomMonthly(c.start, c.end)))).flat();
+    const map = new Map<string, AggRow>();
+    for (const r of allRows) {
+      const existing = map.get(r.productId);
+      if (existing) {
+        existing.costMicros  += r.costMicros;
+        existing.convValue   += r.convValue;
+        existing.conversions += r.conversions;
+        existing.clicks      += r.clicks;
+        existing.impressions += r.impressions;
+      } else {
+        map.set(r.productId, { ...r });
+      }
+    }
+    return map;
+  }
+
+  const [mainResults, customAggMap] = await Promise.all([
+    fetchAdsRows(customerId, accessToken, mainQuery, storeKey),
+    customRange ? fetchCustomRangeAgg(customRange.start, customRange.end) : Promise.resolve(new Map<string, AggRow>()),
+  ]);
 
   const productMap = new Map<string, { title: string; rows: DailyRow[] }>();
-  for (const row of results) {
+  for (const row of mainResults) {
     const itemId: string = row.segments?.productItemId ?? '';
     const title: string = row.segments?.productTitle ?? '';
     const date: string  = row.segments?.date ?? '';
@@ -363,7 +441,33 @@ async function fetchProductSpendMapUncached(
     });
   }
 
-  console.log(`[spend-map] ${storeKey}: api rows=${results.length} uniqueProducts=${productMap.size}`);
+  // Zorg dat producten die alleen in de custom range actief waren ook in de output komen.
+  for (const [productId, agg] of customAggMap.entries()) {
+    if (!productMap.has(productId)) productMap.set(productId, { title: agg.title, rows: [] });
+  }
+
+  const customMap = new Map<string, ProductPeriodMetrics>();
+  if (customRange) {
+    const r2 = (v: number) => Math.round(v * 100) / 100;
+    for (const [productId, agg] of customAggMap.entries()) {
+      const spend       = agg.costMicros / 1_000_000;
+      const convValue   = agg.convValue;
+      const { clicks, impressions, conversions } = agg;
+      customMap.set(productId, {
+        spend:       r2(spend),
+        revenue:     r2(convValue),
+        conversions,
+        clicks,
+        impressions,
+        roas:        spend > 0 ? r2(convValue / spend) : 0,
+        ctr:         impressions > 0 ? r2((clicks / impressions) * 100) : 0,
+        cpc:         clicks > 0 ? r2(spend / clicks) : 0,
+        cpa:         conversions > 0 ? r2(spend / conversions) : 0,
+      });
+    }
+  }
+
+  console.log(`[spend-map] ${storeKey}: main=${mainResults.length}rows customProducts=${customAggMap.size} products=${productMap.size}`);
   const today = new Date(endDate + 'T12:00:00');
   const zero: ProductPeriodMetrics = { spend: 0, revenue: 0, conversions: 0, clicks: 0, impressions: 0, roas: 0, ctr: 0, cpc: 0, cpa: 0 };
   const record: Record<string, SpendEntry> = {};
@@ -376,7 +480,7 @@ async function fetchProductSpendMapUncached(
       d14: calcMetrics(rows, 14, today),
       d7:  calcMetrics(rows, 7,  today),
     };
-    if (customRange) entry.custom = calcMetricsByRange(rows, customRange.start, customRange.end);
+    if (customRange) entry.custom = customMap.get(productId) ?? zero;
     record[productId] = entry;
   }
 

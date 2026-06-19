@@ -150,33 +150,6 @@ export default function ProductsPage() {
       }
       setProducts(merged);
       setLoading(false);
-
-      // Per store top 50 op spend — anders pakt slice(0,150) alleen Luhvia
-      // omdat de flat array gesorteerd is als [alle Luhvia, alle Cecole, alle Luvande].
-      const topN = 50;
-      const luhviaIds      = merged.filter(p => p.store === 'luhvia').slice(0, topN).map(p => p.productId);
-      const cecoleIds      = merged.filter(p => p.store === 'cecole').slice(0, topN).map(p => p.productId);
-      const luvandeIds     = merged.filter(p => p.store === 'luvande').slice(0, topN).map(p => p.productId);
-      const modemeisterIds = merged.filter(p => p.store === 'modemeister').slice(0, topN).map(p => p.productId);
-      if (luhviaIds.length || cecoleIds.length || luvandeIds.length || modemeisterIds.length) {
-        try {
-          const metaRes = await fetch('/api/shopify-products/meta', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ store: selectedStore, luhvia: luhviaIds, cecole: cecoleIds, luvande: luvandeIds, modemeister: modemeisterIds }),
-          });
-          if (myId !== fetchIdRef.current) return; // stale
-          if (metaRes.ok) {
-            const meta = await metaRes.json();
-            setProducts(prev => prev.map(p => {
-              const m = meta[p.store]?.[p.productId];
-              return m ? { ...p, status: m.status, variantCount: m.variantCount, imageUrl: m.imageUrl, brandName: m.brandName } : p;
-            }));
-          }
-        } catch (e) {
-          console.warn('Shopify meta enrichment skipped:', e);
-        }
-      }
     } catch (e: any) {
       if (myId !== fetchIdRef.current) return; // stale
       setError(e.message);

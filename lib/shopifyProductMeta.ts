@@ -82,7 +82,7 @@ export async function fetchShopifyProductMeta(
 
   const headers = { 'X-Shopify-Access-Token': token, 'Content-Type': 'application/json' };
 
-  for (const batch of chunk(missing, BATCH_SIZE)) {
+  await Promise.all(chunk(missing, BATCH_SIZE).map(async batch => {
     const seenInBatch = new Set<string>();
 
     // Stap 1: zoek op als product IDs
@@ -146,7 +146,7 @@ export async function fetchShopifyProductMeta(
         void setCachedValue(`shopify:product-meta:v6:${storeKey}:${id}`, meta, 120);
       }
     }
-  }
+  }));
 
   return result;
 }

@@ -145,6 +145,72 @@ export async function fetchProductRevenueByPeriod(
   );
 }
 
+async function fetchOrdersSequential(
+  store: string,
+  token: string,
+  startStr: string,
+  endStr: string,
+): Promise<any[]> {
+  const orders: any[] = [];
+  let pageInfo: string | null = null;
+  let isFirst = true;
+  while (true) {
+    let endpoint: string;
+    if (isFirst) {
+      endpoint = `orders.json?status=any&financial_status=any&created_at_min=${startStr}T00:00:00&created_at_max=${endStr}T23:59:59&limit=250&fields=id,created_at,financial_status,line_items,refunds`;
+      isFirst = false;
+    } else if (pageInfo) {
+      endpoint = `orders.json?page_info=${pageInfo}&limit=250&fields=id,created_at,financial_status,line_items,refunds`;
+    } else {
+      break;
+    }
+    const res = await fetch(`https://${store}/admin/api/2024-04/${endpoint}`, {
+      headers: { 'X-Shopify-Access-Token': token },
+    });
+    if (!res.ok) throw new Error(`Shopify orders ${store}: ${res.status}`);
+    const data = await res.json();
+    orders.push(...(data.orders || []));
+    const nextMatch = res.headers.get('Link')?.match(/<[^>]*page_info=([^&>]+)[^>]*>;\s*rel="next"/);
+    pageInfo = nextMatch ? nextMatch[1] : null;
+    if (!pageInfo) break;
+  }
+  return orders;
+}
+
+// Bij ranges > 90 dagen: opsplitsen in maandchunks en parallel fetchen
+// zodat we niet sequentieel door 25+ pagina's hoeven.
+function monthChunks(startStr: string, endStr: string): { start: string; end: string }[] {
+  const chunks: { start: string; end: string }[] = [];
+  let cur = new Date(startStr + 'T12:00:00Z');
+  const last = new Date(endStr + 'T12:00:00Z');
+  while (cur <= last) {
+    const chunkStart = cur.toISOString().slice(0, 10);
+    const nextMonth = new Date(cur.getFullYear(), cur.getMonth() + 1, 1);
+    const chunkEnd = new Date(Math.min(nextMonth.getTime() - 1, last.getTime() + 43200000)).toISOString().slice(0, 10);
+    chunks.push({ start: chunkStart, end: chunkEnd });
+    cur = nextMonth;
+  }
+  return chunks;
+}
+
+async function fetchOrdersForRange(
+  store: string,
+  token: string,
+  startStr: string,
+  endStr: string,
+): Promise<any[]> {
+  const days = (new Date(endStr).getTime() - new Date(startStr).getTime()) / 86_400_000;
+  if (days <= 95) {
+    return fetchOrdersSequential(store, token, startStr, endStr);
+  }
+  // Lang bereik: parallel per maand
+  const chunks = monthChunks(startStr, endStr);
+  const results = await Promise.all(
+    chunks.map(c => fetchOrdersSequential(store, token, c.start, c.end)),
+  );
+  return results.flat();
+}
+
 async function fetchProductRevenueByPeriodUncached(
   storeKey: 'luhvia' | 'cecole' | 'luvande' | 'modemeister',
   endDate: string,
@@ -173,32 +239,7 @@ async function fetchProductRevenueByPeriodUncached(
     if (customRange.end > endStr)     endStr   = customRange.end;
   }
 
-  const allOrders: any[] = [];
-  let pageInfo: string | null = null;
-  let isFirst = true;
-
-  while (true) {
-    let endpoint: string;
-    if (isFirst) {
-      endpoint = `orders.json?status=any&financial_status=any&created_at_min=${startStr}T00:00:00&created_at_max=${endStr}T23:59:59&limit=250&fields=id,created_at,financial_status,line_items,refunds`;
-      isFirst = false;
-    } else if (pageInfo) {
-      endpoint = `orders.json?page_info=${pageInfo}&limit=250&fields=id,created_at,financial_status,line_items,refunds`;
-    } else {
-      break;
-    }
-    const res = await fetch(`https://${cfg.store}/admin/api/2024-04/${endpoint}`, {
-      headers: { 'X-Shopify-Access-Token': token, 'Content-Type': 'application/json' },
-      next: { revalidate: 300 },
-    });
-    if (!res.ok) throw new Error(`Shopify product revenue ${storeKey}: ${res.status}`);
-    const data = await res.json();
-    allOrders.push(...(data.orders || []));
-
-    const nextMatch = res.headers.get('Link')?.match(/<[^>]*page_info=([^&>]+)[^>]*>;\s*rel="next"/);
-    pageInfo = nextMatch ? nextMatch[1] : null;
-    if (!pageInfo) break;
-  }
+  const allOrders = await fetchOrdersForRange(cfg.store, token, startStr, endStr);
 
   const map = new Map<string, { d90: number; d30: number; d14: number; d7: number; custom: number }>();
 

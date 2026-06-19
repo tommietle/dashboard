@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
 
   const { store, productIds, action } = body;
 
-  if (store !== 'luhvia' && store !== 'cecole' && store !== 'luvande') {
+  if (store !== 'luhvia' && store !== 'cecole' && store !== 'luvande' && store !== 'modemeister') {
     return NextResponse.json({ error: 'Invalid store' }, { status: 400 });
   }
   if (!Array.isArray(productIds) || productIds.length === 0) {
