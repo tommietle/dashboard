@@ -5,7 +5,7 @@
 // links each to the customer's Re:amaze history, and diagnoses *why it likely
 // went wrong* based on the patterns found in the chargeback study.
 
-import { cached } from './cache';
+import { getCachedValue, setCachedValue } from './cache';
 import { STORES, getShopifyAccessToken, isShopifyConfigured } from './shopify';
 import { REAMAZE_BRANDS, fetchCustomerConversations, htmlToText } from './reamaze';
 import { detectTriggers } from './chargebackTriggers';
@@ -132,6 +132,16 @@ function classify(text: string): { grievance: string; rootCause: string } {
   };
 }
 
+// Run async work in small batches to stay under the Shopify rate limit
+// (firing 50+ order/Re:amaze calls at once causes 429s → failed builds).
+async function mapLimit<T, R>(items: T[], limit: number, fn: (t: T) => Promise<R>): Promise<R[]> {
+  const out: R[] = [];
+  for (let i = 0; i < items.length; i += limit) {
+    out.push(...(await Promise.all(items.slice(i, i + limit).map(fn))));
+  }
+  return out;
+}
+
 async function buildStoreCases(store: CaseStore): Promise<ChargebackCase[]> {
   if (!isShopifyConfigured(store)) return [];
   const cfg = STORES[store];
@@ -146,8 +156,7 @@ async function buildStoreCases(store: CaseStore): Promise<ChargebackCase[]> {
       CASE_CURRENCIES.includes((d.currency || '').toUpperCase()),
   );
 
-  const cases = await Promise.all(
-    raw.map(async (d): Promise<ChargebackCase> => {
+  const cases = await mapLimit(raw, 5, async (d): Promise<ChargebackCase> => {
       const base: ChargebackCase = {
         id: String(d.id),
         store,
@@ -252,21 +261,27 @@ async function buildStoreCases(store: CaseStore): Promise<ChargebackCase[]> {
       }
 
       return base;
-    }),
+    },
   );
 
   return cases;
 }
 
 export async function fetchChargebackCases(): Promise<ChargebackCase[]> {
-  return cached('cb-cases:v2', 1800, async () => {
-    const all = (await Promise.all(CASE_STORES.map((s) => buildStoreCases(s).catch(() => [])))).flat();
-    // Lost first (what we failed), then most recent.
-    const order = { lost: 0, open: 1, won: 2 } as const;
-    all.sort((a, b) => {
-      if (order[a.outcome] !== order[b.outcome]) return order[a.outcome] - order[b.outcome];
-      return new Date(b.initiatedAt).getTime() - new Date(a.initiatedAt).getTime();
-    });
-    return all;
+  const key = 'cb-cases:v3';
+  const hit = await getCachedValue<ChargebackCase[]>(key);
+  if (hit && hit.length) return hit; // never trust an empty cached value
+
+  const all = (
+    await Promise.all(CASE_STORES.map((s) => buildStoreCases(s).catch(() => [] as ChargebackCase[])))
+  ).flat();
+  // Lost first (what we failed), then most recent.
+  const order = { lost: 0, open: 1, won: 2 } as const;
+  all.sort((a, b) => {
+    if (order[a.outcome] !== order[b.outcome]) return order[a.outcome] - order[b.outcome];
+    return new Date(b.initiatedAt).getTime() - new Date(a.initiatedAt).getTime();
   });
+
+  if (all.length) await setCachedValue(key, all, 1800); // only cache non-empty results
+  return all;
 }
