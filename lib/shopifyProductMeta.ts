@@ -152,6 +152,9 @@ export async function fetchShopifyProductMeta(
 }
 
 // Zet de Shopify-status van een product (active / archived / draft).
+// Gebruikt GraphQL productChangeStatus i.p.v. REST products/update PUT:
+// die laatste her-valideert ALLE velden (incl. lege variant-SKU's) en faalt dan
+// met 422 "sku can't be blank". productChangeStatus muteert alleen status.
 export async function setShopifyProductStatus(
   storeKey: 'luhvia' | 'cecole' | 'luvande' | 'modemeister',
   productId: string,
@@ -163,19 +166,42 @@ export async function setShopifyProductStatus(
   }
 
   const token = await getShopifyAccessToken(storeKey);
-  const url = `https://${cfg.store}/admin/api/2024-04/products/${productId}.json`;
+  const url = `https://${cfg.store}/admin/api/2024-04/graphql.json`;
+  const mutation = `
+    mutation ChangeStatus($id: ID!, $status: ProductStatus!) {
+      productChangeStatus(productId: $id, status: $status) {
+        product { id status }
+        userErrors { field message }
+      }
+    }
+  `;
   const res = await fetch(url, {
-    method: 'PUT',
+    method: 'POST',
     headers: {
       'X-Shopify-Access-Token': token,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ product: { id: Number(productId), status } }),
+    body: JSON.stringify({
+      query: mutation,
+      variables: {
+        id: `gid://shopify/Product/${productId}`,
+        status: status.toUpperCase(),
+      },
+    }),
   });
 
   if (!res.ok) {
     const err = await res.text();
     throw new Error(`Shopify update ${storeKey}/${productId}: ${res.status} ${err.slice(0, 200)}`);
+  }
+
+  const data = await res.json();
+  const userErrors = data?.data?.productChangeStatus?.userErrors;
+  if (userErrors && userErrors.length > 0) {
+    throw new Error(`Shopify update ${storeKey}/${productId}: ${userErrors.map((e: any) => `${e.field?.join('.') || ''} ${e.message}`).join('; ')}`);
+  }
+  if (data?.errors) {
+    throw new Error(`Shopify update ${storeKey}/${productId}: ${JSON.stringify(data.errors).slice(0, 200)}`);
   }
 
   // Cache invalideren zodat de UI direct de nieuwe status ziet.
