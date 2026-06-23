@@ -47,6 +47,23 @@ function Dash() {
 
 interface Collection { id: string; title: string; }
 
+// Vercel function timeouts / 500's komen terug als plain text of HTML ("An error occurred…"),
+// niet als JSON. response.json() crasht dan met een nietszeggende parse-error.
+// Deze helper leest de body eerst als text en geeft een bruikbare melding terug.
+async function parseJsonOrThrow(res: Response, label: string): Promise<any> {
+  const text = await res.text();
+  if (!res.ok) {
+    const snippet = text.slice(0, 200).trim() || 'no body';
+    throw new Error(`${label} ${res.status}: ${snippet}`);
+  }
+  try {
+    return JSON.parse(text);
+  } catch {
+    const snippet = text.slice(0, 200).trim();
+    throw new Error(`${label} gaf geen JSON terug (mogelijk timeout): ${snippet}`);
+  }
+}
+
 export default function ProductsPage() {
   const [selectedStore, setSelectedStore]   = useState('all');
   const [showStoreMenu, setShowStoreMenu]   = useState(false);
@@ -112,7 +129,7 @@ export default function ProductsPage() {
         fetch(`/api/shopify-product-revenue?store=${selectedStore}&end=${end}${customQuery}&d90=1`),
       ]);
       if (myId !== fetchIdRef.current) return; // stale — a newer fetch is in flight
-      const json = await roasRes.json();
+      const json = await parseJsonOrThrow(roasRes, 'product-roas');
       if (json.error) throw new Error(json.error);
       const base: ProductRoas[] = json.products;
       setOrphanSpend(json.orphanSpend ?? {});
@@ -121,7 +138,7 @@ export default function ProductsPage() {
       // en hereken ROAS per periode. Zonder Shopify-match: revenue = 0, roas = 0.
       let merged = base;
       if (revRes.ok) {
-        const revJson = await revRes.json();
+        const revJson = await parseJsonOrThrow(revRes, 'shopify-product-revenue');
         const shopRev: { productId: string; store: string; d90: number; d30: number; d14: number; d7: number; custom?: number }[] = revJson.products || [];
         const map = new Map<string, { d90: number; d30: number; d14: number; d7: number; custom?: number }>();
         for (const r of shopRev) map.set(`${r.store}:${r.productId}`, { d90: r.d90 ?? 0, d30: r.d30, d14: r.d14, d7: r.d7, custom: r.custom });
