@@ -268,17 +268,63 @@ export interface SpendEntry {
   custom?: ProductPeriodMetrics;
 }
 
-export function fetchProductSpendMap(
+// Standaard- en custom-range queries worden SEPARAAT gecached. Switchen
+// van custom-datum invalideert daardoor niet de dure 90D-aggregaten.
+export async function fetchProductSpendMap(
   storeKey: AdsStoreKey,
   endDate: string,
   refreshToken: string,
   customRange?: { start: string; end: string },
   include90 = false,
 ): Promise<Record<string, SpendEntry>> {
-  const cacheKey = customRange
-    ? `google-ads:spend-map:v4:${storeKey}:${endDate}:${customRange.start}:${customRange.end}`
-    : `google-ads:spend-map:v4:${storeKey}:${endDate}:${include90 ? '90' : '30'}`;
-  return cached(cacheKey, 600, () => fetchProductSpendMapUncached(storeKey, endDate, refreshToken, customRange, include90));
+  const [std, custom] = await Promise.all([
+    fetchSpendStandard(storeKey, endDate, refreshToken, include90),
+    customRange ? fetchSpendCustom(storeKey, refreshToken, customRange) : Promise.resolve(null),
+  ]);
+
+  if (!custom) return std;
+
+  // Merge: voeg custom toe aan elke standaard-entry; producten alleen in custom
+  // krijgen lege standaard-perioden.
+  const zero: ProductPeriodMetrics = { spend: 0, revenue: 0, conversions: 0, clicks: 0, impressions: 0, roas: 0, ctr: 0, cpc: 0, cpa: 0 };
+  const out: Record<string, SpendEntry> = { ...std };
+  for (const [pid, c] of Object.entries(custom)) {
+    if (out[pid]) {
+      out[pid] = { ...out[pid], custom: c.metrics };
+    } else {
+      out[pid] = { title: c.title, d90: zero, d30: zero, d14: zero, d7: zero, custom: c.metrics };
+    }
+  }
+  // Voor producten alleen in standard: nog steeds custom: zero zetten.
+  for (const pid of Object.keys(std)) {
+    if (!out[pid].custom) out[pid] = { ...out[pid], custom: zero };
+  }
+  return out;
+}
+
+function fetchSpendStandard(
+  storeKey: AdsStoreKey,
+  endDate: string,
+  refreshToken: string,
+  include90: boolean,
+): Promise<Record<string, SpendEntry>> {
+  return cached(
+    `google-ads:spend-std:v5:${storeKey}:${endDate}:${include90 ? '90' : '30'}`,
+    600,
+    () => fetchSpendStandardUncached(storeKey, endDate, refreshToken, include90),
+  );
+}
+
+function fetchSpendCustom(
+  storeKey: AdsStoreKey,
+  refreshToken: string,
+  customRange: { start: string; end: string },
+): Promise<Record<string, { title: string; metrics: ProductPeriodMetrics }>> {
+  return cached(
+    `google-ads:spend-custom:v5:${storeKey}:${customRange.start}:${customRange.end}`,
+    600,
+    () => fetchSpendCustomUncached(storeKey, refreshToken, customRange),
+  );
 }
 
 function adsMonthChunks(startStr: string, endStr: string): { start: string; end: string }[] {
@@ -329,12 +375,11 @@ async function fetchAdsRows(
   return results;
 }
 
-async function fetchProductSpendMapUncached(
+async function fetchSpendStandardUncached(
   storeKey: AdsStoreKey,
   endDate: string,
   refreshToken: string,
-  customRange?: { start: string; end: string },
-  include90 = false,
+  include90: boolean,
 ): Promise<Record<string, SpendEntry>> {
   const account = ADS_ACCOUNTS[storeKey];
   if (!account.customerId) return {};
@@ -347,7 +392,6 @@ async function fetchProductSpendMapUncached(
   const accessToken = await getAccessToken(refreshToken);
   const customerId = account.customerId.replace(/-/g, '');
 
-  // Main query: standard window with segments.date for d7/d14/d30/d90 calculations.
   const mainQuery = `
     SELECT
       segments.product_item_id,
@@ -363,8 +407,54 @@ async function fetchProductSpendMapUncached(
       AND metrics.impressions > 0
   `;
 
-  // Custom range: parallel maandelijkse queries (elk geaggregeerd per product, geen date-segment).
-  // Dit vermijdt sequentieel pagineren over 17+ maanden aan dagelijkse rijen.
+  const mainResults = await fetchAdsRows(customerId, accessToken, mainQuery, storeKey);
+
+  const productMap = new Map<string, { title: string; rows: DailyRow[] }>();
+  for (const row of mainResults) {
+    const itemId: string = row.segments?.productItemId ?? '';
+    const title: string = row.segments?.productTitle ?? '';
+    const date: string  = row.segments?.date ?? '';
+    const productId = extractProductId(itemId);
+    if (!productId) continue;
+    if (!productMap.has(productId)) productMap.set(productId, { title, rows: [] });
+    productMap.get(productId)!.rows.push({
+      date,
+      costMicros:       Number(row.metrics?.costMicros ?? 0),
+      conversionsValue: Number(row.metrics?.conversionsValue ?? 0),
+      conversions:      Number(row.metrics?.conversions ?? 0),
+      clicks:           Number(row.metrics?.clicks ?? 0),
+      impressions:      Number(row.metrics?.impressions ?? 0),
+    });
+  }
+
+  const today = new Date(endDate + 'T12:00:00');
+  const zero: ProductPeriodMetrics = { spend: 0, revenue: 0, conversions: 0, clicks: 0, impressions: 0, roas: 0, ctr: 0, cpc: 0, cpa: 0 };
+  const record: Record<string, SpendEntry> = {};
+
+  for (const [productId, { title, rows }] of productMap.entries()) {
+    record[productId] = {
+      title,
+      d90: include90 ? calcMetrics(rows, 90, today) : zero,
+      d30: calcMetrics(rows, 30, today),
+      d14: calcMetrics(rows, 14, today),
+      d7:  calcMetrics(rows, 7,  today),
+    };
+  }
+  console.log(`[spend-std] ${storeKey}: main=${mainResults.length}rows products=${productMap.size}`);
+  return record;
+}
+
+async function fetchSpendCustomUncached(
+  storeKey: AdsStoreKey,
+  refreshToken: string,
+  customRange: { start: string; end: string },
+): Promise<Record<string, { title: string; metrics: ProductPeriodMetrics }>> {
+  const account = ADS_ACCOUNTS[storeKey];
+  if (!account.customerId) return {};
+
+  const accessToken = await getAccessToken(refreshToken);
+  const customerId = account.customerId.replace(/-/g, '');
+
   type AggRow = { productId: string; title: string; costMicros: number; convValue: number; conversions: number; clicks: number; impressions: number };
 
   async function fetchCustomMonthly(start: string, end: string): Promise<AggRow[]> {
@@ -398,62 +488,32 @@ async function fetchProductSpendMapUncached(
     });
   }
 
-  // Splits een datumrange in maandchunks en fetcht parallel.
-  async function fetchCustomRangeAgg(start: string, end: string): Promise<Map<string, AggRow>> {
-    const chunks = adsMonthChunks(start, end);
-    const allRows = (await Promise.all(chunks.map((c: { start: string; end: string }) => fetchCustomMonthly(c.start, c.end)))).flat();
-    const map = new Map<string, AggRow>();
-    for (const r of allRows) {
-      const existing = map.get(r.productId);
-      if (existing) {
-        existing.costMicros  += r.costMicros;
-        existing.convValue   += r.convValue;
-        existing.conversions += r.conversions;
-        existing.clicks      += r.clicks;
-        existing.impressions += r.impressions;
-      } else {
-        map.set(r.productId, { ...r });
-      }
+  const chunks = adsMonthChunks(customRange.start, customRange.end);
+  const allRows = (await Promise.all(chunks.map(c => fetchCustomMonthly(c.start, c.end)))).flat();
+
+  const aggMap = new Map<string, AggRow>();
+  for (const r of allRows) {
+    const existing = aggMap.get(r.productId);
+    if (existing) {
+      existing.costMicros  += r.costMicros;
+      existing.convValue   += r.convValue;
+      existing.conversions += r.conversions;
+      existing.clicks      += r.clicks;
+      existing.impressions += r.impressions;
+    } else {
+      aggMap.set(r.productId, { ...r });
     }
-    return map;
   }
 
-  const [mainResults, customAggMap] = await Promise.all([
-    fetchAdsRows(customerId, accessToken, mainQuery, storeKey),
-    customRange ? fetchCustomRangeAgg(customRange.start, customRange.end) : Promise.resolve(new Map<string, AggRow>()),
-  ]);
-
-  const productMap = new Map<string, { title: string; rows: DailyRow[] }>();
-  for (const row of mainResults) {
-    const itemId: string = row.segments?.productItemId ?? '';
-    const title: string = row.segments?.productTitle ?? '';
-    const date: string  = row.segments?.date ?? '';
-    const productId = extractProductId(itemId);
-    if (!productId) continue;
-    if (!productMap.has(productId)) productMap.set(productId, { title, rows: [] });
-    productMap.get(productId)!.rows.push({
-      date,
-      costMicros:       Number(row.metrics?.costMicros ?? 0),
-      conversionsValue: Number(row.metrics?.conversionsValue ?? 0),
-      conversions:      Number(row.metrics?.conversions ?? 0),
-      clicks:           Number(row.metrics?.clicks ?? 0),
-      impressions:      Number(row.metrics?.impressions ?? 0),
-    });
-  }
-
-  // Zorg dat producten die alleen in de custom range actief waren ook in de output komen.
-  for (const [productId, agg] of customAggMap.entries()) {
-    if (!productMap.has(productId)) productMap.set(productId, { title: agg.title, rows: [] });
-  }
-
-  const customMap = new Map<string, ProductPeriodMetrics>();
-  if (customRange) {
-    const r2 = (v: number) => Math.round(v * 100) / 100;
-    for (const [productId, agg] of customAggMap.entries()) {
-      const spend       = agg.costMicros / 1_000_000;
-      const convValue   = agg.convValue;
-      const { clicks, impressions, conversions } = agg;
-      customMap.set(productId, {
+  const r2 = (v: number) => Math.round(v * 100) / 100;
+  const out: Record<string, { title: string; metrics: ProductPeriodMetrics }> = {};
+  for (const [productId, agg] of aggMap.entries()) {
+    const spend     = agg.costMicros / 1_000_000;
+    const convValue = agg.convValue;
+    const { clicks, impressions, conversions } = agg;
+    out[productId] = {
+      title: agg.title,
+      metrics: {
         spend:       r2(spend),
         revenue:     r2(convValue),
         conversions,
@@ -463,26 +523,9 @@ async function fetchProductSpendMapUncached(
         ctr:         impressions > 0 ? r2((clicks / impressions) * 100) : 0,
         cpc:         clicks > 0 ? r2(spend / clicks) : 0,
         cpa:         conversions > 0 ? r2(spend / conversions) : 0,
-      });
-    }
-  }
-
-  console.log(`[spend-map] ${storeKey}: main=${mainResults.length}rows customProducts=${customAggMap.size} products=${productMap.size}`);
-  const today = new Date(endDate + 'T12:00:00');
-  const zero: ProductPeriodMetrics = { spend: 0, revenue: 0, conversions: 0, clicks: 0, impressions: 0, roas: 0, ctr: 0, cpc: 0, cpa: 0 };
-  const record: Record<string, SpendEntry> = {};
-
-  for (const [productId, { title, rows }] of productMap.entries()) {
-    const entry: SpendEntry = {
-      title,
-      d90: include90 ? calcMetrics(rows, 90, today) : zero,
-      d30: calcMetrics(rows, 30, today),
-      d14: calcMetrics(rows, 14, today),
-      d7:  calcMetrics(rows, 7,  today),
+      },
     };
-    if (customRange) entry.custom = customMap.get(productId) ?? zero;
-    record[productId] = entry;
   }
-
-  return record;
+  console.log(`[spend-custom] ${storeKey}: products=${aggMap.size}`);
+  return out;
 }

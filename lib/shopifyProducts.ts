@@ -129,19 +129,96 @@ export interface ProductRevenuePeriods {
 // Haalt per-product Shopify omzet op gesplitst in d7/d14/d30 windows
 // (gemeten vanaf endDate). Gebruikt voor échte ROAS-berekening op de
 // products page: Shopify omzet ÷ Google Ads spend.
+//
+// Cache-strategie: standaard-perioden (d90/d30/d14/d7) en de custom range
+// worden SEPARAAT gecached. Zo invalideert een andere custom-range niet
+// de dure 90D-data. Switchen van datum = alleen de kleine custom fetch
+// is vers.
 export async function fetchProductRevenueByPeriod(
   storeKey: 'luhvia' | 'cecole' | 'luvande' | 'modemeister',
   endDate: string,
   customRange?: { start: string; end: string },
   include90 = false,
 ): Promise<ProductRevenuePeriods[]> {
-  const cacheKey = customRange
-    ? `shopify:product-revenue:v9:${storeKey}:${endDate}:${customRange.start}:${customRange.end}`
-    : `shopify:product-revenue:v9:${storeKey}:${endDate}:${include90 ? '90' : '30'}`;
+  const [standard, customRec] = await Promise.all([
+    fetchProductRevenueStandard(storeKey, endDate, include90),
+    customRange ? fetchProductRevenueCustom(storeKey, customRange) : Promise.resolve(null),
+  ]);
+
+  if (!customRec) return standard;
+
+  // Merge custom into standard; voeg custom-only producten toe.
+  const r = (v: number) => Math.round(v * 100) / 100;
+  const byId = new Map(standard.map(s => [s.productId, s]));
+  for (const [pid, val] of Object.entries(customRec)) {
+    const existing = byId.get(pid);
+    if (existing) {
+      existing.custom = r(val);
+    } else {
+      byId.set(pid, {
+        productId: pid,
+        d90: 0, d30: 0, d14: 0, d7: 0,
+        custom: r(val),
+        store: storeKey,
+        currency: STORES[storeKey].currency,
+      });
+    }
+  }
+  return Array.from(byId.values());
+}
+
+function fetchProductRevenueStandard(
+  storeKey: 'luhvia' | 'cecole' | 'luvande' | 'modemeister',
+  endDate: string,
+  include90: boolean,
+): Promise<ProductRevenuePeriods[]> {
   return cached(
-    cacheKey,
+    `shopify:product-revenue-std:v10:${storeKey}:${endDate}:${include90 ? '90' : '30'}`,
     600,
-    () => fetchProductRevenueByPeriodUncached(storeKey, endDate, customRange, include90),
+    () => fetchProductRevenueByPeriodUncached(storeKey, endDate, undefined, include90),
+  );
+}
+
+// Custom-range revenue als plain object (Redis serialiseert via JSON — Map gaat verloren).
+function fetchProductRevenueCustom(
+  storeKey: 'luhvia' | 'cecole' | 'luvande' | 'modemeister',
+  customRange: { start: string; end: string },
+): Promise<Record<string, number>> {
+  return cached(
+    `shopify:product-revenue-custom:v10:${storeKey}:${customRange.start}:${customRange.end}`,
+    600,
+    async () => {
+      const cfg = STORES[storeKey];
+      const token = await getShopifyAccessToken(storeKey);
+      const orders = await fetchOrdersForRange(cfg.store, token, customRange.start, customRange.end);
+      const out: Record<string, number> = {};
+      const startD = new Date(customRange.start + 'T00:00:00');
+      const endD   = new Date(customRange.end   + 'T23:59:59');
+      for (const order of orders) {
+        const fs = order.financial_status;
+        if (fs !== 'paid' && fs !== 'partially_refunded') continue;
+        const orderDate = new Date(order.created_at);
+        if (orderDate < startD || orderDate > endD) continue;
+        const refundMap = new Map<number, number>();
+        for (const refund of order.refunds || []) {
+          for (const rli of refund.refund_line_items || []) {
+            const lid = rli.line_item_id as number;
+            const amt = parseFloat(rli.subtotal_set?.shop_money?.amount ?? rli.subtotal ?? '0');
+            refundMap.set(lid, (refundMap.get(lid) ?? 0) + amt);
+          }
+        }
+        for (const item of order.line_items || []) {
+          const pid = String(item.product_id || '');
+          if (!pid) continue;
+          const unitPrice = parseFloat(item.price_set?.shop_money?.amount ?? item.price ?? '0');
+          const discount = parseFloat(item.total_discount_set?.shop_money?.amount ?? item.total_discount ?? '0');
+          const gross = (unitPrice * (item.quantity || 1)) - discount;
+          const refunded = refundMap.get(item.id as number) ?? 0;
+          out[pid] = (out[pid] ?? 0) + gross - refunded;
+        }
+      }
+      return out;
+    },
   );
 }
 
@@ -200,10 +277,12 @@ async function fetchOrdersForRange(
   endStr: string,
 ): Promise<any[]> {
   const days = (new Date(endStr).getTime() - new Date(startStr).getTime()) / 86_400_000;
-  if (days <= 95) {
+  // < 32 dagen: 1 maand, sequentieel pagineren is prima.
+  // ≥ 32 dagen (zoals 90D): opsplitsen per maand en parallel fetchen om
+  // sequentiële pagina-trains van 18+ requests te vermijden.
+  if (days < 32) {
     return fetchOrdersSequential(store, token, startStr, endStr);
   }
-  // Lang bereik: parallel per maand
   const chunks = monthChunks(startStr, endStr);
   const results = await Promise.all(
     chunks.map(c => fetchOrdersSequential(store, token, c.start, c.end)),

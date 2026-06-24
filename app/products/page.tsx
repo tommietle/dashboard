@@ -358,17 +358,32 @@ export default function ProductsPage() {
       });
   }, [products, selectedStore, collectionProductIds, excludedProductIds, brandOverrides, search, status, roasMin, roasMax, roas90Min, roas90Max, decliningRoas, activeDaysMin, spendMin, spendMax, spend90Min, spend90Max, clicksMin, clicksMax, cpcMin, cpcMax]);
 
+  // Samenvattings-kaarten gebruiken de custom-periode wanneer die actief is,
+  // anders d30. Orphan spend bestaat alleen op d30, dus we slaan dat over
+  // wanneer een custom-range actief is.
   const filteredRoas = useMemo(() => {
     let spend = 0, revenue = 0;
-    for (const p of filtered) { spend += p.d30.spend; revenue += p.d30.revenue; }
-    // Add orphan spend (deleted products still advertised in Google Ads)
-    const extraSpend = selectedStore === 'all'
-      ? Object.values(orphanSpend).reduce((s, v) => s + v, 0)
-      : (orphanSpend[selectedStore] ?? 0);
-    spend += extraSpend;
+    for (const p of filtered) {
+      const m = customActive ? (p.custom ?? { spend: 0, revenue: 0 }) : p.d30;
+      spend   += m.spend;
+      revenue += m.revenue;
+    }
+    if (!customActive) {
+      const extraSpend = selectedStore === 'all'
+        ? Object.values(orphanSpend).reduce((s, v) => s + v, 0)
+        : (orphanSpend[selectedStore] ?? 0);
+      spend += extraSpend;
+    }
     const r2 = (v: number) => Math.round(v * 100) / 100;
     return { spend: r2(spend), revenue: r2(revenue), roas: spend > 0 ? r2(revenue / spend) : 0 };
-  }, [filtered, orphanSpend, selectedStore]);
+  }, [filtered, orphanSpend, selectedStore, customActive]);
+
+  const lowRoasCount = useMemo(() => {
+    return filtered.filter(p => {
+      const m = customActive ? p.custom : p.d30;
+      return m && m.spend > 0 && m.roas < 1;
+    }).length;
+  }, [filtered, customActive]);
 
   const startDate = endDate
     ? (() => { const d = new Date(endDate); d.setDate(d.getDate() - 29); return d.toISOString().slice(0, 10); })()
@@ -810,7 +825,7 @@ export default function ProductsPage() {
               </div>
             </div>
             <div className="bg-white rounded-2xl border border-gray-200 p-4">
-              <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">Avg ROAS 30d</div>
+              <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">Avg ROAS {customActive ? customLabel : '30d'}</div>
               <div className="text-2xl font-bold text-gray-900">
                 {filteredRoas.spend > 0 ? `${filteredRoas.roas.toFixed(2)}x` : '—'}
               </div>
@@ -821,9 +836,9 @@ export default function ProductsPage() {
               )}
             </div>
             <div className="bg-white rounded-2xl border border-gray-200 p-4">
-              <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">ROAS &lt; 1x (30d)</div>
+              <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">ROAS &lt; 1x ({customActive ? customLabel : '30d'})</div>
               <div className="text-2xl font-bold text-red-500">
-                {filtered.filter(p => p.d30.spend > 0 && p.d30.roas < 1).length}
+                {lowRoasCount}
               </div>
             </div>
           </div>
