@@ -10,6 +10,7 @@ interface SavedFilter {
     status: string;
     roasMin: string; roasMax: string;
     roas90Min: string; roas90Max: string;
+    decliningRoas?: boolean;
     activeDaysMin: string;
     spendMin: string; spendMax: string;
     spend90Min: string; spend90Max: string;
@@ -93,6 +94,8 @@ export default function ProductsPage() {
   const [roasMax,   setRoasMax]   = useState('');
   const [roas90Min, setRoas90Min] = useState('');
   const [roas90Max,     setRoas90Max]     = useState('');
+  // "Dalende ROAS": 90D > 30D > 7D, met spend > 0 in alle drie de periodes.
+  const [decliningRoas, setDecliningRoas] = useState(false);
   const [activeDaysMin, setActiveDaysMin] = useState('');
   const [spendMin,   setSpendMin]   = useState('');
   const [spendMax,   setSpendMax]   = useState('');
@@ -258,7 +261,7 @@ export default function ProductsPage() {
   }, []);
 
   function currentFilterSnapshot() {
-    return { status, roasMin, roasMax, roas90Min, roas90Max, activeDaysMin, spendMin, spendMax, spend90Min, spend90Max, clicksMin, clicksMax, cpcMin, cpcMax, customStart, customEnd };
+    return { status, roasMin, roasMax, roas90Min, roas90Max, decliningRoas, activeDaysMin, spendMin, spendMax, spend90Min, spend90Max, clicksMin, clicksMax, cpcMin, cpcMax, customStart, customEnd };
   }
 
   function saveCurrentFilter() {
@@ -276,6 +279,7 @@ export default function ProductsPage() {
     setStatus(f.filters.status);
     setRoasMin(f.filters.roasMin);   setRoasMax(f.filters.roasMax);
     setRoas90Min(f.filters.roas90Min ?? ''); setRoas90Max(f.filters.roas90Max ?? '');
+    setDecliningRoas(!!f.filters.decliningRoas);
     setActiveDaysMin(f.filters.activeDaysMin ?? '');
     setSpendMin(f.filters.spendMin); setSpendMax(f.filters.spendMax);
     setSpend90Min(f.filters.spend90Min ?? ''); setSpend90Max(f.filters.spend90Max ?? '');
@@ -293,7 +297,7 @@ export default function ProductsPage() {
 
   // Count active filters for badge
   const activeFilterCount = [roasMin, roasMax, roas90Min, roas90Max, activeDaysMin, spendMin, spendMax, spend90Min, spend90Max, clicksMin, clicksMax, cpcMin, cpcMax]
-    .filter(v => v !== '').length + (status !== 'all' ? 1 : 0) + (customActive ? 1 : 0);
+    .filter(v => v !== '').length + (status !== 'all' ? 1 : 0) + (customActive ? 1 : 0) + (decliningRoas ? 1 : 0);
 
   function clearFilters() {
     setRoasMin(''); setRoasMax(''); setRoas90Min(''); setRoas90Max(''); setActiveDaysMin('');
@@ -303,6 +307,7 @@ export default function ProductsPage() {
     setStatus('all');
     setSearch('');
     setCustomStart(''); setCustomEnd('');
+    setDecliningRoas(false);
   }
 
   // Apply filters + brand overrides client-side
@@ -334,6 +339,12 @@ export default function ProductsPage() {
         if (roasMax   !== '' && p.d30.roas > Number(roasMax))   return false;
         if (roas90Min    !== '' && p.d90.roas < Number(roas90Min))           return false;
         if (roas90Max    !== '' && p.d90.roas > Number(roas90Max))           return false;
+        if (decliningRoas) {
+          // 90D > 30D > 7D, met echte ad-activiteit in alle drie de periodes
+          // (anders telt 0 ROAS van "geen spend" mee als daling).
+          if (p.d90.spend <= 0 || p.d30.spend <= 0 || p.d7.spend <= 0) return false;
+          if (!(p.d90.roas > p.d30.roas && p.d30.roas > p.d7.roas))    return false;
+        }
         if (activeDaysMin !== '' && (p.activeDays ?? 0) < Number(activeDaysMin)) return false;
         if (spendMin   !== '' && p.d30.spend < Number(spendMin))   return false;
         if (spendMax   !== '' && p.d30.spend > Number(spendMax))   return false;
@@ -345,7 +356,7 @@ export default function ProductsPage() {
         if (cpcMax !== '' && p.d30.cpc > Number(cpcMax)) return false;
         return true;
       });
-  }, [products, selectedStore, collectionProductIds, excludedProductIds, brandOverrides, search, status, roasMin, roasMax, roas90Min, roas90Max, activeDaysMin, spendMin, spendMax, spend90Min, spend90Max, clicksMin, clicksMax, cpcMin, cpcMax]);
+  }, [products, selectedStore, collectionProductIds, excludedProductIds, brandOverrides, search, status, roasMin, roasMax, roas90Min, roas90Max, decliningRoas, activeDaysMin, spendMin, spendMax, spend90Min, spend90Max, clicksMin, clicksMax, cpcMin, cpcMax]);
 
   const filteredRoas = useMemo(() => {
     let spend = 0, revenue = 0;
@@ -688,6 +699,15 @@ export default function ProductsPage() {
                     <span className="text-sm text-gray-600 w-20 shrink-0">Active ≥ dagen</span>
                     <NumInput value={activeDaysMin} onChange={setActiveDaysMin} placeholder="bv. 90" />
                   </div>
+                  <label className="flex items-center gap-2 cursor-pointer pt-1">
+                    <input
+                      type="checkbox"
+                      checked={decliningRoas}
+                      onChange={e => setDecliningRoas(e.target.checked)}
+                      className="w-4 h-4 rounded border-gray-300 text-violet-600 focus:ring-violet-400 focus:ring-2 cursor-pointer"
+                    />
+                    <span className="text-sm text-gray-700">Dalende ROAS <span className="text-xs text-gray-400">(90D &gt; 30D &gt; 7D)</span></span>
+                  </label>
                 </div>
               </div>
 
