@@ -46,7 +46,12 @@ export async function GET(req: NextRequest) {
       currency: 'EUR',
     }));
 
-    return NextResponse.json({ products: productsEur });
+    return NextResponse.json({ products: productsEur }, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=1800',
+        'CDN-Cache-Control': 'public, s-maxage=300, stale-while-revalidate=1800',
+      },
+    });
   } catch (err: any) {
     console.error('Shopify product revenue error:', err.message);
     return NextResponse.json({ error: err.message }, { status: 500 });

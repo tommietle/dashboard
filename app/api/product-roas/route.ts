@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { AdsStoreKey, ProductPeriodMetrics, ProductRoas, SpendEntry, isAdsProductsConfigured, fetchProductSpendMap } from '@/lib/googleAdsProducts';
 import { fetchAllShopifyProducts } from '@/lib/shopifyAllProducts';
 import { fetchProductRevenueByPeriod } from '@/lib/shopifyProducts';
+import { fetchProductATCs, fetchProductCheckouts } from '@/lib/shopifyAtcs';
 import { getConnection } from '@/lib/adsConnections';
 import { getEurConverter } from '@/lib/fx';
 import { STORES, isShopifyConfigured } from '@/lib/shopify';
@@ -67,7 +68,7 @@ async function buildProductsForStore(
 
   console.log(`[product-roas] ${storeKey}: token=${!!token} adsConfigured=${isAdsProductsConfigured(storeKey)}`);
 
-  const [shopifyProducts, spendMap, revenues] = await Promise.all([
+  const [shopifyProducts, spendMap, revenues, atcMap, checkoutMap] = await Promise.all([
     fetchAllShopifyProducts(storeKey),
     token && isAdsProductsConfigured(storeKey)
       ? fetchProductSpendMap(storeKey, endDate, token, customRange, include90).catch(err => {
@@ -76,6 +77,14 @@ async function buildProductsForStore(
         })
       : Promise.resolve({} as Record<string, SpendEntry>),
     fetchProductRevenueByPeriod(storeKey, endDate, customRange, include90),
+    fetchProductATCs(storeKey, endDate, customRange, include90).catch(err => {
+      console.error(`[product-roas] ${storeKey} ATC failed:`, err.message);
+      return {} as Record<string, { d90: number; d30: number; d14: number; d7: number; custom?: number }>;
+    }),
+    fetchProductCheckouts(storeKey, endDate, customRange, include90).catch(err => {
+      console.error(`[product-roas] ${storeKey} checkout failed:`, err.message);
+      return {} as Record<string, { d90: number; d30: number; d14: number; d7: number; custom?: number }>;
+    }),
   ]);
 
   console.log(`[product-roas] ${storeKey}: shopify=${shopifyProducts.length} spendKeys=${Object.keys(spendMap).length}`);
@@ -124,10 +133,16 @@ async function buildProductsForStore(
   const products: ProductRoas[] = shopifyProducts.map(p => {
     const s = resolvedSpendMap[p.id];
     const rev = revenueById.get(p.id);
+    const atc = atcMap[p.id];
+    const chk = checkoutMap[p.id];
+
+    const withCounts = (m: ProductPeriodMetrics, a: number | undefined, c: number | undefined): ProductPeriodMetrics =>
+      (a !== undefined || c !== undefined) ? { ...m, ...(a !== undefined ? { atc: a } : {}), ...(c !== undefined ? { checkout: c } : {}) } : m;
 
     return {
       productId:    p.id,
       title:        p.title,
+      handle:       p.handle,
       currency:     shopCurrency,
       store:        storeKey,
       status:       p.status,
@@ -135,11 +150,11 @@ async function buildProductsForStore(
       imageUrl:     p.imageUrl,
       brandName:    p.brandName,
       activeDays:   p.publishedAt ? Math.floor((Date.now() - new Date(p.publishedAt).getTime()) / 86400000) : undefined,
-      d90: include90 ? buildPeriod(s?.d90 ?? ZERO, rev?.d90 ?? 0) : ZERO,
-      d30: buildPeriod(s?.d30 ?? ZERO, rev?.d30 ?? 0),
-      d14: buildPeriod(s?.d14 ?? ZERO, rev?.d14 ?? 0),
-      d7:  buildPeriod(s?.d7  ?? ZERO, rev?.d7  ?? 0),
-      ...(customRange ? { custom: buildPeriod(s?.custom ?? ZERO, rev?.custom ?? 0) } : {}),
+      d90: include90 ? withCounts(buildPeriod(s?.d90 ?? ZERO, rev?.d90 ?? 0), atc?.d90, chk?.d90) : ZERO,
+      d30: withCounts(buildPeriod(s?.d30 ?? ZERO, rev?.d30 ?? 0), atc?.d30, chk?.d30),
+      d14: withCounts(buildPeriod(s?.d14 ?? ZERO, rev?.d14 ?? 0), atc?.d14, chk?.d14),
+      d7:  withCounts(buildPeriod(s?.d7  ?? ZERO, rev?.d7  ?? 0), atc?.d7, chk?.d7),
+      ...(customRange ? { custom: withCounts(buildPeriod(s?.custom ?? ZERO, rev?.custom ?? 0), atc?.custom, chk?.custom) } : {}),
     };
   });
 
@@ -212,6 +227,8 @@ export async function GET(req: NextRequest) {
         ctr:         m.ctr,
         cpc:         r2(toEur(m.cpc, adsCur)),
         cpa:         r2(toEur(m.cpa, adsCur)),
+        atc:         m.atc, // ATC is een count, geen currency conversie nodig
+        checkout:    m.checkout,
       };
     };
 
@@ -237,7 +254,14 @@ export async function GET(req: NextRequest) {
       orphanSpendEur[r.store] = r2(toEur(r.orphanSpend, r.adsCurrency));
     }
 
-    return NextResponse.json({ products: productsEur, orphanSpend: orphanSpendEur });
+    return NextResponse.json({ products: productsEur, orphanSpend: orphanSpendEur }, {
+      headers: {
+        // Vercel edge cache: 5 min fresh, 30 min stale-while-revalidate.
+        // Na eerste cold-start serveert edge instant; achtergrondrefresh houdt data actueel.
+        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=1800',
+        'CDN-Cache-Control': 'public, s-maxage=300, stale-while-revalidate=1800',
+      },
+    });
   } catch (err: any) {
     console.error('Product ROAS error:', err);
     return NextResponse.json({ error: err.message }, { status: 500 });
