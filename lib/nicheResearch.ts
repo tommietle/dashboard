@@ -99,28 +99,131 @@ async function getAccessToken(refreshToken: string): Promise<string> {
   return token;
 }
 
-async function getCredentials(): Promise<{ customerId: string; refreshToken: string }> {
-  const storeKeys = ['luvande', 'cecole', 'luhvia'];
+const MCC_ID = (process.env.GOOGLE_ADS_MCC_ID || '').replace(/-/g, '');
+
+// Welke customer id we gebruiken voor de Keyword Planner + of er een
+// login-customer-id (MCC) header bij moet. Google geeft 403 PERMISSION_DENIED
+// als het account alleen via het manager-account bereikbaar is en die header
+// ontbreekt, dus we proberen beide varianten en onthouden wat werkte.
+export interface AdsContext {
+  refreshToken: string;
+  candidates: string[];
+  resolved?: { customerId: string; loginCustomerId?: string };
+}
+
+let ctxCache: { ctx: AdsContext; expiresAt: number } | null = null;
+
+const uniq = (xs: (string | undefined)[]) =>
+  Array.from(new Set(xs.filter(Boolean) as string[]));
+
+async function listAccessibleCustomers(accessToken: string): Promise<string[]> {
+  try {
+    const res = await fetch(
+      'https://googleads.googleapis.com/v24/customers:listAccessibleCustomers',
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'developer-token': process.env.GOOGLE_ADS_DEVELOPER_TOKEN!,
+        },
+      },
+    );
+    if (!res.ok) return [];
+    const data = await res.json();
+    return ((data.resourceNames as string[]) || []).map(r =>
+      r.replace('customers/', '').replace(/-/g, ''),
+    );
+  } catch {
+    return [];
+  }
+}
+
+export async function getAdsContext(): Promise<{ ctx: AdsContext; accessToken: string }> {
+  if (ctxCache && ctxCache.expiresAt > Date.now()) {
+    return { ctx: ctxCache.ctx, accessToken: await getAccessToken(ctxCache.ctx.refreshToken) };
+  }
+
+  const storeKeys = ['luvande', 'cecole', 'luhvia', 'modemeister'];
+  const genericToken = process.env.GOOGLE_ADS_REFRESH_TOKEN;
   const envIds: Record<string, string | undefined> = {
-    luvande: process.env.LUVANDE_GOOGLE_ADS_CUSTOMER_ID,
-    cecole:  process.env.CECOLE_GOOGLE_ADS_CUSTOMER_ID,
-    luhvia:  process.env.LUHVIA_GOOGLE_ADS_CUSTOMER_ID,
+    luvande:     process.env.LUVANDE_GOOGLE_ADS_CUSTOMER_ID,
+    cecole:      process.env.CECOLE_GOOGLE_ADS_CUSTOMER_ID,
+    luhvia:      process.env.LUHVIA_GOOGLE_ADS_CUSTOMER_ID,
+    modemeister: process.env.MODEMEISTER_GOOGLE_ADS_CUSTOMER_ID,
   };
   const envTokens: Record<string, string | undefined> = {
-    luvande: process.env.LUVANDE_GOOGLE_ADS_REFRESH_TOKEN || process.env.GOOGLE_ADS_REFRESH_TOKEN,
-    cecole:  process.env.CECOLE_GOOGLE_ADS_REFRESH_TOKEN  || process.env.GOOGLE_ADS_REFRESH_TOKEN,
-    luhvia:  process.env.LUHVIA_GOOGLE_ADS_REFRESH_TOKEN  || process.env.GOOGLE_ADS_REFRESH_TOKEN,
+    luvande:     process.env.LUVANDE_GOOGLE_ADS_REFRESH_TOKEN,
+    cecole:      process.env.CECOLE_GOOGLE_ADS_REFRESH_TOKEN,
+    luhvia:      process.env.LUHVIA_GOOGLE_ADS_REFRESH_TOKEN,
+    modemeister: process.env.MODEMEISTER_GOOGLE_ADS_REFRESH_TOKEN,
   };
 
+  const envCustomerIds: string[] = [];
+  const tokens: string[] = [];
   for (const store of storeKeys) {
     const conn = await getConnection(store);
-    const customerId = envIds[store];
-    const refreshToken = conn?.refreshToken || envTokens[store];
-    if (customerId && refreshToken) {
-      return { customerId: customerId.replace(/-/g, ''), refreshToken };
+    const token = conn?.refreshToken || envTokens[store];
+    if (token) tokens.push(token);
+    const id = envIds[store];
+    if (id) envCustomerIds.push(id.replace(/-/g, ''));
+    for (const c of conn?.accessibleCustomers || []) envCustomerIds.push(c.replace(/-/g, ''));
+  }
+  if (genericToken) tokens.push(genericToken);
+
+  const uniqueTokens = uniq(tokens);
+  if (!uniqueTokens.length) {
+    throw new Error('Geen Google Ads account gevonden. Koppel eerst een account via Instellingen.');
+  }
+
+  // Pak de eerste token die daadwerkelijk accounts ziet; anders de eerste token
+  // met de customer ids uit de env als kandidaten.
+  let chosen: { refreshToken: string; accessToken: string; accessible: string[] } | null = null;
+  let lastErr: unknown = null;
+  for (const refreshToken of uniqueTokens) {
+    try {
+      const accessToken = await getAccessToken(refreshToken);
+      const accessible = await listAccessibleCustomers(accessToken);
+      if (accessible.length) {
+        chosen = { refreshToken, accessToken, accessible };
+        break;
+      }
+      chosen ??= { refreshToken, accessToken, accessible };
+    } catch (err) {
+      lastErr = err;
     }
   }
-  throw new Error('Geen Google Ads account gevonden. Koppel eerst een account via Instellingen.');
+  if (!chosen) throw (lastErr instanceof Error ? lastErr : new Error('Google Ads login mislukt.'));
+
+  const candidates = uniq([
+    ...envCustomerIds.filter(id => chosen!.accessible.includes(id)),
+    ...chosen.accessible,
+    ...envCustomerIds,
+    MCC_ID,
+  ]).slice(0, 6);
+
+  if (!candidates.length) {
+    throw new Error('Geen Google Ads account gevonden. Koppel eerst een account via Instellingen.');
+  }
+
+  const ctx: AdsContext = { refreshToken: chosen.refreshToken, candidates };
+  ctxCache = { ctx, expiresAt: Date.now() + 30 * 60 * 1000 };
+  return { ctx, accessToken: chosen.accessToken };
+}
+
+// Elke (customerId, login-customer-id)-combinatie die we mogen proberen.
+function attemptsFor(ctx: AdsContext): { customerId: string; loginCustomerId?: string }[] {
+  const out: { customerId: string; loginCustomerId?: string }[] = [];
+  if (ctx.resolved) out.push(ctx.resolved); // eerder gelukte combinatie eerst
+  for (const customerId of ctx.candidates) {
+    out.push({ customerId });
+    if (MCC_ID && MCC_ID !== customerId) out.push({ customerId, loginCustomerId: MCC_ID });
+  }
+  const seen = new Set<string>();
+  return out.filter(a => {
+    const key = `${a.customerId}|${a.loginCustomerId ?? ''}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
 
 export interface MonthlyVolume {
@@ -350,7 +453,7 @@ async function scrapeShoppingMerchants(keyword: string, countryCode: string): Pr
 }> {
   const empty = { merchants: [], count: null, countIsExact: false };
   const mkt = BING_MARKET[countryCode.toUpperCase()] ?? 'en-US';
-  const url = `https://www.bing.com/shop?q=${encodeURIComponent(keyword)}&mkt=${mkt}&count=30`;
+  const url = `https://www.bing.com/shop?q=${encodeURIComponent(keyword)}&mkt=${mkt}&count=48`;
   try {
     const res = await fetch(url, { headers: BING_HEADERS, signal: AbortSignal.timeout(12000) });
     if (!res.ok) return { ...empty, debug: `bing_http_${res.status}` };
@@ -358,38 +461,34 @@ async function scrapeShoppingMerchants(keyword: string, countryCode: string): Pr
 
     const seen = new Set<string>();
     const merchants: MerchantInfo[] = [];
-    const pat = /class="[^"]*(?:seller|store|merchant|shop)[^"]*"[^>]*>([^<]{2,60})</gi;
+
+    // Primary: extract unique merchant domains from Bing aclick redirect URLs
+    const aclickPat = /href="(https:\/\/www\.bing\.com\/aclk[^"]+)"/gi;
     let m: RegExpExecArray | null;
-    while ((m = pat.exec(html)) !== null) {
-      const name = m[1].trim();
-      if (!name || seen.has(name) || MERCHANT_NOISE.test(name)) continue;
-      seen.add(name);
-      // Try to find the destination store URL from nearest preceding href
-      let link: string | undefined;
-      const before = html.slice(Math.max(0, m.index - 3000), m.index);
-      const hrefMatches = [...before.matchAll(/href="([^"]+)"/gi)];
-      for (let i = hrefMatches.length - 1; i >= 0; i--) {
-        const href = hrefMatches[i][1];
-        // Bing aclick redirect — extract url= param
-        const urlParam = href.match(/[?&]url=([^&"]+)/i);
-        if (urlParam) {
-          try {
-            const dest = new URL(decodeURIComponent(urlParam[1]));
-            link = dest.origin;
-            break;
-          } catch {}
-        }
-        // Direct store href (not bing.com internal)
-        if (href.startsWith('https://') && !href.includes('bing.com') && !href.includes('microsoft.com')) {
-          try {
-            const dest = new URL(href);
-            link = dest.origin;
-            break;
-          } catch {}
-        }
+    while ((m = aclickPat.exec(html)) !== null && merchants.length < 48) {
+      const urlParam = m[1].match(/[?&]url=([^&"]+)/i);
+      if (!urlParam) continue;
+      try {
+        const dest = new URL(decodeURIComponent(urlParam[1]));
+        const domain = dest.hostname.replace(/^www\./, '');
+        if (!domain || seen.has(domain) || /bing\.com|microsoft\.com/i.test(domain)) continue;
+        seen.add(domain);
+        merchants.push({ name: domain, isDirect: !isBigRetailer(domain), link: dest.origin });
+      } catch {}
+    }
+
+    // Fallback: any non-Bing https link in the page (catches shops not using aclick)
+    if (merchants.length < 5) {
+      const hrefPat = /href="(https:\/\/(?!(?:www\.)?bing\.com|(?:www\.)?microsoft\.com)[^"]+)"/gi;
+      while ((m = hrefPat.exec(html)) !== null && merchants.length < 48) {
+        try {
+          const dest = new URL(m[1]);
+          const domain = dest.hostname.replace(/^www\./, '');
+          if (!domain || seen.has(domain)) continue;
+          seen.add(domain);
+          merchants.push({ name: domain, isDirect: !isBigRetailer(domain), link: dest.origin });
+        } catch {}
       }
-      merchants.push({ name, isDirect: !isBigRetailer(name), link });
-      if (merchants.length >= 30) break;
     }
 
     return {
@@ -401,6 +500,52 @@ async function scrapeShoppingMerchants(keyword: string, countryCode: string): Pr
   } catch (e: any) {
     return { ...empty, debug: `bing_fout: ${String(e?.message ?? e).slice(0, 80)}` };
   }
+}
+
+// SerpAPI — Google Shopping (accurate merchant count, requires SERPAPI_KEY)
+async function fetchSerpApiShoppingMerchants(keyword: string, countryCode: string): Promise<{
+  merchants: MerchantInfo[];
+  count: number | null;
+  debug?: string;
+}> {
+  // countryCode is already an ISO 3166-1 alpha-2 code (NL, DE, GB, etc.)
+  // Google's gl parameter uses the same codes in lowercase — no separate mapping needed
+  const gl = countryCode.toLowerCase();
+  const hl = COUNTRY_LANG[countryCode.toUpperCase()] ?? 'en';
+
+  // Try each configured provider in order until one returns results
+  const providers: { url: string; label: string }[] = [];
+  if (process.env.VALUESERP_KEY) {
+    const params = new URLSearchParams({ api_key: process.env.VALUESERP_KEY, q: keyword, search_type: 'shopping', gl, hl, num: '100' });
+    providers.push({ url: `https://api.valueserp.com/search?${params}`, label: 'valueserp' });
+  }
+  if (process.env.SERPAPI_KEY) {
+    const params = new URLSearchParams({ api_key: process.env.SERPAPI_KEY, engine: 'google_shopping', q: keyword, gl, hl, num: '100' });
+    providers.push({ url: `https://serpapi.com/search?${params}`, label: 'serpapi' });
+  }
+  if (!providers.length) return { merchants: [], count: null, debug: 'no_search_api_key' };
+
+  for (const provider of providers) {
+    try {
+      const res = await fetch(provider.url, { signal: AbortSignal.timeout(15000) });
+      if (!res.ok) continue;
+      const data = await res.json();
+      if (data.error) continue;
+
+      const results: any[] = data.shopping_results ?? [];
+      const seen = new Set<string>();
+      const merchants: MerchantInfo[] = [];
+      for (const item of results) {
+        const source = (item.source || '').trim();
+        if (!source || seen.has(source.toLowerCase())) continue;
+        seen.add(source.toLowerCase());
+        merchants.push({ name: source, isDirect: !isBigRetailer(source), link: item.link });
+      }
+      if (merchants.length > 0) return { merchants, count: merchants.length };
+    } catch {}
+  }
+
+  return { merchants: [], count: null, debug: 'all_providers_failed' };
 }
 
 // Yahoo Search subdomain by country (works from server-side / datacenter IPs)
@@ -557,7 +702,7 @@ async function fetchGoogleShoppingMerchants(keyword: string, geoId: string, lang
         se_domain: DATAFORSEO_SE_DOMAIN[geoId] ?? 'google.com',
         device: 'desktop',
         os: 'windows',
-        depth: 100,
+        depth: 700,
       }]),
       signal: AbortSignal.timeout(30000),
     });
@@ -650,7 +795,13 @@ export async function fetchExactShoppingAdsCount(keyword: string, countryCode: s
     }
   }
 
-  // Fallback: Bing Shopping scraping
+  // Fallback: SerpAPI (Google Shopping, accurate)
+  const serpApi = await fetchSerpApiShoppingMerchants(keyword, countryCode);
+  if (serpApi.count !== null) {
+    return { count: serpApi.count, countIsExact: true, uniqueAdvertisers: serpApi.count, merchants: serpApi.merchants.slice(0, 10), debug: serpApi.debug };
+  }
+
+  // Last resort: Bing Shopping scraping
   const lang = COUNTRY_LANG[countryCode.toUpperCase()] ?? 'en';
   const buyTerm = (BUY_TERMS[lang] ?? BUY_TERMS.en)[0];
   const variant = `${keyword} ${buyTerm}`;
@@ -696,7 +847,16 @@ export async function fetchMultiKeywordShoppingAds(keywords: string[], countryCo
     }
   }
 
-  // Fallback: Bing scraping
+  // Fallback: ValueSERP / SerpAPI (Google Shopping, accurate)
+  // Scan only the first (highest-volume) keyword to conserve API credits
+  if (process.env.VALUESERP_KEY || process.env.SERPAPI_KEY) {
+    const r = await fetchSerpApiShoppingMerchants(keywords[0], countryCode);
+    if (r.count !== null) {
+      return { count: r.count, countIsExact: true, uniqueAdvertisers: r.count, merchants: r.merchants.slice(0, 10), debug: r.debug };
+    }
+  }
+
+  // Last resort: Bing scraping
   const results = await Promise.all(keywords.map(kw => scrapeShoppingMerchants(kw, countryCode)));
   const seen = new Set<string>();
   const merged: MerchantInfo[] = [];
@@ -756,7 +916,7 @@ async function fetchKeywordIdeas(
   niche: string,
   geoId: string,
   languageId: string,
-  customerId: string,
+  ctx: AdsContext,
   accessToken: string,
   preTranslated?: string, // skip translation when pre-computed (global scan)
 ): Promise<KeywordIdea[]> {
@@ -780,29 +940,53 @@ async function fetchKeywordIdeas(
     `${localKeyword} ${buyTerms[1]}`,
   ].filter(Boolean) as string[])).slice(0, 5);
 
-  const res = await fetch(
-    `https://googleads.googleapis.com/v24/customers/${customerId}:generateKeywordIdeas`,
-    {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'developer-token': process.env.GOOGLE_ADS_DEVELOPER_TOKEN!,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        keywordSeed: { keywords: seedKeywords },
-        language: `languageConstants/${languageId}`,
-        geoTargetConstants: [`geoTargetConstants/${geoId}`],
-        includeAdultKeywords: false,
-        keywordPlanNetwork: 'GOOGLE_SEARCH',
-        pageSize: 30,
-      }),
-    },
-  );
+  const body = JSON.stringify({
+    keywordSeed: { keywords: seedKeywords },
+    language: `languageConstants/${languageId}`,
+    geoTargetConstants: [`geoTargetConstants/${geoId}`],
+    includeAdultKeywords: false,
+    keywordPlanNetwork: 'GOOGLE_SEARCH',
+    pageSize: 30,
+  });
 
-  if (!res.ok) {
-    const errText = await res.text();
-    throw new Error(`Google Ads API ${res.status}: ${errText}`);
+  let res: Response | null = null;
+  let lastError = '';
+  for (const attempt of attemptsFor(ctx)) {
+    const headers: Record<string, string> = {
+      Authorization: `Bearer ${accessToken}`,
+      'developer-token': process.env.GOOGLE_ADS_DEVELOPER_TOKEN!,
+      'Content-Type': 'application/json',
+    };
+    if (attempt.loginCustomerId) headers['login-customer-id'] = attempt.loginCustomerId;
+
+    const r = await fetch(
+      `https://googleads.googleapis.com/v24/customers/${attempt.customerId}:generateKeywordIdeas`,
+      { method: 'POST', headers, body },
+    );
+
+    if (r.ok) {
+      ctx.resolved = attempt; // onthoud de werkende combinatie voor volgende calls
+      res = r;
+      break;
+    }
+
+    const errText = await r.text();
+    lastError = `Google Ads API ${r.status}: ${errText}`;
+    // Alleen doorschuiven bij een toegangsprobleem; andere fouten meteen melden.
+    const isPermission = r.status === 403 || r.status === 401 ||
+      errText.includes('USER_PERMISSION_DENIED') || errText.includes('CUSTOMER_NOT_FOUND');
+    if (!isPermission) throw new Error(lastError);
+  }
+
+  if (!res) {
+    const tried = attemptsFor(ctx)
+      .map(a => `${a.customerId}${a.loginCustomerId ? ` (via MCC ${a.loginCustomerId})` : ''}`)
+      .join(', ');
+    throw new Error(
+      `Google Ads gaf geen toegang tot een account. Geprobeerd: ${tried}. ` +
+      `Koppel het juiste account opnieuw via Instellingen, of zet GOOGLE_ADS_MCC_ID. ` +
+      `Laatste fout: ${lastError}`,
+    );
   }
 
   const data = await res.json();
@@ -841,28 +1025,29 @@ export async function researchNiche(
   geoId: string,
   languageId: string,
 ): Promise<NicheResearchResult> {
-  const { customerId, refreshToken } = await getCredentials();
-  const accessToken = await getAccessToken(refreshToken);
+  const { ctx, accessToken } = await getAdsContext();
   const geoLabel = GEO_OPTIONS.find(g => g.geoId === geoId && g.languageId === languageId)?.label ?? geoId;
 
-  const keywords = await fetchKeywordIdeas(niche, geoId, languageId, customerId, accessToken);
+  const keywords = await fetchKeywordIdeas(niche, geoId, languageId, ctx, accessToken);
   return { niche, geo: geoLabel, keywords, summary: summarize(keywords, estimateShoppingAdvertisers(keywords)) };
 }
 
 const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 
 async function fetchKeywordIdeasWithRetry(
-  niche: string, geoId: string, languageId: string, customerId: string, accessToken: string,
+  niche: string, geoId: string, languageId: string, ctx: AdsContext, accessToken: string,
   preTranslated?: string,
 ): Promise<KeywordIdea[]> {
   for (let attempt = 0; attempt < 3; attempt++) {
     try {
-      return await fetchKeywordIdeas(niche, geoId, languageId, customerId, accessToken, preTranslated);
+      return await fetchKeywordIdeas(niche, geoId, languageId, ctx, accessToken, preTranslated);
     } catch (err: any) {
       if (err.message?.includes('429') && attempt < 2) {
         await sleep(3000);
         continue;
       }
+      // Toegangsfouten gelden voor alle landen: doorgeven i.p.v. 20x leeg teruggeven.
+      if (err.message?.includes('403') || err.message?.includes('401')) throw err;
       return [];
     }
   }
@@ -870,8 +1055,7 @@ async function fetchKeywordIdeasWithRetry(
 }
 
 export async function researchNicheGlobal(niche: string): Promise<GlobalNicheResult> {
-  const { customerId, refreshToken } = await getCredentials();
-  const accessToken = await getAccessToken(refreshToken);
+  const { ctx, accessToken } = await getAdsContext();
 
   // Pre-translate directly to each unique language (sl=auto detects input language)
   // Sequential to avoid rate-limiting Google Translate with 11 simultaneous calls
@@ -888,7 +1072,7 @@ export async function researchNicheGlobal(niche: string): Promise<GlobalNicheRes
     const batch = GEO_OPTIONS.slice(i, i + 7);
     const batchResults = await Promise.all(batch.map(async (geo) => {
       const preTranslated = langMap.get(geo.languageId) ?? niche;
-      const keywords = await fetchKeywordIdeasWithRetry(niche, geo.geoId, geo.languageId, customerId, accessToken, preTranslated);
+      const keywords = await fetchKeywordIdeasWithRetry(niche, geo.geoId, geo.languageId, ctx, accessToken, preTranslated);
       const summary = summarize(keywords, estimateShoppingAdvertisers(keywords));
       const top = keywords[0];
       const topKeywords = keywords.slice(0, 5).map(k => k.keyword).filter(Boolean);
